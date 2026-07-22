@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-22T08:30:00Z",
+  "title": "Design System: Levvro",
+  "extensions": {
+    "colorMeta": {
+      "teal-primary": {
+        "role": "primary",
+        "displayName": "Deep Peacock Teal",
+        "canonical": "oklch(0.478 0.085 196)",
+        "tonalRamp": ["oklch(0.258 0.04 202)", "oklch(0.405 0.068 198)", "oklch(0.478 0.085 196)", "oklch(0.56 0.1 195)", "oklch(0.668 0.11 194)", "oklch(0.768 0.106 193)", "oklch(0.856 0.082 193)", "oklch(0.957 0.025 194)"]
+      },
+      "gold-accent": {
+        "role": "secondary",
+        "displayName": "Achievement Gold",
+        "canonical": "oklch(0.775 0.15 80)",
+        "tonalRamp": ["oklch(0.302 0.056 64)", "oklch(0.502 0.098 68)", "oklch(0.602 0.12 72)", "oklch(0.705 0.142 76)", "oklch(0.775 0.15 80)", "oklch(0.822 0.142 82)", "oklch(0.872 0.12 85)", "oklch(0.958 0.045 90)"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Zinc Ink",
+        "canonical": "oklch(0.145 0 0)",
+        "tonalRamp": ["#09090b", "#18181b", "#27272a", "#52525b", "#a1a1aa", "#d4d4d8", "#e4e4e7", "#fafafa"]
+      },
+      "surface-light": {
+        "role": "neutral",
+        "displayName": "Teal-Whisper White",
+        "canonical": "oklch(0.985 0.006 200)",
+        "tonalRamp": ["#0e181a", "#131d20", "#1c2a2d", "#37484b", "#7c9296", "#c3d3d5", "#e6eeef", "#f6fbfc"]
+      },
+      "surface-dark": {
+        "role": "neutral",
+        "displayName": "Teal-Ink Near-Black",
+        "canonical": "oklch(0.175 0.016 210)",
+        "tonalRamp": ["#050c0d", "#081214", "#0e181a", "#131d20", "#1c2a2d", "#37484b", "#7c9296", "#c3d3d5"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Marketing hero headline only." },
+      "headline": { "displayName": "Headline", "purpose": "Section headings; text-wrap: balance." },
+      "title": { "displayName": "Title", "purpose": "Card and panel titles." },
+      "body": { "displayName": "Body", "purpose": "Running copy; cap prose at 65-75ch." },
+      "label": { "displayName": "Label", "purpose": "UI labels, buttons, table headers." },
+      "mono": { "displayName": "Mono", "purpose": "Career Score, metrics, tabular figures." }
+    },
+    "shadows": [
+      { "name": "xs", "value": "0 1px 2px 0 rgb(9 9 11 / 0.04)", "purpose": "Resting inputs and outline buttons." },
+      { "name": "sm", "value": "0 1px 3px 0 rgb(9 9 11 / 0.06), 0 1px 2px -1px rgb(9 9 11 / 0.06)", "purpose": "Primary button, small cards." },
+      { "name": "md", "value": "0 4px 12px -2px rgb(9 9 11 / 0.08), 0 2px 6px -2px rgb(9 9 11 / 0.05)", "purpose": "Hovered cards, popovers." },
+      { "name": "lg", "value": "0 12px 32px -8px rgb(9 9 11 / 0.12), 0 4px 12px -4px rgb(9 9 11 / 0.08)", "purpose": "Dialogs, floating panels." },
+      { "name": "brand-glow", "value": "0 8px 32px -8px rgb(0 134 135 / 0.45)", "purpose": "Gradient CTA and primary-button hover only." }
+    ],
+    "motion": [
+      { "name": "standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Default state transitions (150-250ms)." },
+      { "name": "emphasized", "value": "cubic-bezier(0.2, 0, 0, 1)", "purpose": "Larger reveals; the Career Score ring fill." },
+      { "name": "decelerate", "value": "cubic-bezier(0, 0, 0.2, 1)", "purpose": "Entrances that settle in." },
+      { "name": "spring", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Lively ease-out settle — no overshoot/bounce." }
+    ],
+    "breakpoints": [
+      { "name": "xs", "value": "480px" },
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1536px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The default action: deep teal fill with a crafted inner top highlight, soft shadow, and a brightness lift on hover.",
+      "html": "<button class='ds-btn-primary'>Start Your Career Journey <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12h14'/><path d='m12 5 7 7-7 7'/></svg></button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;height:2.25rem;padding:0 .875rem;border:none;border-radius:.75rem;background:#006b6d;color:#fff;font:500 .875rem/1 Geist,system-ui,sans-serif;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15),0 1px 3px rgba(9,9,11,.12);cursor:pointer;transition:filter .15s,transform .1s}.ds-btn-primary:hover{filter:brightness(1.1)}.ds-btn-primary:active{transform:translateY(1px);filter:brightness(.95)}.ds-btn-primary:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(0,134,135,.5)}"
+    },
+    {
+      "name": "Gradient Button",
+      "kind": "button",
+      "refersTo": "button-gradient",
+      "description": "The committed brand CTA: the teal-aqua-gold gradient with a stronger inset highlight and a brand glow on hover.",
+      "html": "<button class='ds-btn-gradient'>Continue AI Coach</button>",
+      "css": ".ds-btn-gradient{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;height:2.25rem;padding:0 .875rem;border:none;border-radius:.75rem;background:linear-gradient(120deg,#008687,#52c9c6,#e7a929);color:#fff;font:500 .875rem/1 Geist,system-ui,sans-serif;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),0 1px 3px rgba(9,9,11,.12);cursor:pointer;transition:filter .15s,box-shadow .2s,transform .1s}.ds-btn-gradient:hover{filter:brightness(1.05);box-shadow:0 8px 32px -8px rgba(0,134,135,.45)}.ds-btn-gradient:active{transform:translateY(1px)}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Low-chrome secondary action on the surface, with a hairline border and a subtle hover fill.",
+      "html": "<button class='ds-btn-outline'>See how it works</button>",
+      "css": ".ds-btn-outline{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;height:2.25rem;padding:0 .875rem;border:1px solid #e4e4e7;border-radius:.75rem;background:#fff;color:#09090b;font:500 .875rem/1 Geist,system-ui,sans-serif;box-shadow:0 1px 2px rgba(9,9,11,.04);cursor:pointer;transition:background .15s}.ds-btn-outline:hover{background:#f4f4f5}.ds-btn-outline:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(0,134,135,.5)}"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Text field: hairline border, teal focus ring, muted placeholder that still clears contrast.",
+      "html": "<input class='ds-input' placeholder='Search roles…' />",
+      "css": ".ds-input{width:16rem;max-width:100%;height:2.25rem;padding:0 .75rem;border:1px solid #e4e4e7;border-radius:.625rem;background:#fff;color:#09090b;font:400 .875rem/1 Geist,system-ui,sans-serif;transition:border-color .15s,box-shadow .15s}.ds-input::placeholder{color:#52525b}.ds-input:focus{outline:none;border-color:#008687;box-shadow:0 0 0 3px rgba(0,134,135,.25)}"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Content surface one level off the page: a hairline ring plus a soft shadow, never a heavy border. Never nest cards.",
+      "html": "<div class='ds-card'><div class='ds-card-title'>Career Readiness Score</div><div class='ds-card-body'>Your recruiter-readiness — with the reasoning behind every point.</div></div>",
+      "css": ".ds-card{background:#fff;border-radius:1rem;padding:1.5rem;box-shadow:0 0 0 1px rgba(9,9,11,.1),0 1px 3px rgba(9,9,11,.06);color:#09090b;font-family:Geist,system-ui,sans-serif}.ds-card-title{font-weight:600;font-size:1.25rem;line-height:1.35}.ds-card-body{margin-top:.25rem;font-size:.875rem;color:#52525b}"
+    },
+    {
+      "name": "Nav Item (active)",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Sidebar destination in its active state: muted surface, teal left indicator, and a teal filled icon.",
+      "html": "<a class='ds-nav-item' href='#'><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='7' height='7' rx='1'/><rect x='14' y='3' width='7' height='7' rx='1'/><rect x='14' y='14' width='7' height='7' rx='1'/><rect x='3' y='14' width='7' height='7' rx='1'/></svg>Dashboard</a>",
+      "css": ".ds-nav-item{position:relative;display:inline-flex;align-items:center;gap:.75rem;padding:.5rem .75rem;border-radius:.75rem;background:#f4f4f5;color:#18181b;font:500 .875rem/1 Geist,system-ui,sans-serif;text-decoration:none}.ds-nav-item::before{content:'';position:absolute;left:0;top:50%;height:1.25rem;width:3px;transform:translateY(-50%);border-radius:0 9999px 9999px 0;background:#006b6d}.ds-nav-item svg{color:#006b6d}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Golden-Hour Mentor",
+    "overview": "Levvro should feel like sitting across from a sharp, warm mentor in a calm, well-lit room — one who tells an anxious job-seeker exactly where they stand and lights the path forward. Two colours do two jobs: deep peacock teal for calm competence and trust, and warm achievement gold for momentum and 'your moment'. The register is premium, calm, and confident — editorial craft over decoration, in the Linear/Notion lineage. Identity lives in colour, type, and motion, never in gimmicks. Every palette value passes a WCAG-AA contrast gate at build time.",
+    "keyCharacteristics": [
+      "Two-colour identity: teal (trust/competence) + gold (achievement/momentum).",
+      "Dark = teal-ink near-black, not pure black; light = near-white with a teal whisper, never a warm cream.",
+      "One typeface (Geist) carried by weight and size contrast, not a pairing.",
+      "No screen is ever flat — a living gradient backdrop on every surface.",
+      "Depth from soft shadows + hairline rings, not heavy borders."
+    ],
+    "rules": [
+      { "name": "The No-Purple Rule", "body": "Indigo, violet, and fuchsia are forbidden — that gradient is the generic-AI-SaaS tell. Teal is the identity.", "section": "colors" },
+      { "name": "The Gold-Is-Earned Rule", "body": "Gold appears only on achievement and brand moments (the gradient, streaks, score highlights). Never a button fill, a border, or default chrome.", "section": "colors" },
+      { "name": "The Warming-Score Rule", "body": "The Career Readiness ring is stroked with the brand gradient (teal to gold), so it reads as progress and warmth — never judging an anxious user with red.", "section": "colors" },
+      { "name": "The One-Family Rule", "body": "Geist carries everything. Do not introduce a second sans; if the hero needs more voice, swap the heading slot for a true contrast face.", "section": "typography" },
+      { "name": "The Hairline Rule", "body": "Cards use a 1px translucent ring, never a heavy border. Depth is a soft shadow plus that hairline.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do carry the identity in teal + gold, with one Geist family across the UI.",
+      "Do keep muted text at >=4.5:1 — bump toward ink before dropping to gray.",
+      "Do use gold only for achievement and brand moments (the Gold-Is-Earned Rule).",
+      "Do stroke the Career Score with the brand gradient so progress reads warm, not judgemental.",
+      "Do give every surface a living backdrop; never ship a flat block of colour.",
+      "Do give buttons real depth: inset-ring highlight + soft shadow + brightness hover; default height 36px.",
+      "Do honor prefers-reduced-motion on every animation."
+    ],
+    "donts": [
+      "Don't use indigo/violet/fuchsia or a purple gradient — the generic AI-SaaS tell.",
+      "Don't ship gradient-filled text (background-clip: text); emphasize with weight or a solid teal.",
+      "Don't look like a cold enterprise / HR portal — stiff, gray, joyless.",
+      "Don't look like an over-gamified job app — badge-spam, confetti, cartoon mascots.",
+      "Don't look like a crypto/neon-dark hype page — glow-on-black distrust.",
+      "Don't look like a cheap resume-builder — busy, ad-heavy, template-picker.",
+      "Don't use decorative glassmorphism, side-stripe borders, nested cards, or a tiny uppercase tracked eyebrow above every section.",
+      "Don't use bounce/elastic easing; ease out with exponential curves only."
+    ]
+  }
+}

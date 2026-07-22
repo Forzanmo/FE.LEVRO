@@ -1,0 +1,288 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+/* Design tokens (single source of truth — generated from lib/design/tokens.ts) */
+@import '../styles/tokens.generated.css';
+@import '../styles/theme.generated.css';
+
+/* Dark mode is class-based (`.dark` on <html>), driven by next-themes. */
+@custom-variant dark (&:is(.dark *));
+
+/* -------------------------------------------------------------------------- */
+/* Base layer                                                                 */
+/* -------------------------------------------------------------------------- */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+    /* Paint the themed background on <html> too: next-themes sets `.dark`
+       pre-paint, so the correct surface shows from the first frame even before
+       Mantine's provider hydrates and touches <body>. */
+    background-color: var(--background);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+    /* Prevent iOS text auto-inflation. */
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply text-foreground font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading tracking-tight text-balance;
+  }
+
+  /* Component-owned focus rings win; this is the fallback for plain elements. */
+  :where(a, [role='button'], [tabindex]:not([tabindex='-1'])):focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background rounded-xs;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--brand) 22%, transparent);
+  }
+
+  /* Premium thin scrollbars. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: var(--radius-full);
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+    background-clip: content-box;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Body background — design-token owned                                       */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * The base surface color is owned by <html> (set in the base layer above, and
+ * flash-proof because next-themes sets `.dark` pre-paint). The body is forced
+ * transparent so that:
+ *   1. fixed decorative backdrops (the brand-surface AuroraBackdrop) show
+ *      through — an opaque body would paint over a `-z-10` layer; and
+ *   2. Mantine's reset (`body { background: var(--mantine-color-body) }`, which
+ *      only resolves after its provider hydrates) can't repaint the body and
+ *      cause the reload "flash" — this `!important` transparent always wins, and
+ *      <html>'s color shows through unchanged.
+ */
+body {
+  background-color: transparent !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Brand utilities                                                            */
+/* -------------------------------------------------------------------------- */
+
+@utility bg-gradient-brand {
+  background-image: linear-gradient(
+    120deg,
+    var(--gradient-from),
+    var(--gradient-via),
+    var(--gradient-to)
+  );
+}
+
+/* Deep-teal brand gradient for surfaces that carry WHITE text or icons. The
+   teal→gold `bg-gradient-brand` fails WCAG contrast on its light aqua/gold half,
+   so glyph-bearing surfaces (buttons, CTA bands, icon chips) use this dark,
+   white-safe ramp. Gold stays decorative — the score ring, aurora, and logo. */
+@utility bg-gradient-brand-deep {
+  background-image: linear-gradient(135deg, var(--brand-700), var(--brand-900));
+}
+
+/* Token-driven transitions so motion stays consistent across the app. */
+@utility transition-emphasized {
+  transition-timing-function: var(--ease-emphasized);
+  transition-duration: var(--duration-base);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Dynamic brand motion — aurora drift, entrance rise, CTA sheen              */
+/* -------------------------------------------------------------------------- */
+
+@keyframes aurora-drift-a {
+  0%,
+  100% {
+    transform: translate3d(-3%, -2%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(7%, 5%, 0) scale(1.18);
+  }
+}
+@keyframes aurora-drift-b {
+  0%,
+  100% {
+    transform: translate3d(4%, 3%, 0) scale(1.12);
+  }
+  50% {
+    transform: translate3d(-6%, -5%, 0) scale(0.9);
+  }
+}
+@keyframes aurora-drift-c {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.05);
+  }
+  50% {
+    transform: translate3d(5%, -7%, 0) scale(1.24);
+  }
+}
+@keyframes brand-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/*
+ * Transform-only entrance for the hero. Opacity stays 1 the whole time, so the
+ * content is legible even if the animation never ticks (a background tab, a
+ * headless renderer, or a frame stolen by WebGL init) — it just slides up.
+ */
+@keyframes hero-rise {
+  from {
+    transform: translateY(18px);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes brand-sheen {
+  0% {
+    transform: translateX(-130%) skewX(-14deg);
+  }
+  55%,
+  100% {
+    transform: translateX(240%) skewX(-14deg);
+  }
+}
+
+/*
+ * Entrance rise for above-the-fold content. It ends fully visible, so it is
+ * safe even if JS never runs, and the reduced-motion block below collapses it
+ * to an instant reveal. Stagger with an inline `animation-delay`.
+ */
+@utility animate-rise {
+  animation: brand-rise 0.7s var(--ease-decelerate) both;
+}
+
+/* Moving highlight that sweeps across committed brand surfaces (the CTA band). */
+@utility brand-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    color-mix(in oklab, white 28%, transparent) 50%,
+    transparent 70%
+  );
+  animation: brand-sheen 6s var(--ease-standard) 1.5s infinite;
+}
+
+/*
+ * Roadmap "living map" — ambient energy flowing along the active frontier: the
+ * connector edges that lead into the next available quest. Purely decorative,
+ * so the global reduced-motion block below freezes it to a static dotted line.
+ */
+@keyframes quest-flow {
+  to {
+    stroke-dashoffset: -17;
+  }
+}
+.quest-flow {
+  stroke-dasharray: 3 14;
+  animation: quest-flow 0.9s linear infinite;
+}
+
+/*
+ * Staggered entrance for a block of hero children (above the fold). Each direct
+ * child rises in sequence. Pure CSS, so it runs without JS and ends visible;
+ * the reduced-motion block collapses it to an instant reveal.
+ */
+.hero-stagger > * {
+  animation: hero-rise 0.7s var(--ease-decelerate) both;
+}
+.hero-stagger > :nth-child(2) {
+  animation-delay: 0.07s;
+}
+.hero-stagger > :nth-child(3) {
+  animation-delay: 0.14s;
+}
+.hero-stagger > :nth-child(4) {
+  animation-delay: 0.21s;
+}
+.hero-stagger > :nth-child(5) {
+  animation-delay: 0.28s;
+}
+.hero-stagger > :nth-child(6) {
+  animation-delay: 0.35s;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Accessibility — honor the OS "reduce motion" preference globally.          */
+/* -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Print — export only the resume sheet (Resume → Download PDF).              */
+/* -------------------------------------------------------------------------- */
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  .print-sheet,
+  .print-sheet * {
+    visibility: visible !important;
+  }
+  .print-sheet {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    max-width: none;
+    box-shadow: none !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+  }
+}
