@@ -380,6 +380,35 @@ exception covers a link inside a sentence, not a list of them — the marketing
 footer's 18px-tall link rows were a real failure, and now carry `min-h-6` on the
 link box itself.
 
+### A first visit is signed out
+The app used to seed an authenticated, onboarded user on first paint so it was
+reviewable without a login wall. The cost of that convenience was the entire top
+of the funnel: `/sign-in` and `/onboarding` both redirected to `/dashboard`,
+every marketing CTA landed on a populated dashboard, and no visitor could create
+an account — the product shipped with no way to acquire a user. It also greeted
+strangers by the name of someone who is not them.
+
+Browsing without signing in still exists, behind `NEXT_PUBLIC_DEMO_MODE=1`. A
+review convenience must never be the thing a real visitor gets.
+
+This is load-bearing for the verification gates too: they need an explicit
+`no-assessment` state (signed in, onboarded, assessment never taken) to reach
+the pre-assessment designs. Without it those four routes redirect to sign-in and
+both gates report green while measuring the sign-in page over and over.
+
+### Disabled is a muted surface, not a faded copy
+`disabled:opacity-50` on a filled button is white text over 50% brand teal:
+measured 2.25:1. Disabled controls are exempt from WCAG 1.4.3, so this passes
+every automated gate including this project's own — and it was the coach's
+primary "Continue", on the screen where an anxious first-timer is least sure
+they are doing it right, unable to read the word blocking them.
+
+Disabled now resolves to `bg-muted` + `text-muted-foreground` (7.03:1) uniformly
+across every variant, so disabled looks the same everywhere. And a disabled
+control must be paired with text saying what is required — "Pick one to
+continue" — because the disabled state communicates "not yet" but never "why
+not".
+
 ### The assessment gate
 **Nothing downstream of the assessment renders before the assessment exists**,
 and the check lives in the service, not the call site. `documents-service`,
@@ -392,6 +421,12 @@ twice and was forgotten five times, and the failure mode is the worst thing this
 product can do: an achievements screen congratulating a brand-new visitor for
 "Completed your career assessment" is the exact inverse of *evidence over
 assertion*. A gate that any new screen can forget to call is not a gate.
+
+`cover-letter-service` was the fifth service and the one that forgot: without an
+assessment it still produced a complete, confident, downloadable letter signed
+with the user's name — the one artifact a candidate emails to a recruiter,
+invented. `generate()` now fails closed, so a call site that forgets gets
+nothing rather than a fabrication.
 
 `journeyStorage` reads localStorage, so it answers "no" on the server. Anything
 consulting it during render must go through `useHasAssessment()`

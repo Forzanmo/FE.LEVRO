@@ -6,9 +6,9 @@ How to prove this frontend is sound, and what was true at the last full run.
 
 ```bash
 npm run typecheck                        # tsc --noEmit
-npx eslint src scripts --max-warnings 0  # zero warnings is the bar
+npm run lint -- --max-warnings 0         # whole project; zero warnings is the bar
 node scripts/build-tokens.mts            # token contrast gate (42 pairs x 2 themes)
-npm run build                            # production build, 15 routes
+npm run build                            # production build, 14 routes
 
 npm run dev                              # then, against the dev server:
 npm run check:contrast                   # rendered-pixel WCAG AA, all routes x themes x viewports
@@ -42,14 +42,19 @@ The token gate passed while the hero subhead measured **1.01:1** on screen.
 ## State matters as much as the route
 
 `scripts/lib/app-state.mjs` holds one route list, shared by both browser gates, and
-each route declares the app state it must be measured in (`new`, `onboarded`,
-`needs-onboarding`, `signedout`). This exists because of two real misses:
+each route declares the app state it must be measured in (`new`, `no-assessment`,
+`onboarded`, `needs-onboarding`, `signedout`). This exists because of three real
+misses:
 
 - The dashboard first passed with **11 text runs** — that was the pre-assessment
   empty state. The skills card, documents list, and activity feed were never
   measured. Seeded correctly it reports **52**.
-- `/sign-in` and `/onboarding` both **redirected to /dashboard** (the demo session
-  auto-authenticates), so the gate measured the wrong page twice and reported green.
+- `/sign-in` and `/onboarding` both **redirected to /dashboard** (the session used to
+  auto-authenticate), so the gate measured the wrong page twice and reported green.
+- When a first visit became signed out, four app routes measured in the keyless `new`
+  state started redirecting to `/sign-in` — they had only ever reached the
+  pre-assessment designs because the provider silently authenticated everyone. Hence
+  the `no-assessment` state: signed in, onboarded, assessment never taken.
 
 `check-contrast` now **fails** on an unexpected redirect rather than passing
 quietly, and both gates fail on zero renders. A green result on a state you did not
@@ -100,6 +105,12 @@ produced a confident but false result:
     spawned a second one beside it, and the two then fought for the CPU — which is
     what the resulting garbage findings actually measured. Dead ports now cost a
     400ms TCP check; a port that is listening gets 20s.
+15. **A strict CSP broke the gate itself.** `connect-src 'self'` blocked the
+    websocket `next dev` uses for HMR — it serves the page and the socket on
+    different ports — so `page.addScriptTag` failed and the a11y run aborted with
+    exit 2. The websocket allowances (`ws: wss:`, `'unsafe-eval'`) are now
+    development-only; production keeps the strict policy, verified working without
+    them across nine routes.
 
 ## Last full-matrix result
 
@@ -108,15 +119,13 @@ else touching the machine. Concurrency between a gate and anything else is not a
 detail: it invalidated two earlier runs outright.
 
 - `typecheck` — clean
-- `eslint src scripts --max-warnings 0` — clean
+- `eslint` (whole project, incl. `e2e`, all 14 stories, `.storybook`, configs) — clean
 - token gate — **42 pairs × 2 themes**, pass
 - production build — **14 routes**, pass
-- `check-contrast` — **2,068/2,068 text runs clear WCAG AA**, every route in its
+- `check-contrast` — **2,126/2,126 text runs clear WCAG AA**, every route in its
   intended state
-- `check-a11y` — **80 page renders, 0 axe violations, 0 keyboard findings** (the
-  first run with the doubled tab coverage, so this is the first time the
-  touch-target and focus checks saw the whole tab order)
-- `playwright test` — **21 passed, 2 skipped**; the skips are the `describe.skip`'d
+- `check-a11y` — **84 page renders, 0 axe violations, 0 keyboard findings**
+- `playwright test` — **23 passed, 2 skipped**; the skips are the `describe.skip`'d
   roadmap specs for the unbuilt feature
 
 ### Bundle, same run
@@ -145,6 +154,7 @@ motion. It is a Turbopack chunk-allocation artifact, not app code — see the no
   form-validation errors, no loading skeletons. axe therefore never sees portal
   content.
 - `/terms` and `/privacy` are honest placeholders, not legal copy. They say so.
-- `authService.seedReturningUser()` still auto-authenticates in dev, which is why
-  `/sign-in` needs a seeded signed-out state to be reachable. Putting it behind
-  `NEXT_PUBLIC_DEMO_MODE` would make the real funnel the default.
+- The production CSP allows `'unsafe-inline'` for scripts and styles, because Next's
+  hydration bootstrap and `next/font` emit inline tags. Tightening that needs a nonce
+  threaded through the document — a real change, not a config line. `'unsafe-eval'` is
+  dev-only and verified unnecessary in production.

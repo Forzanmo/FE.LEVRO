@@ -14,13 +14,30 @@ import type { NextConfig } from 'next'
  * document, which is a real change rather than a config line — noted rather than
  * pretended away.
  */
+/*
+ * `connect-src` has to allow websockets in development, and finding that out
+ * cost a verification run.
+ *
+ * `next dev` serves the page on one port and its HMR socket on another, so
+ * `ws://127.0.0.1:<other-port>` is not `'self'` and a bare `connect-src 'self'`
+ * blocks it. The symptoms were not obviously CSP: the a11y gate died on
+ * `page.addScriptTag`, and the e2e run filled with websocket errors from an
+ * editor extension. Live reload was broken for anyone running the dev server.
+ *
+ * Production keeps the strict value — there is no HMR socket to allow, and
+ * that is the environment the header exists to protect.
+ */
+const isDev = process.env.NODE_ENV === 'development'
+
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  // `unsafe-eval` is dev-only: Turbopack's HMR runtime needs it, the production
+  // bundle does not.
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  "connect-src 'self'",
+  `connect-src 'self'${isDev ? ' ws: wss:' : ''}`,
   "form-action 'self'",
   "frame-ancestors 'none'",
   "base-uri 'self'",
