@@ -62,11 +62,19 @@ function MinimalistCv({ data }: { data: ResumeData }) {
             {/* Index keys, not the value. These are static presentational lists
                 built from user text, and two fields holding the same string —
                 or a CV stored with a duplicate skill — would otherwise collide
-                on the key and corrupt reconciliation. Nothing here reorders. */}
+                on the key and corrupt reconciliation. Nothing here reorders.
+
+                The separator TRAILS its item rather than leading the next one.
+                Each span is one unbreakable unit, so a leading separator put the
+                dot at the start of the wrapped line — "· alexrivera.dev" reads as
+                a bullet point, not as a continuation. Trailing means the break
+                lands after the dot instead, which is how a wrapped metadata line
+                is meant to read. Four contact fields wrap on the printed sheet
+                more often than not. */}
             {contact.map((item, i) => (
               <span key={i} className="flex items-center gap-2">
-                {i > 0 ? <span aria-hidden="true">·</span> : null}
                 {item}
+                {i < contact.length - 1 ? <span aria-hidden="true">·</span> : null}
               </span>
             ))}
           </p>

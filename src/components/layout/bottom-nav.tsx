@@ -34,6 +34,11 @@ export function BottomNav() {
             <li key={item.href}>
               <Link
                 href={item.href}
+                // Same reasoning as the sidebar (see `nav-item.tsx`): always on
+                // screen, so the default prefetched the whole app from every
+                // page — and this is the surface where the user is most likely
+                // to be on mobile data.
+                prefetch={false}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
                   // text-xs (on the ramp), and truncate so a long label cannot

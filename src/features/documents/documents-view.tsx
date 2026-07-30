@@ -81,14 +81,31 @@ export function DocumentsView() {
          * against the "Start my assessment" the empty state is asking for —
          * two primary actions, one of them a dead end.
          */
+        /*
+         * Both document kinds are creatable from here, and that is a
+         * reachability fix, not a convenience. The mobile bottom bar is capped
+         * at five destinations and Cover Letter is not one of them, so on the
+         * device most job-seekers actually use, /cover-letter had exactly one
+         * inbound link in the whole app — from an existing cover letter. You
+         * could edit one but never write your first. A cover letter is half of
+         * what the landing page promises.
+         */
         actions={
           hasAssessment === false ? null : (
-            <Button asChild>
-              <Link href={ROUTES.resume}>
-                <Icon name="add" size="sm" />
-                New CV
-              </Link>
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button asChild>
+                <Link href={ROUTES.resume}>
+                  <Icon name="add" size="sm" />
+                  New CV
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href={ROUTES.coverLetter}>
+                  <Icon name="add" size="sm" />
+                  New cover letter
+                </Link>
+              </Button>
+            </div>
           )
         }
       />
@@ -179,9 +196,20 @@ export function DocumentsView() {
                 ))}
               </ul>
             ) : (
-              <Text size="sm" tone="muted" className="px-3 py-3 sm:px-4">
-                No cover letters yet.
-              </Text>
+              /* An empty section that only states its own emptiness wastes the
+                 one moment the user is looking straight at the gap. */
+              <div className="px-3 py-3 sm:px-4">
+                <Text size="sm" tone="muted">
+                  No cover letters yet — they’re written from the same evidence as
+                  your CV, tailored to one role.
+                </Text>
+                <Button asChild variant="outline" size="sm" className="mt-3">
+                  <Link href={ROUTES.coverLetter}>
+                    Write a cover letter
+                    <Icon name="arrow-right" size="xs" />
+                  </Link>
+                </Button>
+              </div>
             )}
           </section>
         </div>

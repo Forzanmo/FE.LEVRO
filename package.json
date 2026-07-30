@@ -14,7 +14,7 @@
     "typecheck": "tsc --noEmit",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:a11y": "node scripts/check-a11y.mjs",
-    "verify": "npm run typecheck && npm run lint -- src scripts --max-warnings 0 && npm run build && npm run check:contrast && npm run check:a11y",
+    "verify": "npm run typecheck && npm run lint -- --max-warnings 0 && npm run build && npm run check:contrast && npm run check:a11y",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,md}\"",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/nextjs'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 import { Icon } from './icon'
 import { iconRegistry } from './registry'
@@ -43,7 +43,9 @@ export const Gallery: Story = {
       {Object.keys(iconRegistry).map((name) => (
         <div key={name} className="flex flex-col items-center gap-1">
           <Icon name={name as keyof typeof iconRegistry} size="md" />
-          <span className="text-muted-foreground text-[0.6rem]">{name}</span>
+          {/* `text-xs`, not an arbitrary 0.6rem: the gallery that documents the
+              design system is the last place that should invent a type step. */}
+          <span className="text-muted-foreground text-xs">{name}</span>
         </div>
       ))}
     </div>

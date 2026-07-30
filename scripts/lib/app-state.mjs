@@ -34,13 +34,28 @@ export function seedFor(state) {
         'levvro:auth': { authenticated: true, user: DEMO_USER, hasOnboarded: true },
         'levvro:journey': { assessmentCompletedAt: SEEDED_AT, dashboardSeenAt: SEEDED_AT },
       }
+    /*
+     * Signed in and onboarded, but the assessment has never been taken — the
+     * state every gated surface renders its pre-assessment design for.
+     *
+     * This state exists because a first visit is now signed OUT. The app routes
+     * used to be measured in the keyless `new` state and reached the
+     * pre-assessment design anyway, because the session provider silently
+     * authenticated everyone. With that removed, a keyless `/dashboard` redirects
+     * to `/sign-in` — so the gates would have carried on reporting green while
+     * measuring the sign-in page four times over, and the pre-assessment designs
+     * would have gone completely unproven. Same failure the file header
+     * describes, one layer down.
+     */
+    case 'no-assessment':
+      return { 'levvro:auth': { authenticated: true, user: DEMO_USER, hasOnboarded: true } }
     case 'needs-onboarding':
       return { 'levvro:auth': { authenticated: true, user: DEMO_USER, hasOnboarded: false } }
     case 'signedout':
       return { 'levvro:auth': { authenticated: false, user: null, hasOnboarded: false } }
     case 'new':
     default:
-      // No keys — a genuinely fresh visitor. Exercises the pre-assessment states.
+      // No keys at all — a genuinely fresh visitor. Public surfaces only.
       return {}
   }
 }
@@ -55,7 +70,7 @@ export const ROUTES = [
   { path: '/sign-in', state: 'signedout' },
   { path: '/onboarding', state: 'needs-onboarding' },
   { path: '/coach', state: 'onboarded' },
-  { path: '/dashboard', state: 'new' },
+  { path: '/dashboard', state: 'no-assessment' },
   { path: '/dashboard', state: 'onboarded' },
   { path: '/documents', state: 'onboarded' },
   /*
@@ -64,9 +79,10 @@ export const ROUTES = [
    * the assessment — that is the whole point of the gate — so measuring only the
    * populated one would leave the state a brand-new user actually sees unproven.
    */
-  { path: '/documents', state: 'new' },
-  { path: '/resume', state: 'new' },
-  { path: '/applications', state: 'new' },
+  { path: '/documents', state: 'no-assessment' },
+  { path: '/resume', state: 'no-assessment' },
+  { path: '/applications', state: 'no-assessment' },
+  { path: '/cover-letter', state: 'no-assessment' },
   /* A retired route, so this measures the branded not-found page. */
   { path: '/roadmap', state: 'new' },
   // The CV templates are the highest-risk contrast surfaces in the product:

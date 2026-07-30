@@ -38,5 +38,23 @@ export const MOBILE_NAV: readonly NavItem[] = [
   // else, and two nouns for one object is the mental-model drift that makes an
   // app feel like several apps.
   { label: 'Edit CV', href: ROUTES.resume, icon: 'edit' },
-  { label: 'Apps', href: ROUTES.applications, icon: 'applications' },
+  /*
+   * "Tracker", not "Apps".
+   *
+   * On a phone, "Apps" reads as software before it reads as job applications —
+   * the one place the word has a dominant competing meaning is the device this
+   * label only ever appears on.
+   *
+   * The full noun is not an option: measured at `text-xs font-medium`,
+   * "Applications" is 71px against a 56–70px column at 320–390px, so `truncate`
+   * would clip it to "Applicat…" on essentially every phone. "Pipeline" is
+   * recruiter jargon and "Jobs" promises a job board this product does not have,
+   * both of which PRODUCT.md's plain-language bar rules out. "Tracker" is the
+   * verb the page itself uses — "Track every application from applied to offer".
+   *
+   * The sidebar keeps "Applications". That is a container/contents pair, not the
+   * Resume-vs-CV problem: those were two names for one artifact, which is what
+   * actually confuses people.
+   */
+  { label: 'Tracker', href: ROUTES.applications, icon: 'applications' },
 ]

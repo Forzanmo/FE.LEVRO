@@ -20,6 +20,8 @@ const eslintConfig = defineConfig([
     "coverage/**",
     "playwright-report/**",
     "test-results/**",
+    // Vendored agent tooling, not project source.
+    ".claude/**",
   ]),
   ...storybook.configs["flat/recommended"]
 ]);

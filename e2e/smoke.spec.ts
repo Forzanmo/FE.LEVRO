@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { seedAssessed } from './support/journey'
+import { seedAssessed, seedOnboardedNoAssessment } from './support/journey'
 
 test.describe('Levvro smoke', () => {
   test('landing renders the hero and primary CTA', async ({ page }) => {
@@ -28,12 +28,14 @@ test.describe('Levvro smoke', () => {
     // The regression this guards is the P0 that shipped twice: every history
     // service used to answer with fixtures regardless of whether the user had
     // done anything.
+    await seedOnboardedNoAssessment(page)
     await page.goto('/dashboard')
     await expect(page.getByRole('link', { name: /Start my assessment/i })).toBeVisible()
     await expect(page.getByText(/day streak/i)).toHaveCount(0)
   })
 
   test('AI coach renders the assessment', async ({ page }) => {
+    await seedAssessed(page)
     await page.goto('/coach')
     await expect(page.getByRole('heading', { name: 'Career assessment' })).toBeVisible()
     await expect(page.getByText('Levvro coach').first()).toBeVisible()
@@ -47,6 +49,7 @@ test.describe('Levvro smoke', () => {
   })
 
   test('signing out leads to the sign-in screen', async ({ page }) => {
+    await seedAssessed(page)
     await page.goto('/dashboard')
     await page.getByRole('button', { name: 'Account menu' }).click()
     await page.getByRole('menuitem', { name: 'Sign out' }).click()

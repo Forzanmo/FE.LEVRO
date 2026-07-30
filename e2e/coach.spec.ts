@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test'
 
+import { seedAssessed } from './support/journey'
+
 test.describe('AI Coach', () => {
+  test.beforeEach(async ({ page }) => {
+    await seedAssessed(page)
+  })
+
   test('answering advances the assessment; Back returns', async ({ page }) => {
     await page.goto('/coach')
 
@@ -11,16 +17,16 @@ test.describe('AI Coach', () => {
     await expect(
       page.getByRole('heading', { name: 'Where are you in your career right now?' }),
     ).toBeVisible()
-    await expect(page.getByText('1/8')).toBeVisible()
+    await expect(page.getByText('1/7')).toBeVisible()
 
     await page.getByText(/Junior \(0/).click()
     await page.getByRole('button', { name: 'Continue' }).click()
 
     await expect(page.getByRole('heading', { name: 'What role are you aiming for?' })).toBeVisible()
-    await expect(page.getByText('2/8')).toBeVisible()
+    await expect(page.getByText('2/7')).toBeVisible()
 
     await page.getByRole('button', { name: 'Back' }).click()
-    await expect(page.getByText('1/8')).toBeVisible()
+    await expect(page.getByText('1/7')).toBeVisible()
   })
 
   test('reasoning disclosure can be opened', async ({ page }) => {

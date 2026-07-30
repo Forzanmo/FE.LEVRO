@@ -25,5 +25,12 @@ export const STATUS_META: Record<AppStatus, StatusMeta> = {
   rejected: { label: 'Rejected', tone: 'bg-destructive-muted text-destructive', icon: 'close' },
 }
 
-/** Ordered pipeline stages used by the funnel summary (excludes 'rejected'). */
-export const PIPELINE_STAGES: AppStatus[] = ['applied', 'screening', 'interview', 'offer']
+/*
+ * `PIPELINE_STAGES` (applied/screening/interview/offer, excluding 'rejected')
+ * lived here and is deliberately gone. The summary divided by a total that
+ * included rejections while listing only the four stages that didn't, so its
+ * counts never reconciled with the table beneath it and a user's rejections
+ * disappeared from their own numbers. The funnel order now lives in
+ * `pipeline-summary.tsx`, includes every status exactly once, and is the only
+ * place that decides stage order.
+ */

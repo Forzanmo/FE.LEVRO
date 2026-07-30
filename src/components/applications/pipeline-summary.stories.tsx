@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/nextjs'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 import type { Application } from '@/features/applications/types'
 
@@ -73,7 +73,23 @@ export const Default: Story = {
   render: () => <PipelineSummary applications={APPLICATIONS} />,
 }
 
-/** The state a new tracker actually opens in. */
+/**
+ * A bad week. Rejections used to be excluded from the summary entirely while
+ * still counting toward the denominator, so the numbers disagreed with the table
+ * and the user's rejections vanished from their own page. They are now the
+ * terminal segment — muted, not alarming, but present and counted.
+ */
+export const MostlyRejected: Story = {
+  render: () => (
+    <PipelineSummary
+      applications={APPLICATIONS.map((a, i) =>
+        i < 3 ? { ...a, status: 'rejected' as const } : a,
+      )}
+    />
+  ),
+}
+
+/** The state a new tracker actually opens in — renders nothing at all. */
 export const Empty: Story = {
   render: () => <PipelineSummary applications={[]} />,
 }

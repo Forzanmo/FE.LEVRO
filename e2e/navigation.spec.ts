@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test'
 
+import { seedAssessed } from './support/journey'
+
 test.describe('Navigation + theme', () => {
+  test.beforeEach(async ({ page }) => {
+    await seedAssessed(page)
+  })
+
   test('sidebar navigates between app routes', async ({ page }) => {
     await page.goto('/dashboard')
 

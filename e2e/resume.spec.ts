@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { seedAssessed } from './support/journey'
+import { seedAssessed, seedOnboardedNoAssessment } from './support/journey'
 
 test.describe('Resume editor', () => {
   // The generated CV is the assessment's output, so the editor only seeds it
@@ -34,6 +34,10 @@ test.describe('Resume editor', () => {
 test('without an assessment the editor offers the coach instead of a stranger’s CV', async ({
   page,
 }) => {
+  // Signed in and onboarded, but the assessment has never been taken. That
+  // has to be stated now that a first visit is signed out — otherwise this
+  // lands on /sign-in and the pre-assessment design goes untested.
+  await seedOnboardedNoAssessment(page)
   await page.goto('/resume')
 
   await expect(page.getByText('Alex Rivera')).toHaveCount(0)

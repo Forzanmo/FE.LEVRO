@@ -5,8 +5,24 @@ import { Loader2Icon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 
+/**
+ * Disabled is a MUTED SURFACE, not a faded copy of the enabled button.
+ *
+ * The base used to carry `disabled:opacity-50`, which on the primary variant is
+ * white text over 50%-opacity teal: measured at 2.25:1 in light and 2.60:1 in
+ * dark. Disabled controls are exempt from WCAG 1.4.3, so this passed every
+ * automated gate including this project's own — and it was the coach's primary
+ * "Continue" button, on the screen where an anxious first-timer is least sure
+ * they are doing it right. They could see something was greyed out and could not
+ * read the word telling them what.
+ *
+ * `bg-muted` + `text-muted-foreground` clears 4.5:1 by construction (DESIGN.md's
+ * muted-text rule), applies identically to every variant so disabled looks the
+ * same everywhere, and `bg-none` kills the gradient variant's image so it cannot
+ * show through the flat fill.
+ */
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-busy:opacity-100! aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:bg-muted disabled:text-muted-foreground disabled:border-transparent disabled:shadow-none disabled:inset-ring-0 disabled:bg-none aria-busy:opacity-100! aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {

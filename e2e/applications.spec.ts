@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { seedAssessed } from './support/journey'
+import { seedAssessed, seedOnboardedNoAssessment } from './support/journey'
 
 test.describe('Applications table', () => {
   // Every test here needs the tracked applications, and those are gated on a
@@ -57,6 +57,10 @@ test.describe('Applications table', () => {
 test('a visitor with no assessment sees an empty tracker, not fourteen invented rows', async ({
   page,
 }) => {
+  // Signed in and onboarded, but the assessment has never been taken. That
+  // has to be stated now that a first visit is signed out — otherwise this
+  // lands on /sign-in and the pre-assessment design goes untested.
+  await seedOnboardedNoAssessment(page)
   await page.goto('/applications')
   await expect(page.getByText('Vercel')).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Add application' })).toBeVisible()

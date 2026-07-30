@@ -91,18 +91,33 @@ const ASSESSMENT: Assessment = {
       placeholder: 'Be honest — this stays private',
       optional: true,
     },
-    {
-      id: 'plan',
-      type: 'single',
-      prompt: 'What should we generate for you first?',
-      reasoning: 'We’ll tailor your next steps to exactly what you pick here.',
-      options: [
-        { value: 'assets', label: 'Resume + Cover Letter' },
-        { value: 'cv-letters', label: 'CV + cover letters' },
-      ],
-    },
+    /*
+     * The assessment used to end on a question asking "What should we generate
+     * for you first?" with two options: "Resume + Cover Letter" and "CV + cover
+     * letters". Those are the same deliverable written twice, one of them using
+     * the noun the rest of the product deliberately standardised away — and
+     * onboarding has already asked this exact question ("Just my CV" vs "CV +
+     * cover letters"). Its answer was never read by anything; it was only ever
+     * saved and restored.
+     *
+     * So the final beat of the product's signature experience was a choice that
+     * wasn't a choice, about something already decided, that changed nothing.
+     * Ending on the blocker question is stronger anyway: it is the most human
+     * question in the set, and the one a coach would actually act on.
+     */
   ],
 }
+
+/**
+ * How many questions the assessment asks.
+ *
+ * Exported so no screen ever writes the number down. The first-run panel
+ * promised "Eight questions" while the assessment asked seven — a hardcoded
+ * count that went stale the moment a question was removed, making the very first
+ * factual claim the product makes to a new user wrong within one click. On a
+ * product selling accuracy about someone's own life, that is not a typo.
+ */
+export const COACH_QUESTION_COUNT = ASSESSMENT.questions.length
 
 export const coachService = {
   getAssessment(): Assessment {

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Icon, type IconName } from '@/components/ui/icon'
 import { Heading, Text } from '@/components/ui/typography'
+import { COACH_QUESTION_COUNT } from '@/services/api/coach-service'
 import { ROUTES } from '@/lib/constants/routes'
 
 /**
@@ -50,10 +51,11 @@ export function FirstRunPanel() {
             Start with a short conversation
           </Heading>
 
+          {/* The count is derived, never written down — see COACH_QUESTION_COUNT. */}
           <Text tone="muted" measure="lead" className="mt-2 text-pretty">
-            Eight questions, one at a time — about the role you want and what you’ve actually
-            done. The coach explains why it’s asking each one, and you can skip anything or stop
-            and come back.
+            {COACH_QUESTION_COUNT} questions, one at a time — about the role you want and what
+            you’ve actually done. The coach explains why it’s asking each one, and you can skip
+            anything or stop and come back.
           </Text>
 
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">

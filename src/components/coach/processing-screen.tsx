@@ -25,7 +25,7 @@ const TIP_INTERVAL_MS = 2800
  *
  * This used to say "Drafting your CV" and hand off to the editor. That framing
  * skipped the thing the user was actually promised: the landing page sells "See
- * what your CV proves", the user answers eight questions, and the payoff is the
+ * what your CV proves", the user answers the assessment, and the payoff is the
  * skills read-out — not a text form. The CV draft is the step *after* seeing
  * where you stand, which is also the order PRODUCT.md describes.
  */

@@ -1,6 +1,7 @@
 'use client'
 
 import { useFieldArray, type UseFormReturn } from 'react-hook-form'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { TextField } from '@/components/ui/field'
@@ -44,10 +45,31 @@ export function ResumeEditor({ form }: { form: UseFormReturn<ResumeData> }) {
     control,
     watch,
     setValue,
+    getValues,
     formState: { errors },
   } = form
-  const { fields, append, remove } = useFieldArray({ control, name: 'experience' })
+  const { fields, append, remove, insert } = useFieldArray({ control, name: 'experience' })
   const skills = watch('skills')
+
+  /*
+   * Undo, matching the applications table exactly.
+   *
+   * Deleting a role threw away a job title, a company, dates and every
+   * hand-written highlight instantly, with no confirm and no way back — while
+   * deleting an application, which is one row of far cheaper data, got an
+   * optimistic delete plus an Undo toast. The stronger safeguard was on the
+   * weaker data. Re-inserting at the original index keeps the CV's order intact,
+   * because a restored role appearing at the bottom is its own small betrayal.
+   */
+  const removeRole = (index: number) => {
+    const role = getValues(`experience.${index}`)
+    remove(index)
+    const label = [role?.role, role?.company].filter(Boolean).join(' · ')
+    toast('Role removed', {
+      description: label || 'This role was empty.',
+      action: { label: 'Undo', onClick: () => insert(index, role) },
+    })
+  }
 
   return (
     <div className="space-y-4">
@@ -123,7 +145,7 @@ export function ResumeEditor({ form }: { form: UseFormReturn<ResumeData> }) {
                   variant="ghost"
                   size="icon-sm"
                   aria-label={`Remove role ${i + 1}`}
-                  onClick={() => remove(i)}
+                  onClick={() => removeRole(i)}
                 >
                   <Icon name="delete" size="xs" />
                 </Button>

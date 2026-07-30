@@ -1,9 +1,23 @@
 import type { CoverLetter, CoverLetterInput, CoverLetterTone } from '@/features/cover-letter/types'
+import { journeyStorage } from '@/services/storage/journey-storage'
 
 /**
  * Cover letter service. The letter is generated (spec §8: "generated only"),
  * not hand-edited. This mock composes a believable letter from the inputs; a
  * real implementation would call the generation endpoint with the same shape.
+ *
+ * **The assessment gate lives here, at the source.** `documents-service`,
+ * `applications-service`, `dashboard-service` and `resume-service` all consult
+ * `journeyStorage.hasAssessment()`; this one did not, and it was the single
+ * worst place in the product to forget it. Without an assessment the generator
+ * still produced a complete, confident, downloadable letter — "my background
+ * maps closely to what the role needs", "I have followed the work your team
+ * publishes" — signed with the user's name. That is the one artifact a candidate
+ * emails to a real recruiter, and the product was inventing its contents.
+ *
+ * DESIGN.md records that the call-site version of this gate "shipped twice and
+ * was forgotten five times". This was the sixth, and it is why the check is in
+ * the service rather than in the view.
  */
 const GENERATE_MS = 1200
 
@@ -28,7 +42,16 @@ function delay<T>(value: T, ms = GENERATE_MS): Promise<T> {
 }
 
 export const coverLetterService = {
-  generate(input: CoverLetterInput, applicantName: string): Promise<CoverLetter> {
+  /** True when there is evidence to argue from. The view uses this to decide
+   *  what to render; `generate()` enforces it regardless. */
+  canGenerate(): boolean {
+    return journeyStorage.hasAssessment()
+  },
+
+  generate(input: CoverLetterInput, applicantName: string): Promise<CoverLetter | null> {
+    // Fail closed. A caller that forgets to check gets nothing, not a fabrication.
+    if (!journeyStorage.hasAssessment()) return delay(null)
+
     const company = input.company.trim() || 'your company'
     const role = input.role.trim() || 'the role'
     const highlights = input.highlights

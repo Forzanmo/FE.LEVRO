@@ -73,7 +73,7 @@ export function CoachView() {
     /*
      * To the dashboard, not the CV editor.
      *
-     * This was `ROUTES.resume`, so eight questions and a six-second progress
+     * This was `ROUTES.resume`, so the whole assessment and a six-second progress
      * ring ended in a text form — the peak-end moment of the whole product
      * spent on data entry. `journey-storage` argues in its own header that "the
      * end of the first session is what the whole session is remembered by", and

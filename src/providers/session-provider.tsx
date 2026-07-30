@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useMemo, useSyncExternalStore } from 'react'
 
+import { env } from '@/config/env'
 import {
   authService,
   type AuthPlan,
@@ -33,7 +34,11 @@ const listeners = new Set<() => void>()
 
 function getSnapshot(): StoredSession {
   if (!initialized) {
-    cache = authService.getSession() ?? authService.seedReturningUser()
+    // No stored session means a first visit, and a first visit is signed OUT.
+    // Demo mode is the only path back to the old auto-authenticated default.
+    cache =
+      authService.getSession() ??
+      (env.isDemoMode ? authService.seedReturningUser() : authService.signedOut())
     initialized = true
   }
   return cache as StoredSession
