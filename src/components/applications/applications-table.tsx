@@ -48,13 +48,23 @@ export function ApplicationsTable({
                   return (
                     <th
                       key={header.id}
+                      // The actions column renders an empty <th>; give it a
+                      // screen-reader name rather than an unlabelled header.
+                      scope="col"
                       className="text-muted-foreground px-4 py-2.5 text-left font-medium"
                     >
-                      {header.isPlaceholder ? null : canSort ? (
+                      {/* The row-actions column has no visible header. An empty
+                          <th> is an unlabelled column for screen readers, so it
+                          gets a name that simply isn't painted. */}
+                      {!header.column.columnDef.header ? (
+                        <span className="sr-only">Actions</span>
+                      ) : header.isPlaceholder ? null : canSort ? (
                         <button
                           type="button"
                           onClick={header.column.getToggleSortingHandler()}
-                          className="hover:text-foreground inline-flex items-center gap-1 outline-none"
+                          // `outline-none` with no replacement made this sort
+                          // control invisible to keyboard focus.
+                          className="hover:text-foreground focus-visible:ring-ring inline-flex items-center gap-1 rounded outline-none focus-visible:ring-2"
                         >
                           {flexRender(header.column.columnDef.header, header.getContext())}
                           <Icon

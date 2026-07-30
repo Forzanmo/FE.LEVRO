@@ -184,23 +184,66 @@ export type SemanticColorRole =
   | 'info'
   | 'info-foreground'
   | 'info-muted'
+  /**
+   * Achievement gold. The ONLY colour of a win: earned quests, completed
+   * milestones, streaks, score highlights.
+   *
+   * This role exists because the Gold-Is-Earned Rule was inverted in practice.
+   * Gold never appeared on achievements — `warning` amber did — while gold was
+   * spent on decoration like the "Today's Mission" rule, which marks a to-do,
+   * not a win. The result was a collision on a single screen: one amber pill
+   * meant "5-day streak, well done" and an identical amber pill 600px away
+   * meant "your score dropped". Achievement and warning are now different
+   * things, and each says exactly one thing.
+   */
+  | 'achievement'
+  | 'achievement-foreground'
+  | 'achievement-muted'
+  /**
+   * The committed brand surface — a fold that IS the brand rather than being
+   * tinted by it: the marketing hero, its header, the CTA band, the Designer CV
+   * sidebar.
+   *
+   * These are deliberately IDENTICAL in light and dark. A hero that inverts with
+   * the theme cannot commit to a colour, and the whole point of a committed
+   * surface is that the colour carries the identity. That property is also what
+   * makes the foreground safe to fix at white.
+   *
+   * The role exists because three surfaces had each hardcoded their own version —
+   * `bg-[var(--brand-950)]`, the `bg-gradient-brand-deep` utility, and
+   * `bg-[var(--brand-900)]` — so "the brand surface" had three different colours
+   * and no single place to change it.
+   */
+  | 'brand-surface'
+  | 'brand-surface-foreground'
+  /** Secondary copy on the committed surface — still AA against it. */
+  | 'brand-surface-muted'
+  /**
+   * Gold ON the committed surface. A separate role from `achievement` because
+   * that one is tuned for light backgrounds (a dark accent-800, which measured
+   * 2.53:1 here) — the same hue needs the opposite end of the ramp to be legible
+   * on a near-black teal. Two contexts, two values, one meaning.
+   */
+  | 'brand-surface-accent'
   | 'gradient-from'
   | 'gradient-via'
   | 'gradient-to'
-  | 'score-track'
-  | 'score-low'
-  | 'score-mid'
-  | 'score-high'
+  | 'progress-track'
 
 type SemanticColorMap = Record<SemanticColorRole, string>
 
-const alpha = (hex: string, a: number): string => {
-  const v = hex.replace('#', '')
-  const r = parseInt(v.slice(0, 2), 16)
-  const g = parseInt(v.slice(2, 4), 16)
-  const b = parseInt(v.slice(4, 6), 16)
-  return `rgb(${r} ${g} ${b} / ${a})`
-}
+/**
+ * Fade a colour toward transparent, in whatever colour space it is authored in.
+ *
+ * This used to hex-parse. The brand ramp is authored in OKLCH while
+ * success/warning/info are hex, so `alpha(palette.brand[500], 0.15)` produced
+ * `rgb(NaN NaN NaN / 0.15)` — an invalid declaration browsers silently drop,
+ * which blanked every `bg-brand-muted` surface in dark mode (the coach avatar,
+ * empty-state icons, the header avatar, status badges). `color-mix` is
+ * colour-space agnostic, so the input notation no longer matters.
+ */
+const alpha = (color: string, a: number): string =>
+  `color-mix(in oklab, ${color} ${a * 100}%, transparent)`
 
 export const semanticColors: { light: SemanticColorMap; dark: SemanticColorMap } = {
   light: {
@@ -224,7 +267,10 @@ export const semanticColors: { light: SemanticColorMap; dark: SemanticColorMap }
     'destructive-muted': palette.danger[50],
     border: palette.neutral[200],
     input: palette.neutral[200],
-    ring: palette.brand[500],
+    // brand-500 measured 2.76:1 on the page and 2.61:1 on ghost buttons — under
+    // SC 1.4.11. The ring is how a keyboard user navigates everything, so it
+    // steps down the ramp until it clears 3:1 against every surface it lands on.
+    ring: palette.brand[700],
     'chart-1': palette.brand[500],
     'chart-2': palette.accent[500],
     'chart-3': palette.info[500],
@@ -232,12 +278,14 @@ export const semanticColors: { light: SemanticColorMap; dark: SemanticColorMap }
     'chart-5': palette.warning[500],
     sidebar: palette.neutral[50],
     'sidebar-foreground': palette.neutral[900],
-    'sidebar-primary': palette.brand[600],
+    // brand-600 left white text at 4.43:1 — just under AA. brand-700 matches
+    // `primary` and clears it.
+    'sidebar-primary': palette.brand[700],
     'sidebar-primary-foreground': pureWhite,
     'sidebar-accent': palette.neutral[100],
     'sidebar-accent-foreground': palette.neutral[900],
     'sidebar-border': palette.neutral[200],
-    'sidebar-ring': palette.brand[500],
+    'sidebar-ring': palette.brand[700],
     brand: palette.brand[700],
     'brand-foreground': pureWhite,
     'brand-muted': palette.brand[50],
@@ -256,10 +304,17 @@ export const semanticColors: { light: SemanticColorMap; dark: SemanticColorMap }
     'gradient-from': palette.brand[600],
     'gradient-via': palette.brand[400],
     'gradient-to': palette.accent[500],
-    'score-track': palette.neutral[200],
-    'score-low': palette.danger[500],
-    'score-mid': palette.warning[500],
-    'score-high': palette.success[500],
+    // Gold has to step down to 800 in light mode to carry text at AA — at 700
+    // it measured 4.01:1 on card and 3.84:1 on its own tint.
+    achievement: palette.accent[800],
+    'achievement-foreground': pureWhite,
+    'achievement-muted': palette.accent[50],
+    // Theme-invariant by design — identical in the dark block below.
+    'brand-surface': palette.brand[950],
+    'brand-surface-foreground': pureWhite,
+    'brand-surface-muted': 'oklch(0.86 0.02 200)',
+    'brand-surface-accent': palette.accent[300],
+    'progress-track': palette.neutral[200],
   },
   dark: {
     // Deep teal-ink near-black (not pure black); surfaces step up in lightness.
@@ -278,8 +333,13 @@ export const semanticColors: { light: SemanticColorMap; dark: SemanticColorMap }
     'muted-foreground': palette.neutral[400],
     accent: palette.neutral[800],
     'accent-foreground': palette.neutral[50],
-    destructive: palette.danger[500],
-    'destructive-foreground': pureWhite,
+    // danger-400, not 500: as badge TEXT on a `destructive-muted` tint over a
+    // card, 500 rendered at 4.10:1 — the pair gate cleared it at page level but
+    // a card is a lighter surface underneath the tint.
+    destructive: palette.danger[400],
+    // Ink, not white: white on this fill is well under AA. Matches the dark
+    // theme's own pattern of dark text on a vivid fill (see primary above).
+    'destructive-foreground': palette.neutral[950],
     'destructive-muted': alpha(palette.danger[500], 0.15),
     border: alpha(pureWhite, 0.08),
     input: alpha(pureWhite, 0.12),
@@ -292,13 +352,15 @@ export const semanticColors: { light: SemanticColorMap; dark: SemanticColorMap }
     sidebar: 'oklch(0.200 0.015 211)',
     'sidebar-foreground': palette.neutral[200],
     'sidebar-primary': palette.brand[500],
-    'sidebar-primary-foreground': pureWhite,
+    'sidebar-primary-foreground': palette.neutral[950],
     'sidebar-accent': palette.neutral[800],
     'sidebar-accent-foreground': palette.neutral[50],
     'sidebar-border': alpha(pureWhite, 0.08),
     'sidebar-ring': palette.brand[500],
     brand: palette.brand[300],
-    'brand-foreground': pureWhite,
+    // `brand` is a light aqua in dark mode, so white on it was 1.50:1 — a latent
+    // landmine waiting for the first component to use the pair.
+    'brand-foreground': palette.neutral[950],
     'brand-muted': alpha(palette.brand[500], 0.15),
     'brand-emphasis': palette.brand[400],
     success: palette.success[500],
@@ -308,15 +370,22 @@ export const semanticColors: { light: SemanticColorMap; dark: SemanticColorMap }
     'warning-foreground': palette.neutral[950],
     'warning-muted': alpha(palette.warning[500], 0.15),
     info: palette.info[500],
-    'info-foreground': pureWhite,
+    // Ink, not white (2.77:1) — same dark-theme rule as primary/destructive.
+    'info-foreground': palette.neutral[950],
     'info-muted': alpha(palette.info[500], 0.15),
     'gradient-from': palette.brand[500],
     'gradient-via': palette.brand[400],
     'gradient-to': palette.accent[400],
-    'score-track': palette.neutral[800],
-    'score-low': palette.danger[500],
-    'score-mid': palette.warning[400],
-    'score-high': palette.success[500],
+    achievement: palette.accent[400],
+    'achievement-foreground': palette.neutral[950],
+    'achievement-muted': alpha(palette.accent[500], 0.15),
+    // Identical to light on purpose: a committed brand surface that flipped with
+    // the theme would not be committed to anything.
+    'brand-surface': palette.brand[950],
+    'brand-surface-foreground': pureWhite,
+    'brand-surface-muted': 'oklch(0.86 0.02 200)',
+    'brand-surface-accent': palette.accent[300],
+    'progress-track': palette.neutral[800],
   },
 }
 

@@ -24,7 +24,7 @@ export function PipelineSummary({ applications }: { applications: Application[] 
             <Text as="span" size="sm" tone="muted">
               {STATUS_META[stage].label}
             </Text>
-            <div className="font-heading mt-1 text-2xl font-semibold tabular-nums">{count}</div>
+            <div className="font-mono mt-1 text-2xl font-semibold tabular-nums">{count}</div>
             <div className="bg-muted mt-2 h-1 overflow-hidden rounded-full">
               <div
                 className={cn('h-full rounded-full transition-all duration-500', STAGE_BAR[stage])}

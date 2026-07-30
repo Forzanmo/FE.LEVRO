@@ -12,10 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { useSession } from '@/providers/session-provider'
 import { coverLetterService } from '@/services/api/cover-letter-service'
-import {
-  coverLetterSchema,
-  type CoverLetterFormValues,
-} from '@/lib/validators/cover-letter-schema'
+import { coverLetterSchema, type CoverLetterFormValues } from '@/lib/validators/cover-letter-schema'
 
 import type { CoverLetter } from './types'
 

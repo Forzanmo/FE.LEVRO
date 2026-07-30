@@ -6,17 +6,19 @@ export const siteConfig = {
   name: 'Levvro',
   title: 'Levvro — AI Career Intelligence',
   description:
-    'Transform career uncertainty into a measurable roadmap toward getting hired. Assessment, coaching, and AI-generated career assets for juniors and career shifters.',
+    'See what your CV actually proves — and fix what it doesn’t. AI coaching that maps your skills to the role you want, then writes the CV and cover letter that show it.',
   tagline: 'Never waste your time.',
   url: process.env.NEXT_PUBLIC_APP_URL ?? 'https://levvro.app',
   ogImage: '/og.png',
   creator: 'Levvro',
+  /** Single source for the public contact address (footer, legal pages). */
+  contactEmail: 'hello@levvro.app',
   keywords: [
     'AI career coach',
     'resume generator',
-    'career roadmap',
+    'ATS resume template',
     'cover letter generator',
-    'career readiness score',
+    'skills gap analysis',
     'job search',
   ],
   links: {

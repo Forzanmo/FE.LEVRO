@@ -2,7 +2,12 @@
 
 import { createContext, useContext, useMemo, useSyncExternalStore } from 'react'
 
-import { authService, type AuthPlan, type SessionUser, type StoredSession } from '@/services/auth/auth-service'
+import {
+  authService,
+  type AuthPlan,
+  type SessionUser,
+  type StoredSession,
+} from '@/services/auth/auth-service'
 
 export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated'
 
@@ -56,7 +61,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<SessionContextValue>(
     () => ({
-      status: session === null ? 'loading' : session.authenticated ? 'authenticated' : 'unauthenticated',
+      status:
+        session === null ? 'loading' : session.authenticated ? 'authenticated' : 'unauthenticated',
       user: session?.user ?? null,
       hasOnboarded: session?.hasOnboarded ?? false,
       plan: session?.plan,

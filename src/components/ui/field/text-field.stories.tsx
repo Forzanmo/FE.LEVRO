@@ -28,5 +28,9 @@ export const WithError: Story = {
 }
 
 export const WithAdornment: Story = {
-  args: { leftAdornment: <Icon name="search" size="sm" />, label: 'Search', placeholder: 'Search…' },
+  args: {
+    leftAdornment: <Icon name="search" size="sm" />,
+    label: 'Search',
+    placeholder: 'Search…',
+  },
 }

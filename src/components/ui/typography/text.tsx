@@ -34,7 +34,15 @@ export const textVariants = cva('', {
       warning: 'text-warning',
       danger: 'text-destructive',
       info: 'text-info',
-      inverse: 'text-primary-foreground',
+      /**
+       * For committed brand surfaces (`bg-gradient-brand-deep`), which are the
+       * SAME dark teal in both themes — so the colour must NOT be theme-reactive.
+       * Replaces the old `inverse` tone (`primary-foreground`), which inverted
+       * to near-black in dark mode on a surface that never changed.
+       */
+      onBrand: 'text-white',
+      /** Sets no colour — the surrounding surface owns it. */
+      inherit: '',
     },
     leading: {
       none: 'leading-none',
@@ -53,6 +61,22 @@ export const textVariants = cva('', {
       center: 'text-center',
       right: 'text-right',
     },
+    /**
+     * Line length. DESIGN.md caps prose at 65–75ch, but there was no variant
+     * for it, so every call site improvised with whatever `max-w-*` felt right
+     * — and the landing page's most important paragraph landed at ~76ch, over
+     * the cap. `ch` units track the actual font, which `max-w-3xl` does not.
+     */
+    measure: {
+      /** ~66ch — running prose. */
+      prose: 'max-w-[66ch]',
+      /** ~52ch — intros and lead paragraphs, which read better narrower. */
+      lead: 'max-w-[52ch]',
+      /** ~40ch — captions, helper text, empty-state copy. */
+      tight: 'max-w-[40ch]',
+      /** Opt out where the container already constrains the line. */
+      none: '',
+    },
     truncate: { true: 'truncate' },
     balance: { true: 'text-balance' },
     pretty: { true: 'text-pretty' },
@@ -66,8 +90,7 @@ export const textVariants = cva('', {
 })
 
 export interface TextProps
-  extends React.HTMLAttributes<HTMLElement>,
-    VariantProps<typeof textVariants> {
+  extends React.HTMLAttributes<HTMLElement>, VariantProps<typeof textVariants> {
   /** Element to render. Defaults to <p>. Use 'span' for inline. */
   as?: React.ElementType
 }
@@ -81,6 +104,7 @@ export const Text = React.forwardRef<HTMLElement, TextProps>(function Text(
     leading,
     tracking,
     align,
+    measure,
     truncate,
     balance,
     pretty,
@@ -94,7 +118,18 @@ export const Text = React.forwardRef<HTMLElement, TextProps>(function Text(
       ref={ref}
       data-slot="text"
       className={cn(
-        textVariants({ size, weight, tone, leading, tracking, align, truncate, balance, pretty }),
+        textVariants({
+          size,
+          weight,
+          tone,
+          leading,
+          tracking,
+          align,
+          measure,
+          truncate,
+          balance,
+          pretty,
+        }),
         className,
       )}
       {...props}

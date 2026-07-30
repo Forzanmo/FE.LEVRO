@@ -68,10 +68,14 @@
   --color-gradient-from: var(--gradient-from);
   --color-gradient-via: var(--gradient-via);
   --color-gradient-to: var(--gradient-to);
-  --color-score-track: var(--score-track);
-  --color-score-low: var(--score-low);
-  --color-score-mid: var(--score-mid);
-  --color-score-high: var(--score-high);
+  --color-achievement: var(--achievement);
+  --color-achievement-foreground: var(--achievement-foreground);
+  --color-achievement-muted: var(--achievement-muted);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-surface-foreground: var(--brand-surface-foreground);
+  --color-brand-surface-muted: var(--brand-surface-muted);
+  --color-brand-surface-accent: var(--brand-surface-accent);
+  --color-progress-track: var(--progress-track);
 
   /* Palette ramps */
   --color-brand-50: var(--brand-50);

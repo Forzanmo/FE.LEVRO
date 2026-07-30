@@ -1,118 +1,85 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import { MeshGradient } from '@paper-design/shaders-react'
-import { motion, useReducedMotion } from 'motion/react'
-
 import { cn } from '@/lib/utils'
 
-// Brand-family hues for the WebGL mesh: deep teal → teal → aqua → warm gold.
-const MESH_COLORS = ['#008687', '#1aa9a8', '#52c9c6', '#e7a929']
-
 /**
- * Full-page dynamic gradient background for the brand surfaces (landing, auth).
- * Replaces the flat `--background` with a living gradient that covers the whole
- * viewport — never a plain block of white/black.
+ * Full-page brand backdrop for the marketing and auth surfaces.
  *
- * Layered for richness AND robustness:
- *   1. a token gradient wash + drifting aurora glows — pure CSS, server-rendered,
- *      so the gradient is present on the first frame and covers top-to-bottom;
- *   2. a WebGL `MeshGradient` (the `@paper-design/shaders-react` library) that
- *      fades in on top for continuous organic motion.
+ * A token gradient wash plus three slow drifting glows — pure CSS, server
+ * rendered, present on the first frame, no JavaScript and no WebGL.
+ *
+ * The alphas here are not a matter of taste. They are the ceiling that keeps
+ * `muted-foreground` body copy above 4.5:1 once every layer has composited, and
+ * `scripts/check-contrast.mjs` measures the rendered result and fails if they
+ * drift up. At their previous values (a 55% wash under glows at up to 60%) the
+ * hero subhead measured 1.01:1 — the reassurance copy written to calm an
+ * anxious first-time job-seeker was the least readable text on the page.
+ *
+ * This used to also run a `@paper-design/shaders-react` WebGL MeshGradient.
+ * It was removed rather than tuned:
+ *   - it held a live GL context animating for the lifetime of the tab, shipping
+ *     a shader runtime to every landing and auth visitor, for a layer rendered
+ *     at 0.16 opacity underneath a wash;
+ *   - in dark mode it composited with `mix-blend-plus-lighter`, which is
+ *     additive — gold over teal produced olive, and bright overlaps saturated
+ *     all three channels to pure white, measured at 1.04:1 behind body copy.
+ * Deleting it is visually near-undetectable and removes the single largest
+ * runtime cost on the page.
  *
  * `fixed`, so the gradient stays put while content scrolls. Every layer freezes
- * under `prefers-reduced-motion`. Decorative only (`aria-hidden`), theme-aware
- * via the gradient tokens, and kept translucent so text stays legible.
+ * under `prefers-reduced-motion` via the global rule in globals.css.
+ * Decorative only (`aria-hidden`) and theme-aware through the gradient tokens.
  */
 export function AuroraBackdrop({ className }: { className?: string }) {
-  const reduceMotion = useReducedMotion()
-  const [showMesh, setShowMesh] = useState(false)
-
-  // Run the continuous WebGL mesh only on reasonably capable devices. Low-end
-  // phones, data-saver, and reduced-motion fall back to the static CSS wash +
-  // drifting glows below — no WebGL context, no per-frame battery cost.
-  useEffect(() => {
-    if (reduceMotion) return
-    const nav = navigator as Navigator & {
-      deviceMemory?: number
-      connection?: { saveData?: boolean }
-    }
-    const cores = nav.hardwareConcurrency ?? 0
-    const mem = nav.deviceMemory // undefined off Chromium — don't penalize
-    const saveData = nav.connection?.saveData ?? false
-    setShowMesh(cores >= 4 && (mem === undefined || mem >= 4) && !saveData)
-  }, [reduceMotion])
-
   return (
     <div
       aria-hidden="true"
       className={cn('pointer-events-none fixed inset-0 -z-10 overflow-hidden', className)}
     >
-      {/* Base wash — a brand gradient across the entire viewport (tinted even at the
-          bottom), so no part of the page is ever flat. */}
+      {/* Base wash — a brand gradient across the entire viewport, so no part of
+          the page is ever a flat block of colour. */}
       <div
         className="absolute inset-0"
         style={{
           backgroundImage:
             'linear-gradient(158deg,' +
-            ' color-mix(in oklab, var(--gradient-from) 55%, transparent) 0%,' +
-            ' color-mix(in oklab, var(--gradient-via) 40%, transparent) 30%,' +
-            ' color-mix(in oklab, var(--gradient-to) 30%, transparent) 60%,' +
-            ' color-mix(in oklab, var(--gradient-from) 20%, transparent) 100%)',
+            ' color-mix(in oklab, var(--gradient-from) 14%, transparent) 0%,' +
+            ' color-mix(in oklab, var(--gradient-via) 10%, transparent) 30%,' +
+            ' color-mix(in oklab, var(--gradient-to) 7%, transparent) 60%,' +
+            ' color-mix(in oklab, var(--gradient-from) 5%, transparent) 100%)',
         }}
       />
 
       {/* Drifting aurora glows (frozen under reduced-motion). */}
       <div
-        className="absolute -top-40 left-[8%] h-[46rem] w-[46rem] rounded-full opacity-45 blur-3xl dark:opacity-60"
+        className="absolute -top-40 left-[8%] h-[46rem] w-[46rem] rounded-full opacity-[0.13] blur-3xl dark:opacity-[0.18]"
         style={{
           background:
-            'radial-gradient(circle, color-mix(in oklab, var(--gradient-from) 58%, transparent), transparent 66%)',
+            'radial-gradient(circle, color-mix(in oklab, var(--gradient-from) 40%, transparent), transparent 66%)',
           animation: 'aurora-drift-a 28s ease-in-out infinite',
         }}
       />
       <div
-        className="absolute -top-24 right-[-8rem] h-[42rem] w-[42rem] rounded-full opacity-40 blur-3xl dark:opacity-55"
+        className="absolute -top-24 right-[-8rem] h-[42rem] w-[42rem] rounded-full opacity-[0.11] blur-3xl dark:opacity-[0.15]"
         style={{
           background:
-            'radial-gradient(circle, color-mix(in oklab, var(--gradient-to) 54%, transparent), transparent 66%)',
+            'radial-gradient(circle, color-mix(in oklab, var(--gradient-to) 38%, transparent), transparent 66%)',
           animation: 'aurora-drift-b 34s ease-in-out infinite',
         }}
       />
       <div
-        className="absolute bottom-[-10rem] left-1/3 h-[44rem] w-[44rem] rounded-full opacity-35 blur-3xl dark:opacity-50"
+        className="absolute bottom-[-10rem] left-1/3 h-[44rem] w-[44rem] rounded-full opacity-[0.10] blur-3xl dark:opacity-[0.14]"
         style={{
           background:
-            'radial-gradient(circle, color-mix(in oklab, var(--gradient-via) 52%, transparent), transparent 66%)',
+            'radial-gradient(circle, color-mix(in oklab, var(--gradient-via) 36%, transparent), transparent 66%)',
           animation: 'aurora-drift-c 40s ease-in-out infinite',
         }}
       />
 
-      {/* WebGL mesh — capable devices only (gated in the effect above); fades in
-          client-side so there is no first-paint pop and no SSR WebGL. */}
-      {showMesh ? (
-        <motion.div
-          className="absolute inset-0 dark:mix-blend-plus-lighter"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.16 }}
-          transition={{ duration: 1.2, ease: 'easeOut' }}
-        >
-          <MeshGradient
-            className="h-full w-full"
-            colors={MESH_COLORS}
-            distortion={0.85}
-            swirl={0.65}
-            speed={0.4}
-          />
-        </motion.div>
-      ) : null}
-
       {/* Faint dot texture for depth. */}
       <div
-        className="absolute inset-0 opacity-40"
+        className="absolute inset-0 opacity-[0.28]"
         style={{
           backgroundImage:
-            'radial-gradient(color-mix(in oklab, var(--foreground) 12%, transparent) 1px, transparent 1.6px)',
+            'radial-gradient(color-mix(in oklab, var(--foreground) 9%, transparent) 1px, transparent 1.6px)',
           backgroundSize: '24px 24px',
         }}
       />

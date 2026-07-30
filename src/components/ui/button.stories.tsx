@@ -34,13 +34,13 @@ export const Loading: Story = { args: { isLoading: true, children: 'Saving' } }
 export const AllVariants: Story = {
   render: () => (
     <div className="flex flex-wrap items-center gap-3">
-      {(['default', 'gradient', 'outline', 'secondary', 'ghost', 'destructive', 'link'] as const).map(
-        (variant) => (
-          <Button key={variant} variant={variant}>
-            {variant}
-          </Button>
-        ),
-      )}
+      {(
+        ['default', 'gradient', 'outline', 'secondary', 'ghost', 'destructive', 'link'] as const
+      ).map((variant) => (
+        <Button key={variant} variant={variant}>
+          {variant}
+        </Button>
+      ))}
     </div>
   ),
 }

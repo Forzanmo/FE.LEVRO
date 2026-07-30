@@ -13,7 +13,9 @@ export function ApplicationsCard({ summary }: { summary: ApplicationsSummary }) 
   const stats = [
     { label: 'Total', value: summary.total, tone: 'text-foreground' },
     { label: 'Interviewing', value: summary.interviewing, tone: 'text-info' },
-    { label: 'Offers', value: summary.offers, tone: 'text-success' },
+    // The one label with a plural to get wrong. It rendered "1 Offers" — the
+    // single most-wanted number on the page, in broken English.
+    { label: summary.offers === 1 ? 'Offer' : 'Offers', value: summary.offers, tone: 'text-success' },
   ]
 
   return (
@@ -30,20 +32,34 @@ export function ApplicationsCard({ summary }: { summary: ApplicationsSummary }) 
         </CardAction>
       </CardHeader>
       <CardContent>
-        <div className="divide-border grid grid-cols-3 divide-x">
-          {stats.map((stat) => (
-            <div key={stat.label} className="space-y-0.5 px-2 text-center first:pl-0 last:pr-0">
-              <div
-                className={cn('font-heading text-3xl leading-none font-semibold tabular-nums', stat.tone)}
-              >
-                {stat.value}
+        {/*
+         * 0 / 0 / 0 in a layout built for numbers reads as failure. Before the
+         * first application there is nothing to summarise, so the card says
+         * what it is for instead of reporting three zeroes.
+         */}
+        {summary.total === 0 ? (
+          <Text size="sm" tone="muted" className="text-pretty">
+            Track every application here — where each one stands, and what’s worth following up.
+          </Text>
+        ) : (
+          <div className="divide-border grid grid-cols-3 divide-x">
+            {stats.map((stat) => (
+              <div key={stat.label} className="space-y-0.5 px-2 text-center first:pl-0 last:pr-0">
+                <div
+                  className={cn(
+                    'font-mono text-3xl leading-none font-semibold tabular-nums',
+                    stat.tone,
+                  )}
+                >
+                  {stat.value}
+                </div>
+                <Text as="span" size="xs" tone="muted">
+                  {stat.label}
+                </Text>
               </div>
-              <Text as="span" size="xs" tone="muted">
-                {stat.label}
-              </Text>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   )

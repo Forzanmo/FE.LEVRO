@@ -74,6 +74,7 @@ export function CoachComposer({
           multiple={question.type === 'multi'}
           value={selected}
           onChange={setSelected}
+          legend={question.prompt}
         />
       ) : (
         <div className="relative">

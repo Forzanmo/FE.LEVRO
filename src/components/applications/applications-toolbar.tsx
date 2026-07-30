@@ -39,7 +39,10 @@ export function ApplicationsToolbar({
           onChange={(e) => onSearch(e.target.value)}
         />
         <Select value={status} onValueChange={onStatus}>
-          <SelectTrigger className="sm:w-44">
+          {/* `role="combobox"` does NOT take its name from content, so the
+              trigger's child <span> gave it no accessible name at all — axe
+              reported an unnamed combobox as a critical violation. */}
+          <SelectTrigger className="sm:w-44" aria-label="Filter by status">
             <SelectValue placeholder="All statuses" />
           </SelectTrigger>
           <SelectContent>

@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/select'
 import { APPLICATION_STATUSES, STATUS_META } from '@/features/applications/status'
 import {
+  APPLICATION_LIMITS,
   applicationFormSchema,
   type ApplicationFormValues,
 } from '@/lib/validators/application-schema'
@@ -39,14 +40,18 @@ const DEFAULTS: ApplicationFormValues = {
   source: '',
 }
 
-export function AddApplicationDialog({ onAdd }: { onAdd: (values: ApplicationFormValues) => void }) {
+export function AddApplicationDialog({
+  onAdd,
+}: {
+  onAdd: (values: ApplicationFormValues) => void
+}) {
   const [open, setOpen] = useState(false)
   const {
     register,
     control,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<ApplicationFormValues>({
     resolver: zodResolver(applicationFormSchema),
     defaultValues: DEFAULTS,
@@ -76,8 +81,20 @@ export function AddApplicationDialog({ onAdd }: { onAdd: (values: ApplicationFor
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
-            <TextField label="Company" required error={errors.company?.message} {...register('company')} />
-            <TextField label="Role" required error={errors.role?.message} {...register('role')} />
+            <TextField
+              label="Company"
+              required
+              maxLength={APPLICATION_LIMITS.company}
+              error={errors.company?.message}
+              {...register('company')}
+            />
+            <TextField
+              label="Role"
+              required
+              maxLength={APPLICATION_LIMITS.role}
+              error={errors.role?.message}
+              {...register('role')}
+            />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="app-status">Status</Label>
@@ -101,8 +118,18 @@ export function AddApplicationDialog({ onAdd }: { onAdd: (values: ApplicationFor
             />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <TextField label="Location" placeholder="Remote, Berlin…" {...register('location')} />
-            <TextField label="Source" placeholder="LinkedIn, referral…" {...register('source')} />
+            <TextField
+              label="Location"
+              placeholder="Remote, Berlin…"
+              maxLength={APPLICATION_LIMITS.location}
+              {...register('location')}
+            />
+            <TextField
+              label="Source"
+              placeholder="LinkedIn, referral…"
+              maxLength={APPLICATION_LIMITS.source}
+              {...register('source')}
+            />
           </div>
           <DialogFooter>
             <DialogClose asChild>
@@ -110,7 +137,12 @@ export function AddApplicationDialog({ onAdd }: { onAdd: (values: ApplicationFor
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit">Add application</Button>
+            {/* `handleSubmit` resolves validation asynchronously, so there is a
+                real window between the first click and the dialog closing in
+                which a second click lands and files the application twice. */}
+            <Button type="submit" isLoading={isSubmitting}>
+              Add application
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

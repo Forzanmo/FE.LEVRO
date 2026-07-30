@@ -17,7 +17,12 @@ const FADE_MASK = 'radial-gradient(ellipse at center, black 30%, transparent 75%
  * Decorative background texture — pure CSS (no SVG id, no dependency, server-safe)
  * so it works anywhere and stays cheap. Sits behind content; purely decorative.
  */
-export function GridPattern({ variant = 'grid', size = 32, fade = true, className }: GridPatternProps) {
+export function GridPattern({
+  variant = 'grid',
+  size = 32,
+  fade = true,
+  className,
+}: GridPatternProps) {
   const backgroundImage =
     variant === 'dots'
       ? `radial-gradient(${INK} 1px, transparent 1.5px)`

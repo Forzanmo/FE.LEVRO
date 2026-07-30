@@ -12,11 +12,17 @@ export interface NavItem {
 export const PRIMARY_NAV: readonly NavItem[] = [
   { label: 'Dashboard', href: ROUTES.dashboard, icon: 'dashboard' },
   { label: 'AI Coach', href: ROUTES.coach, icon: 'coach' },
-  { label: 'Roadmap', href: ROUTES.roadmap, icon: 'roadmap' },
-  { label: 'Resume', href: ROUTES.resume, icon: 'resume' },
+  { label: 'Documents', href: ROUTES.documents, icon: 'resume' },
+  // "Edit CV", not "Resume": the product calls this artifact a CV everywhere
+  // else, and two nouns for one object is the mental-model drift that makes an
+  // app feel like several apps.
+  { label: 'Edit CV', href: ROUTES.resume, icon: 'edit' },
   { label: 'Cover Letter', href: ROUTES.coverLetter, icon: 'cover-letter' },
   { label: 'Applications', href: ROUTES.applications, icon: 'applications' },
-  { label: 'Achievements', href: ROUTES.achievements, icon: 'achievements' },
+  // Achievements removed with the roadmap that fed it (PRODUCT.md, "Planned").
+  // A badge wall with no progression behind it is the gamification the product's
+  // anti-references rule out, and it was the one screen stacking two of the
+  // absolute bans — a hero-metric row above an identical-card grid.
 ]
 
 export const SECONDARY_NAV: readonly NavItem[] = [
@@ -27,7 +33,10 @@ export const SECONDARY_NAV: readonly NavItem[] = [
 export const MOBILE_NAV: readonly NavItem[] = [
   { label: 'Dashboard', href: ROUTES.dashboard, icon: 'dashboard' },
   { label: 'Coach', href: ROUTES.coach, icon: 'coach' },
-  { label: 'Roadmap', href: ROUTES.roadmap, icon: 'roadmap' },
-  { label: 'Resume', href: ROUTES.resume, icon: 'resume' },
+  { label: 'Docs', href: ROUTES.documents, icon: 'resume' },
+  // "Edit CV", not "Resume": the product calls this artifact a CV everywhere
+  // else, and two nouns for one object is the mental-model drift that makes an
+  // app feel like several apps.
+  { label: 'Edit CV', href: ROUTES.resume, icon: 'edit' },
   { label: 'Apps', href: ROUTES.applications, icon: 'applications' },
 ]

@@ -1,32 +1,27 @@
 import type { IconName } from '@/components/ui/icon'
+import type { DocumentSummary } from '@/features/documents/types'
 
-export interface ScoreCategory {
+/** How well a skill is currently evidenced in the user's documents. */
+export type SkillStrength = 'strong' | 'partial' | 'missing'
+
+export interface SkillCoverage {
   id: string
   label: string
-  /** 0–100. */
-  score: number
-  /** Evidence-based reasoning shown when the category is expanded. */
-  reasoning: string
+  strength: SkillStrength
+  /**
+   * Why it reads that way — which document evidences it, or what is absent.
+   * Evidence over assertion: a strength label without its reason is a verdict.
+   */
+  evidence: string
 }
 
-export interface CareerScore {
-  /** 0–100. */
-  overall: number
-  /** Change since last assessment (percentage points). */
-  delta: number
-  categories: ScoreCategory[]
+/** The skills picture for the user's target role. */
+export interface SkillsSummary {
+  targetRole: string
+  skills: SkillCoverage[]
 }
 
-export interface Mission {
-  id: string
-  title: string
-  description: string
-  xp: number
-  estimatedMinutes: number
-  icon: IconName
-}
-
-export type ActivityType = 'resume' | 'coach' | 'roadmap' | 'application' | 'achievement'
+export type ActivityType = 'cv' | 'cover-letter' | 'coach' | 'application' | 'achievement'
 
 export interface ActivityItem {
   id: string
@@ -42,27 +37,21 @@ export interface ApplicationsSummary {
   offers: number
 }
 
-export interface RoadmapProgress {
-  completed: number
-  total: number
-  nextQuest: string
-}
-
-export type HeatmapLevel = 0 | 1 | 2 | 3 | 4
-
-export interface HeatmapDay {
-  /** ISO date (YYYY-MM-DD). */
-  date: string
-  level: HeatmapLevel
-}
-
 export interface DashboardOverview {
   userName: string
+  /**
+   * True in the window between finishing the assessment and seeing the
+   * dashboard for the first time.
+   */
+  isFirstRun: boolean
+  /**
+   * Whether the assessment has been completed. When false, `skills` describes
+   * nothing the user has actually done and must not be rendered as if it does.
+   */
+  hasAssessment: boolean
   streakDays: number
-  score: CareerScore
-  mission: Mission
-  roadmap: RoadmapProgress
-  heatmap: HeatmapDay[]
+  skills: SkillsSummary
+  documents: DocumentSummary[]
   activity: ActivityItem[]
   applications: ApplicationsSummary
 }

@@ -1,6 +1,14 @@
 import { expect, test } from '@playwright/test'
 
+import { seedAssessed } from './support/journey'
+
 test.describe('Applications table', () => {
+  // Every test here needs the tracked applications, and those are gated on a
+  // completed assessment now — a fresh context correctly shows an empty table.
+  test.beforeEach(async ({ page }) => {
+    await seedAssessed(page)
+  })
+
   test('search filters the rows', async ({ page }) => {
     await page.goto('/applications')
     const table = page.locator('table')
@@ -44,4 +52,12 @@ test.describe('Applications table', () => {
     await page.getByRole('button', { name: 'Undo' }).click()
     await expect(table.getByText('Vercel')).toBeVisible()
   })
+})
+
+test('a visitor with no assessment sees an empty tracker, not fourteen invented rows', async ({
+  page,
+}) => {
+  await page.goto('/applications')
+  await expect(page.getByText('Vercel')).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Add application' })).toBeVisible()
 })

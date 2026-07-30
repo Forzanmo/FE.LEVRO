@@ -14,7 +14,13 @@ function Demo({ multiple }: { multiple: boolean }) {
   const [value, setValue] = useState<string[]>([])
   return (
     <div className="max-w-sm">
-      <OptionGroup options={OPTIONS} multiple={multiple} value={value} onChange={setValue} />
+      <OptionGroup
+        options={OPTIONS}
+        multiple={multiple}
+        value={value}
+        onChange={setValue}
+        legend="Where are you in your career right now?"
+      />
     </div>
   )
 }

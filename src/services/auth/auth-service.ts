@@ -7,7 +7,7 @@
  * is reviewable without a login wall; explicit sign-out flips it and drives the
  * real sign-in → onboarding → coach flow.
  */
-export type AuthPlan = 'assets' | 'assets-roadmap'
+export type AuthPlan = 'cv' | 'cv-letters'
 
 export interface SessionUser {
   id: string
@@ -68,6 +68,13 @@ export const authService = {
 
   signOut(): StoredSession {
     return write({ authenticated: false, user: null, hasOnboarded: false })
+  },
+
+  /** Persist profile edits. Returns null when there is no session to update. */
+  updateProfile(patch: { name: string }): StoredSession | null {
+    const current = read()
+    if (!current?.user) return null
+    return write({ ...current, user: { ...current.user, name: patch.name } })
   },
 
   completeOnboarding(plan: AuthPlan): StoredSession {

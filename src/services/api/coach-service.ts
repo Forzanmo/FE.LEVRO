@@ -7,7 +7,7 @@ import type { Assessment } from '@/features/coach/types'
  */
 const ASSESSMENT: Assessment = {
   intro:
-    "Hi — I'm your Levvro coach. I'll ask a few quick questions to build your Career Readiness Score. No fluff, and I'll explain why each one matters. You can skip, go back, or edit any answer.",
+    "Hi — I'm your Levvro coach. A few quick questions, and I'll draft your CV from your answers. No fluff, and I'll explain why each one matters. You can skip, go back, or edit any answer.",
   questions: [
     {
       id: 'stage',
@@ -33,7 +33,7 @@ const ASSESSMENT: Assessment = {
       id: 'timeline',
       type: 'single',
       prompt: 'How soon do you want to be interviewing?',
-      reasoning: 'Your timeline decides how aggressive your roadmap should be.',
+      reasoning: 'Your timeline decides how much we polish now versus what can wait.',
       options: [
         { value: 'asap', label: 'As soon as possible' },
         { value: '1-3m', label: 'In 1–3 months' },
@@ -75,8 +75,7 @@ const ASSESSMENT: Assessment = {
       id: 'confidence',
       type: 'single',
       prompt: 'How confident do you feel walking into an interview?',
-      reasoning:
-        'Interview readiness is often the biggest hidden gap — and the most fixable one.',
+      reasoning: 'Interview readiness is often the biggest hidden gap — and the most fixable one.',
       options: [
         { value: 'low', label: 'Not confident' },
         { value: 'some', label: 'Somewhat' },
@@ -99,7 +98,7 @@ const ASSESSMENT: Assessment = {
       reasoning: 'We’ll tailor your next steps to exactly what you pick here.',
       options: [
         { value: 'assets', label: 'Resume + Cover Letter' },
-        { value: 'assets-roadmap', label: 'Resume + Cover Letter + Roadmap' },
+        { value: 'cv-letters', label: 'CV + cover letters' },
       ],
     },
   ],

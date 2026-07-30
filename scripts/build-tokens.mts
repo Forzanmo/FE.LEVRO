@@ -70,8 +70,16 @@ function contrastRatio(fg: string, bg: string, pageBg: string): number {
   return wcagContrast(fgRgb, bgRgb)
 }
 
-/** [foreground role, background role, minimum ratio]. */
-const CONTRAST_PAIRS: [SemanticColorRole, SemanticColorRole, number][] = [
+/**
+ * [foreground role, background role, minimum ratio, surface the bg composites over].
+ *
+ * The fourth element matters for the `*-muted` tints, which are translucent.
+ * They were only ever checked over `background`, but badges live on CARDS — and
+ * a card is a lighter surface, so the same tint resolves differently underneath
+ * them. `destructive` on `destructive-muted` passed the gate at page level and
+ * still measured 4.10:1 on a real card in dark mode. Defaults to 'background'.
+ */
+const CONTRAST_PAIRS: [SemanticColorRole, SemanticColorRole, number, SemanticColorRole?][] = [
   ['foreground', 'background', 4.5],
   ['foreground', 'card', 4.5],
   ['foreground', 'muted', 4.5],
@@ -92,16 +100,53 @@ const CONTRAST_PAIRS: [SemanticColorRole, SemanticColorRole, number][] = [
   ['warning', 'warning-muted', 4.5],
   ['info', 'info-muted', 4.5],
   ['destructive', 'destructive-muted', 4.5],
+
+  // Non-text contrast, WCAG 2.2 SC 1.4.11 (3:1). The focus ring is the single
+  // affordance a keyboard user navigates the entire product by, so it is tested
+  // against every surface it can land on — page, card, and muted (ghost buttons).
+  ['ring', 'background', 3],
+  ['ring', 'card', 3],
+  ['ring', 'muted', 3],
+  ['sidebar-ring', 'sidebar', 3],
+
+  // Text on solid fills that the previous pair list never covered.
+  ['destructive-foreground', 'destructive', 4.5],
+  ['brand-foreground', 'brand', 4.5],
+  ['sidebar-primary-foreground', 'sidebar-primary', 4.5],
+  ['success-foreground', 'success', 4.5],
+  ['warning-foreground', 'warning', 4.5],
+  ['info-foreground', 'info', 4.5],
+  ['achievement', 'achievement-muted', 4.5],
+  ['achievement-foreground', 'achievement', 4.5],
+  ['achievement', 'card', 4.5],
+
+  // The same tinted badges, composited over a card rather than the page.
+  ['success', 'success-muted', 4.5, 'card'],
+  ['warning', 'warning-muted', 4.5, 'card'],
+  ['info', 'info-muted', 4.5, 'card'],
+  ['destructive', 'destructive-muted', 4.5, 'card'],
+  ['brand', 'brand-muted', 4.5, 'card'],
+  ['achievement', 'achievement-muted', 4.5, 'card'],
+
+  // The committed brand surface. Its foreground is fixed at white and the
+  // surface never changes with the theme, so both pairs are checkable up front —
+  // which is the point of promoting it from three hardcoded call sites to a role.
+  ['brand-surface-foreground', 'brand-surface', 4.5],
+  ['brand-surface-muted', 'brand-surface', 4.5],
+  ['brand-surface-accent', 'brand-surface', 4.5],
 ]
 
 function auditContrast(): string[] {
   const failures: string[] = []
   for (const mode of ['light', 'dark'] as const) {
     const colors = semanticColors[mode]
-    for (const [fg, bg, min] of CONTRAST_PAIRS) {
-      const ratio = contrastRatio(colors[fg], colors[bg], colors.background)
+    for (const [fg, bg, min, over = 'background'] of CONTRAST_PAIRS) {
+      const ratio = contrastRatio(colors[fg], colors[bg], colors[over])
       if (ratio + 0.005 < min) {
-        failures.push(`  ✗ [${mode}] ${fg} on ${bg} — ${round(ratio, 2)}:1 (needs ${min}:1)`)
+        const where = over === 'background' ? '' : ` (on ${over})`
+        failures.push(
+          `  ✗ [${mode}] ${fg} on ${bg}${where} — ${round(ratio, 2)}:1 (needs ${min}:1)`,
+        )
       }
     }
   }
@@ -222,6 +267,31 @@ if (failures.length > 0) {
   console.error(failures.join('\n'))
   console.error('\nFix the values in src/lib/design/tokens.ts and re-run.\n')
   process.exit(1)
+}
+
+/**
+ * Never emit a value the browser will silently discard.
+ *
+ * `alpha()` used to hex-parse an OKLCH input and produce
+ * `rgb(NaN NaN NaN / 0.15)`. Invalid custom properties do not throw — they just
+ * fail to apply — so `--brand-muted` was blank across 15 dark-mode surfaces and
+ * nothing caught it until the UI was rendered and sampled. A generated
+ * stylesheet should be provably well-formed before it ships.
+ */
+for (const [name, css] of [
+  ['tokens.generated.css', tokensCss],
+  ['theme.generated.css', themeCss],
+] as const) {
+  const bad = css
+    .split('\n')
+    .map((line, i) => [i + 1, line] as const)
+    .filter(([, line]) => /NaN|undefined|null/.test(line))
+  if (bad.length) {
+    console.error(`\n✗ ${name} contains invalid values:`)
+    for (const [n, line] of bad) console.error(`  ${n}: ${line.trim()}`)
+    console.error('\nThese would be silently dropped by the browser. Fix tokens.ts and re-run.')
+    process.exit(1)
+  }
 }
 
 writeFileSync(join(OUT_DIR, 'tokens.generated.css'), tokensCss, 'utf8')

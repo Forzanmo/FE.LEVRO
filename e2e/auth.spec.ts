@@ -10,9 +10,10 @@ test.describe('Auth + onboarding journey', () => {
 
     await page.getByRole('button', { name: /Continue with Google/i }).click()
     await expect(page).toHaveURL(/\/onboarding/)
-    await expect(
-      page.getByRole('heading', { name: /Resume \+ Cover Letter \+ Roadmap/ }),
-    ).toBeVisible()
+    // The plans were "Resume + Cover Letter + Roadmap" when the roadmap
+    // existed. They are now the two the product actually ships.
+    await expect(page.getByRole('heading', { name: 'Just my CV' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'CV + cover letters' })).toBeVisible()
 
     await page.getByRole('button', { name: /Continue to your coach/i }).click()
     await expect(page).toHaveURL(/\/coach/)

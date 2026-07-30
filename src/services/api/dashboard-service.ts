@@ -1,4 +1,8 @@
-import type { DashboardOverview, HeatmapDay, HeatmapLevel } from '@/features/dashboard/types'
+import type { ApplicationsSummary, DashboardOverview } from '@/features/dashboard/types'
+import type { Application } from '@/features/applications/types'
+import { applicationsService } from '@/services/api/applications-service'
+import { authService } from '@/services/auth/auth-service'
+import { journeyStorage } from '@/services/storage/journey-storage'
 
 /**
  * Dashboard service. All dashboard data access flows through here, so swapping
@@ -12,21 +16,14 @@ function delay<T>(value: T, ms = MOCK_LATENCY_MS): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(value), ms))
 }
 
-/** 13 weeks of deterministic daily-activity levels, trending up into a streak. */
-function buildHeatmap(now: number): HeatmapDay[] {
-  const days: HeatmapDay[] = []
-  for (let i = 90; i >= 0; i--) {
-    const d = new Date(now - i * 86_400_000)
-    const dow = d.getDay()
-    const h = (i * 2654435761) >>> 0
-    let level = h % 5
-    if (dow === 0 || dow === 6) level = Math.max(0, level - 2) // lighter weekends
-    if (i < 6) level = Math.min(4, level + 2) // recent days build the streak
-    else if (i < 14) level = Math.min(4, level + 1)
-    if (h % 13 === 0) level = 0 // the occasional rest day
-    days.push({ date: d.toISOString().slice(0, 10), level: level as HeatmapLevel })
+/** One source of truth for the pipeline counts the dashboard and /applications
+ *  both report, so they cannot disagree about how many applications exist. */
+function summarizeApplications(applications: Application[]): ApplicationsSummary {
+  return {
+    total: applications.length,
+    interviewing: applications.filter((a) => a.status === 'interview').length,
+    offers: applications.filter((a) => a.status === 'offer').length,
   }
-  return days
 }
 
 function buildMockOverview(): DashboardOverview {
@@ -35,68 +32,157 @@ function buildMockOverview(): DashboardOverview {
 
   return {
     userName: 'Alex',
+    isFirstRun: false,
+    hasAssessment: true,
     streakDays: 5,
-    score: {
-      overall: 68,
-      delta: 6,
-      categories: [
+    skills: {
+      targetRole: 'Frontend Engineer',
+      skills: [
         {
-          id: 'experience',
-          label: 'Work Experience',
-          score: 72,
-          reasoning:
-            'Two relevant internships with quantified impact. Add one more outcome metric to your latest role to push this higher.',
+          id: 'react',
+          label: 'React & component architecture',
+          strength: 'strong',
+          evidence: 'Evidenced in two roles on your CV, with outcomes attached.',
         },
         {
-          id: 'skills',
-          label: 'Skills Alignment',
-          score: 64,
-          reasoning:
-            '8 of 12 target-role skills are evidenced in your profile. TypeScript and system design are the highest-leverage gaps.',
+          id: 'typescript',
+          label: 'TypeScript',
+          strength: 'strong',
+          evidence: 'Named in your summary and in both recent experience entries.',
         },
         {
-          id: 'resume',
-          label: 'Resume Quality',
-          score: 81,
-          reasoning:
-            'Strong structure and action verbs. Tighten the summary to a single sentence for a recruiter-friendly scan.',
+          id: 'testing',
+          label: 'Testing',
+          strength: 'partial',
+          evidence: 'Mentioned once, without an outcome. One concrete example would settle it.',
         },
         {
-          id: 'interview',
-          label: 'Interview Readiness',
-          score: 52,
-          reasoning:
-            'You have completed 3 of 8 core behavioural drills. Finish the STAR set to close the biggest score gap.',
+          id: 'accessibility',
+          label: 'Accessibility',
+          strength: 'partial',
+          evidence: 'Implied by your portfolio work but never stated in the CV itself.',
+        },
+        {
+          id: 'system-design',
+          label: 'System design',
+          strength: 'missing',
+          evidence: 'Not present in any document. Common in Frontend Engineer postings you saved.',
         },
       ],
     },
-    mission: {
-      id: 'star-drills',
-      title: 'Finish 2 STAR interview drills',
-      description: 'Interview readiness is your lowest category — 20 minutes here moves your score the most.',
-      xp: 120,
-      estimatedMinutes: 20,
-      icon: 'target',
-    },
-    roadmap: {
-      completed: 4,
-      total: 12,
-      nextQuest: 'Finish the STAR interview set',
-    },
-    heatmap: buildHeatmap(now),
-    activity: [
-      { id: 'a1', title: 'Generated a tailored resume for “Frontend Engineer”', timestamp: hoursAgo(3), type: 'resume', icon: 'resume' },
-      { id: 'a2', title: 'Completed AI Coach: strengths assessment', timestamp: hoursAgo(26), type: 'coach', icon: 'coach' },
-      { id: 'a3', title: 'Unlocked “First Milestone” achievement', timestamp: hoursAgo(49), type: 'achievement', icon: 'achievements' },
-      { id: 'a4', title: 'Applied to Product Studio — Junior Developer', timestamp: hoursAgo(72), type: 'application', icon: 'applications' },
+    documents: [
+      {
+        id: 'cv-northwind',
+        kind: 'cv',
+        title: 'Frontend Engineer — Northwind',
+        role: 'Frontend Engineer',
+        company: 'Northwind',
+        status: 'ready',
+        updatedAt: hoursAgo(3),
+        template: 'minimalist',
+      },
+      {
+        id: 'cl-northwind',
+        kind: 'cover-letter',
+        title: 'Cover letter — Northwind',
+        role: 'Frontend Engineer',
+        company: 'Northwind',
+        status: 'sent',
+        updatedAt: hoursAgo(4),
+      },
+      {
+        id: 'cv-product-studio',
+        kind: 'cv',
+        title: 'Junior Developer — Product Studio',
+        role: 'Junior Developer',
+        company: 'Product Studio',
+        status: 'sent',
+        updatedAt: hoursAgo(72),
+        template: 'ats',
+      },
+      {
+        id: 'cv-general',
+        kind: 'cv',
+        title: 'General CV',
+        role: 'Frontend Engineer',
+        status: 'draft',
+        updatedAt: hoursAgo(120),
+        template: 'designer',
+      },
     ],
-    applications: { total: 12, interviewing: 3, offers: 1 },
+    activity: [
+      {
+        id: 'a1',
+        title: 'Tailored your CV for “Frontend Engineer” at Northwind',
+        timestamp: hoursAgo(3),
+        type: 'cv',
+        icon: 'resume',
+      },
+      {
+        id: 'a2',
+        title: 'Sent a cover letter to Northwind',
+        timestamp: hoursAgo(4),
+        type: 'cover-letter',
+        icon: 'cover-letter',
+      },
+      {
+        id: 'a3',
+        title: 'Added TypeScript evidence to your experience section',
+        timestamp: hoursAgo(26),
+        type: 'cv',
+        icon: 'resume',
+      },
+      {
+        id: 'a4',
+        title: 'Applied to Product Studio — Junior Developer',
+        timestamp: hoursAgo(72),
+        type: 'application',
+        icon: 'applications',
+      },
+    ],
+    // Derived, not hardcoded. These were literals that drifted out of step with
+    // the applications fixture: the dashboard claimed 12 while /applications
+    // listed 14, and the two screens are one click apart.
+    applications: summarizeApplications(applicationsService.getApplications()),
+  }
+}
+
+/**
+ * The dashboard as it genuinely is immediately after a first assessment: a
+ * skills picture, and nothing else yet — no documents, no streak, no history.
+ * The cards render first-run states from this rather than showing zeroes in a
+ * layout designed for content.
+ */
+function buildFirstRunOverview(userName: string): DashboardOverview {
+  const full = buildMockOverview()
+  return {
+    ...full,
+    userName,
+    isFirstRun: true,
+    hasAssessment: true,
+    streakDays: 0,
+    // The skills picture IS earned — it is what the assessment just produced.
+    documents: [],
+    activity: [],
+    applications: { total: 0, interviewing: 0, offers: 0 },
   }
 }
 
 export const dashboardService = {
   getOverview(): Promise<DashboardOverview> {
     // Real implementation: return httpClient.get<DashboardOverview>('/dashboard/overview')
-    return delay(buildMockOverview())
+    const userName = authService.getSession()?.user?.name ?? ''
+
+    // Nothing downstream of the assessment exists until it has been taken.
+    // Serving the seeded skills picture here would tell a brand-new visitor
+    // what their strengths are before they have said a word.
+    if (!journeyStorage.hasAssessment()) {
+      return delay({ ...buildFirstRunOverview(userName), hasAssessment: false })
+    }
+
+    if (journeyStorage.isFirstRun()) {
+      return delay(buildFirstRunOverview(userName))
+    }
+    return delay({ ...buildMockOverview(), userName, isFirstRun: false, hasAssessment: true })
   },
 }

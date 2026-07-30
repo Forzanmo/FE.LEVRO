@@ -12,7 +12,13 @@ export interface EmptyStateProps {
   className?: string
 }
 
-export function EmptyState({ icon = 'sparkles', title, description, action, className }: EmptyStateProps) {
+export function EmptyState({
+  icon = 'sparkles',
+  title,
+  description,
+  action,
+  className,
+}: EmptyStateProps) {
   return (
     <div
       className={cn(
@@ -21,11 +27,21 @@ export function EmptyState({ icon = 'sparkles', title, description, action, clas
       )}
     >
       <GridPattern variant="dots" size={22} className="opacity-60" />
-      <span className="bg-brand-muted text-brand grid size-12 place-items-center rounded-full">
+      {/* Warning icons get warning colour. Hardcoding brand teal meant the
+          dashboard's error state rendered a calm teal warning triangle,
+          visually identical to an ordinary empty state. */}
+      <span
+        className={cn(
+          'grid size-12 place-items-center rounded-full',
+          icon === 'warning' ? 'bg-warning-muted text-warning' : 'bg-brand-muted text-brand',
+        )}
+      >
         <Icon name={icon} size="lg" />
       </span>
       <div className="space-y-1">
-        <Heading level={3} size="lg">
+        {/* level 2: an empty state is usually the only content under the page
+            h1, so h3 skipped a level in the document outline. */}
+        <Heading level={2} size="lg">
           {title}
         </Heading>
         {description ? (

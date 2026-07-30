@@ -9,10 +9,24 @@ export interface LogoProps {
   href?: string
   /** Hide the wordmark (used by the collapsed sidebar). */
   collapsed?: boolean
+  /**
+   * `onBrand` renders the wordmark white for committed brand surfaces (the
+   * drenched marketing header), which are the same deep teal in both themes.
+   *
+   * A prop rather than a blanket `[&_*]:text-white` on the parent: that
+   * descendant selector out-specifies any child's own colour, which would also
+   * have whitened the white "Get started" button's label into invisibility.
+   */
+  tone?: 'default' | 'onBrand'
   className?: string
 }
 
-export function Logo({ href = ROUTES.home, collapsed = false, className }: LogoProps) {
+export function Logo({
+  href = ROUTES.home,
+  collapsed = false,
+  tone = 'default',
+  className,
+}: LogoProps) {
   return (
     <Link
       href={href}
@@ -26,7 +40,12 @@ export function Logo({ href = ROUTES.home, collapsed = false, className }: LogoP
         <Icon name="sparkles" size="sm" variant="filled" />
       </span>
       {!collapsed ? (
-        <span className="text-foreground text-lg font-semibold tracking-tight">
+        <span
+          className={cn(
+            'text-lg font-semibold tracking-tight',
+            tone === 'onBrand' ? 'text-white' : 'text-foreground',
+          )}
+        >
           {siteConfig.name}
         </span>
       ) : null}

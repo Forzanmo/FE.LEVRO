@@ -42,10 +42,17 @@ export const coverLetterService = {
 
     const intro = `${OPENERS[input.tone]} the ${role} position at ${company}. Your work is exactly the kind of problem I want to be solving, and my background maps closely to what the role needs.`
 
+    /*
+     * With no highlights the letter used to assert a work history on the user's
+     * behalf — "I have shipped production features, improved performance…" —
+     * inventing accomplishments and putting the user's name under them. The
+     * fallback now says only what the user has actually told us, which is that
+     * they want the role.
+     */
     const evidence =
       highlights.length > 0
         ? `A few things I would bring: ${highlights.join('; ')}. I care about shipping accessible, high-performance interfaces and owning a problem end to end.`
-        : `In my recent work I have shipped production features, improved performance, and raised the accessibility bar on the products I have touched — always owning the problem end to end.`
+        : `I have followed the work your team publishes, and the problems described in the posting are the ones I want to be spending my time on.`
 
     const fit = `What draws me to ${company} specifically is the chance to do that work with a team that clearly sweats the details. I move quickly, communicate clearly, and turn feedback into progress.`
 

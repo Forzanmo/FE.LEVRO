@@ -36,13 +36,16 @@
     @apply text-foreground font-sans antialiased;
   }
 
+  /* No global `tracking-tight`: it applied display tracking to every heading
+     down to 16px and fought the size-conditional tracking the Heading
+     primitive now owns. The family and balancing stay global. */
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
-    @apply font-heading tracking-tight text-balance;
+    @apply font-heading text-balance;
   }
 
   /* Component-owned focus rings win; this is the fallback for plain elements. */
@@ -113,7 +116,7 @@ body {
 /* Deep-teal brand gradient for surfaces that carry WHITE text or icons. The
    teal→gold `bg-gradient-brand` fails WCAG contrast on its light aqua/gold half,
    so glyph-bearing surfaces (buttons, CTA bands, icon chips) use this dark,
-   white-safe ramp. Gold stays decorative — the score ring, aurora, and logo. */
+   white-safe ramp. Gold carries completion — earned states, the hero lamp. */
 @utility bg-gradient-brand-deep {
   background-image: linear-gradient(135deg, var(--brand-700), var(--brand-900));
 }
@@ -197,7 +200,10 @@ body {
   animation: brand-rise 0.7s var(--ease-decelerate) both;
 }
 
-/* Moving highlight that sweeps across committed brand surfaces (the CTA band). */
+/* Moving highlight that sweeps across committed brand surfaces (the CTA band).
+   The white stop is capped at 12%: at 28% the sweep lightened the band enough
+   to drag its own body copy to 3.53:1 as it passed under the text. A highlight
+   must never be able to make the words it crosses illegible. */
 @utility brand-sheen {
   position: absolute;
   inset: 0;
@@ -205,26 +211,14 @@ body {
   background: linear-gradient(
     100deg,
     transparent 30%,
-    color-mix(in oklab, white 28%, transparent) 50%,
+    color-mix(in oklab, white 12%, transparent) 50%,
     transparent 70%
   );
   animation: brand-sheen 6s var(--ease-standard) 1.5s infinite;
 }
 
-/*
- * Roadmap "living map" — ambient energy flowing along the active frontier: the
- * connector edges that lead into the next available quest. Purely decorative,
- * so the global reduced-motion block below freezes it to a static dotted line.
- */
-@keyframes quest-flow {
-  to {
-    stroke-dashoffset: -17;
-  }
-}
-.quest-flow {
-  stroke-dasharray: 3 14;
-  animation: quest-flow 0.9s linear infinite;
-}
+/* The `quest-flow` rail animation was removed with the roadmap — it had no
+   remaining consumers, and dead keyframes ship to every visitor. */
 
 /*
  * Staggered entrance for a block of hero children (above the fold). Each direct
@@ -266,7 +260,7 @@ body {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Print — export only the resume sheet (Resume → Download PDF).              */
+/* Print — export only the CV / cover-letter sheet (Download PDF).            */
 /* -------------------------------------------------------------------------- */
 
 @media print {
@@ -276,6 +270,12 @@ body {
   .print-sheet,
   .print-sheet * {
     visibility: visible !important;
+    /* Browsers drop background colours when printing by default. The Designer
+       template puts white text on a deep-teal sidebar, so without this the
+       whole left column prints white-on-white and the candidate sends a CV
+       with a blank panel where their skills should be. */
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
   .print-sheet {
     position: absolute;

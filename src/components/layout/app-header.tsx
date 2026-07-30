@@ -88,7 +88,7 @@ function NotificationsMenu() {
 /** Sticky top chrome. No global search by product design (spec §4). */
 export function AppHeader() {
   return (
-    <header className="bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-[var(--z-sticky)] flex h-16 items-center gap-2 border-b px-4 backdrop-blur sm:px-6">
+    <header className="bg-background/95 supports-[backdrop-filter]:bg-background/88 sticky top-0 z-[var(--z-sticky)] flex h-16 items-center gap-2 border-b px-4 backdrop-blur sm:px-6">
       <div className="md:hidden">
         <Logo />
       </div>
