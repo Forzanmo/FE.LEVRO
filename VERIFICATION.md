@@ -87,24 +87,56 @@ produced a confident but false result:
 11. **Walk stopped on any repeated label**, so a second "Get started" (header and
     footer both have one) ended it early and left later stops unexamined. Now stops
     only on a true cycle back to the first stop.
+12. **The walk pressed Tab twice per iteration** — once at the top of the loop and
+    again after recording a stop — so it examined every *other* focusable element
+    and reported the halved count as full coverage. Every touch-target and
+    focus-visibility result before this fix was drawn from half the tab order.
+13. **`probe()` could hang forever.** It cleared its abort timer as soon as the
+    response headers arrived, then awaited `res.text()` with nothing to interrupt
+    it, so a dev server that stalled mid-stream blocked the gate indefinitely.
+    Three a11y runs sat blocked here for hours and were written off as lost.
+14. **The probe budget was shorter than the server.** At 1500ms against a real
+    first response of ~1.78s, the gate concluded a healthy dev server was dead and
+    spawned a second one beside it, and the two then fought for the CPU — which is
+    what the resulting garbage findings actually measured. Dead ports now cost a
+    400ms TCP check; a port that is listening gets 20s.
 
 ## Last full-matrix result
+
+Run end-to-end, sequentially, on the committed code — one gate at a time, nothing
+else touching the machine. Concurrency between a gate and anything else is not a
+detail: it invalidated two earlier runs outright.
 
 - `typecheck` — clean
 - `eslint src scripts --max-warnings 0` — clean
 - token gate — **42 pairs × 2 themes**, pass
-- production build — **15 routes**, pass
-- `check-contrast` — **1,894/1,894 text runs clear WCAG AA** (pre-refactor matrix;
-  needs a re-run against the ChoiceGroup / brand-surface refactor)
-- `check-a11y` — 68 renders, **0 axe violations**; findings fixed in this pass:
-  `landmark-unique` (Designer CV `<aside>` → `<div>`), the 16px "Why I'm asking"
-  disclosure, and the standalone "Back to home" links on `/terms` and `/privacy`
+- production build — **14 routes**, pass
+- `check-contrast` — **2,068/2,068 text runs clear WCAG AA**, every route in its
+  intended state
+- `check-a11y` — **80 page renders, 0 axe violations, 0 keyboard findings** (the
+  first run with the doubled tab coverage, so this is the first time the
+  touch-target and focus checks saw the whole tab order)
+- `playwright test` — **21 passed, 2 skipped**; the skips are the `describe.skip`'d
+  roadmap specs for the unbuilt feature
+
+### Bundle, same run
+
+Measured with CDP encoded bytes against `next start`, not estimated from the build
+output.
+
+| Route | JS (gzipped) |
+|---|---|
+| `/` | 285KB |
+| `(app)` routes | 562KB |
+
+~103KB of the app-route figure is two byte-equivalent copies of zod and two of
+motion. It is a Turbopack chunk-allocation artifact, not app code — see the note in
+`next.config.ts`.
 
 ## Known gaps
 
-- **Re-run both browser gates** after the design-system refactor (ChoiceGroup,
-  `brand-surface` role, shared document sheet). The token gate and build are green;
-  the rendered gates have not been re-run end-to-end since.
+- **The duplicated vendor chunks above.** Worth re-measuring on each Next upgrade;
+  if it persists, it is worth an upstream issue.
 - No reduced-motion pass in either gate. `ProgressRing`, `Reveal`, and the aurora all
   branch on `useReducedMotion()`, and none of that is asserted.
 - No intermediate breakpoints — only 390px and 1280px. The `md`/`lg` transitions
