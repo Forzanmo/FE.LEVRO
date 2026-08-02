@@ -36,9 +36,31 @@ export function ApplicationsTable({
 
   return (
     <>
-      {/* Desktop table */}
-      <div className="ring-foreground/10 hidden overflow-hidden rounded-xl ring-1 md:block">
-        <table className="w-full text-sm">
+      {/*
+       * Desktop table.
+       *
+       * `overflow-x-auto` and `min-w-0`, not `overflow-hidden`. Between 768 and
+       * ~900px the desktop sidebar has already appeared (256px) while the
+       * viewport has not caught up, leaving the table about 512px for six
+       * columns that need ~600. `overflow-hidden` did not contain that: the
+       * wrapper is a grid child, so its automatic minimum was the table's
+       * min-content width and the wrapper itself grew — pushing the whole PAGE
+       * to scroll sideways by 65px at exactly 768px, in both themes.
+       *
+       * Six columns of a data table are worth scrolling; the page is not. The
+       * `min-w-0` is what actually lets the track shrink, and `overflow-x-auto`
+       * is what makes the overflow reachable instead of clipped.
+       *
+       * `relative` is the non-obvious part, and without it the page still
+       * scrolled. The actions column carries an `sr-only` header, and `sr-only`
+       * is `position: absolute`. With no positioned ancestor its containing
+       * block is the initial one — the viewport — so that 1px label sat at
+       * x=839 *outside* the scroll container and extended the document's scroll
+       * width by 72px on its own. Making the wrapper a containing block puts it
+       * back inside the region that scrolls.
+       */}
+      <div className="ring-foreground/10 relative hidden min-w-0 overflow-x-auto rounded-xl ring-1 md:block">
+        <table className="w-full min-w-[38rem] text-sm">
           <thead className="bg-muted/50">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>

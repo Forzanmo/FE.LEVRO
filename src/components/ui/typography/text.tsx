@@ -36,7 +36,7 @@ export const textVariants = cva('', {
       info: 'text-info',
       /**
        * For committed brand surfaces (`bg-gradient-brand-deep`), which are the
-       * SAME dark teal in both themes — so the colour must NOT be theme-reactive.
+       * SAME deep navy in both themes — so the colour must NOT be theme-reactive.
        * Replaces the old `inverse` tone (`primary-foreground`), which inverted
        * to near-black in dark mode on a surface that never changed.
        */

@@ -1,4 +1,4 @@
-import { AuroraBackdrop } from '@/components/shared/aurora-backdrop'
+import { BrandBackdrop } from '@/components/shared/brand-backdrop'
 import { Logo } from '@/components/layout'
 import { ThemeToggle } from '@/components/shared/theme-toggle'
 import { Icon, type IconName } from '@/components/ui/icon'
@@ -42,7 +42,7 @@ export function StatusPage({
 }: StatusPageProps) {
   return (
     <div className="relative flex min-h-svh flex-col overflow-hidden">
-      <AuroraBackdrop />
+      <BrandBackdrop />
 
       <header className="mx-auto flex h-16 w-full max-w-[var(--content-max-width)] items-center justify-between px-4 sm:px-6 lg:px-8">
         <Logo />

@@ -17,10 +17,26 @@ export interface StatusMeta {
   icon: IconName
 }
 
+/*
+ * Five stages, five colours that survive being seen side by side: neutral →
+ * navy → teal → green → rose.
+ *
+ * `interview` used to be `brand` while `screening` was `info`. That was fine
+ * when `info` was sky and the brand was teal. Under the navy identity `info`
+ * resolves to the brand navy itself (there is no room for a second blue between
+ * navy and teal — see the note in `lib/design/tokens.ts`), so those two chips
+ * became the same colour in adjacent columns of the same funnel. `interview`
+ * moves to the accent, which is the one remaining hue in the identity and reads
+ * clearly against both its neighbours.
+ */
 export const STATUS_META: Record<AppStatus, StatusMeta> = {
   applied: { label: 'Applied', tone: 'bg-muted text-muted-foreground', icon: 'send' },
   screening: { label: 'Screening', tone: 'bg-info-muted text-info', icon: 'search' },
-  interview: { label: 'Interview', tone: 'bg-brand-muted text-brand', icon: 'message' },
+  interview: {
+    label: 'Interview',
+    tone: 'bg-achievement-muted text-achievement',
+    icon: 'message',
+  },
   offer: { label: 'Offer', tone: 'bg-success-muted text-success', icon: 'achievements' },
   rejected: { label: 'Rejected', tone: 'bg-destructive-muted text-destructive', icon: 'close' },
 }

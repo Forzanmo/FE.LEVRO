@@ -27,7 +27,13 @@ export const metadata: Metadata = {
     title: siteConfig.title,
     description: siteConfig.description,
   },
-  icons: { icon: '/favicon.ico' },
+  /*
+   * No `icons` entry on purpose. It used to point at `/favicon.ico`, which has
+   * never existed in `public/` — so every page shipped a link to a 404 and
+   * browsers fell back to a generic globe. Next's file convention now owns
+   * this: `app/icon.svg` and `app/apple-icon.png` are discovered and linked
+   * automatically, with the right `sizes` and `type` attributes.
+   */
 }
 
 export const viewport: Viewport = {
@@ -35,8 +41,8 @@ export const viewport: Viewport = {
   // — otherwise mobile browser chrome sits a visibly different colour against
   // the page on a product whose trust signal is pixel-level polish.
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f6fbfc' },
-    { media: '(prefers-color-scheme: dark)', color: '#081214' },
+    { media: '(prefers-color-scheme: light)', color: '#f9fbfe' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a131e' },
   ],
   width: 'device-width',
   initialScale: 1,

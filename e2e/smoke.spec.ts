@@ -6,11 +6,23 @@ test.describe('Levvro smoke', () => {
   test('landing renders the hero and primary CTA', async ({ page }) => {
     await page.goto('/')
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      'says less about you than you think',
+      'what your CV proves',
     )
-    await expect(
-      page.getByRole('link', { name: /Start Your Career Journey/i }).first(),
-    ).toBeVisible()
+    await expect(page.getByRole('link', { name: /See what mine proves/i }).first()).toBeVisible()
+    await expect(page.getByRole('link', { name: /Start your assessment/i }).first()).toBeVisible()
+  })
+
+  test('the hero product panel states a verdict and the evidence behind it', async ({ page }) => {
+    // The panel is the page's whole argument — a verdict is worthless here
+    // without the line of the CV that earned it, and the counts have to
+    // reconcile with the meter beside them. If a redesign drops the reasoning
+    // line, the landing page is asserting rather than evidencing, which is the
+    // one thing this product exists to argue against.
+    await page.goto('/')
+    await expect(page.getByText('Skills assessment')).toBeVisible()
+    await expect(page.getByText('Evidenced').first()).toBeVisible()
+    await expect(page.getByText(/Rebuilt the checkout as 14 shared components/)).toBeVisible()
+    await expect(page.getByRole('img', { name: '7 of 11 skills evidenced' })).toBeVisible()
   })
 
   test('dashboard leads with the skills read-out', async ({ page }) => {

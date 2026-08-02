@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
-import { AuroraBackdrop } from '@/components/shared/aurora-backdrop'
+import { BrandBackdrop } from '@/components/shared/brand-backdrop'
+import { SkipLink } from '@/components/shared/skip-link'
 import { Logo } from '@/components/layout'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
@@ -24,11 +25,12 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <div className="relative flex min-h-svh flex-col">
-      <AuroraBackdrop />
+      <SkipLink />
+      <BrandBackdrop />
       <header className="mx-auto flex h-16 w-full max-w-[var(--content-max-width)] items-center px-4 sm:px-6 lg:px-8">
         <Logo />
       </header>
-      <main className="mx-auto w-full max-w-[var(--content-max-width)] flex-1 px-4 py-16 sm:px-6 lg:px-8">
+      <main id="main-content" className="mx-auto w-full max-w-[var(--content-max-width)] flex-1 px-4 py-16 sm:px-6 lg:px-8">
         <Heading level={1} size="display-sm">
           Terms of Service
         </Heading>

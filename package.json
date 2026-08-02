@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "tokens": "node scripts/build-tokens.mts",
+    "brand-assets": "node scripts/build-brand-assets.mjs",
     "predev": "node scripts/build-tokens.mts",
     "dev": "next dev",
     "prebuild": "node scripts/build-tokens.mts",

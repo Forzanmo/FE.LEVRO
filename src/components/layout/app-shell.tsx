@@ -1,3 +1,4 @@
+import { SkipLink } from '@/components/shared/skip-link'
 import { AmbientBackdrop } from '@/components/shared/ambient-backdrop'
 
 import { AppHeader } from './app-header'
@@ -16,14 +17,7 @@ import { Sidebar } from './sidebar'
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative flex min-h-svh">
-      {/* Bypass-blocks: first focusable element jumps keyboard/SR users past the
-          header + sidebar straight to content (WCAG 2.4.1). */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[var(--z-toast)] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:shadow-lg"
-      >
-        Skip to content
-      </a>
+      <SkipLink />
       <AmbientBackdrop />
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">

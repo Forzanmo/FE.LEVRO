@@ -119,28 +119,78 @@ else touching the machine. Concurrency between a gate and anything else is not a
 detail: it invalidated two earlier runs outright.
 
 - `typecheck` — clean
-- `eslint` (whole project, incl. `e2e`, all 14 stories, `.storybook`, configs) — clean
+- `eslint` (whole project, incl. `e2e`, all stories, `.storybook`, configs) — clean
 - token gate — **42 pairs × 2 themes**, pass
-- production build — **14 routes**, pass
-- `check-contrast` — **2,126/2,126 text runs clear WCAG AA**, every route in its
+- production build — **16 routes**, pass
+- `check-contrast` — **2,238/2,238 text runs clear WCAG AA**, every route in its
   intended state
 - `check-a11y` — **84 page renders, 0 axe violations, 0 keyboard findings**
-- `playwright test` — **23 passed, 2 skipped**; the skips are the `describe.skip`'d
+- `playwright test` — **28 passed, 2 skipped**; the skips are the `describe.skip`'d
   roadmap specs for the unbuilt feature
 
 ### Bundle, same run
 
-Measured with CDP encoded bytes against `next start`, not estimated from the build
-output.
+Measured with CDP encoded bytes against `next start` at a 390px viewport, not
+estimated from the build output.
 
-| Route | JS (gzipped) |
-|---|---|
-| `/` | 285KB |
-| `(app)` routes | 562KB |
+| Route | JS | CSS | Fonts | Total |
+|---|---|---|---|---|
+| `/` | 298.8KB | 34.5KB | 53.9KB | **424.9KB** |
+| `/dashboard` | 320.2KB | 34.5KB | 53.9KB | **453.3KB** |
+
+Fonts fell from 85.3KB to 53.9KB on every route in this pass: Geist Mono is now
+`preload: false`, and the marketing page no longer uses it at all (see DESIGN.md
+§3). Fonts declared in the root layout are preloaded on every route whether or
+not it renders them, which made a 31KB face render-blocking on a landing page
+that used it for eight glyphs.
+
+`/` grew ~14KB of JS against the previous run — the mobile navigation sheet, the
+page's only client component.
 
 ~103KB of the app-route figure is two byte-equivalent copies of zod and two of
 motion. It is a Turbopack chunk-allocation artifact, not app code — see the note in
 `next.config.ts`.
+
+## Adversarial audit (post-redesign)
+
+Run in addition to the four gates, because each of these covers a class the
+gates structurally cannot. Reproduce with the commands in this repo plus a
+production server (`npm run build && npx next start`).
+
+| Check | Method | Result |
+|---|---|---|
+| Responsive | 8 routes x 10 widths (320-1920) x 2 themes = 160 renders; page overflow + per-element viewport escape, excluding legitimate scrollers | 0 overflow, 0 escapes |
+| Reflow (SC 1.4.10) | 320x256 viewport == 1280 at 400% zoom, 4 routes | 0 horizontal scroll |
+| Reduced motion | `reducedMotion: 'reduce'`, count animations still running | 0 infinite, 0 over 50ms; hero panel resolves to its finished state |
+| Layout shift | `PerformanceObserver('layout-shift')`, 3 routes x 2 widths | CLS 0 on `/`; 0.0039 on `/dashboard` mobile |
+| Long tasks | `PerformanceObserver('longtask')` | none |
+| Hydration | console + pageerror capture | clean |
+| Animation cost | rAF frame count over 2s during ambient drift | 60fps |
+| Stacking order | open each overlay, hit-test the intersection with sticky chrome | nothing occluded |
+| Brand assets | assert the traced mark on every surface; fetch every icon URL | one path everywhere, all 200 |
+
+### What it found
+
+Four defects the four gates all passed over, and the reason each was invisible:
+
+1. **`favicon.ico` still carried the pre-redesign mark.** It lives in `src/app/`,
+   not `public/`, so a check of the public folder said the project had none.
+   Nothing imports it; no gate loads it; Next lists it *first* in the head. Every
+   browser tab and crawler got a black circle.
+2. **`twitter:card` was `summary_large_image` with no image.** Metadata gates
+   check that tags exist, not that the thing they point at does.
+3. **`global-error.tsx` rendered the old teal palette.** It inlines its colours
+   by design (it replaces the root layout, so the token layer may be what
+   failed), which also means it does not follow a palette change. No route
+   reaches it in a healthy build, so nothing measured it.
+4. **`/applications` scrolled the page sideways at exactly 768px** — and the
+   cause was not the table. An `sr-only` header is `position: absolute`; with no
+   positioned ancestor its containing block was the viewport, so a 1px label sat
+   at x=839, outside the scroll container, dragging the document 72px wide. The
+   contrast and a11y gates measure at 390 and 1280 and never sample 768.
+
+Plus one Level A gap: the skip link existed only in `AppShell`, so every
+marketing, auth and legal page made a keyboard user tab through the header.
 
 ## Known gaps
 

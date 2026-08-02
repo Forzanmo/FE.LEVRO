@@ -1,16 +1,22 @@
 import { cn } from '@/lib/utils'
 
 /**
- * Ambient background for the authenticated product surface — a restrained,
- * CSS-only counterpart to the marketing `AuroraBackdrop`. Two faint brand glows
- * (cool teal + warm gold) drift over a whisper of a top wash, so no screen is
- * ever a flat block of colour — yet it stays quiet enough to disappear behind
- * dense content (product-register restraint, not a marketing centrepiece).
+ * Ambient background for the authenticated product surface — the restrained
+ * counterpart to the marketing `BrandBackdrop`. Same two ingredients, both
+ * turned down: a whisper of navy at the top so the header region lifts off a
+ * flat surface, and the chevron field at roughly half the marketing alpha.
+ *
+ * It does NOT drift, anywhere. The marketing page gets one slow rise because a
+ * visitor is being told a story; a person editing their CV is not, and ambient
+ * motion under dense working content is distraction dressed as craft. That is
+ * the product/brand register split, made literal in one property.
+ *
+ * The two drifting blobs this used to draw — a teal glow upper-right and a gold
+ * one lower-left — went with the gold half of the old palette. They also
+ * referenced `aurora-drift-*` keyframes that no longer exist.
  *
  * `fixed` so it holds while content scrolls; server-rendered (no WebGL, so the
- * app stays light); decorative (`aria-hidden`); theme-aware via gradient tokens;
- * and frozen under `prefers-reduced-motion` by the global rule in globals.css.
- * Reuses the existing `aurora-drift-*` keyframes.
+ * app stays light); decorative (`aria-hidden`); theme-aware via tokens.
  */
 export function AmbientBackdrop({ className }: { className?: string }) {
   return (
@@ -23,27 +29,11 @@ export function AmbientBackdrop({ className }: { className?: string }) {
         className="absolute inset-x-0 top-0 h-[34rem]"
         style={{
           backgroundImage:
-            'linear-gradient(180deg, color-mix(in oklab, var(--brand) 7%, transparent) 0%, transparent 100%)',
+            'linear-gradient(180deg, color-mix(in oklab, var(--brand) 6%, transparent) 0%, transparent 100%)',
         }}
       />
-      {/* Cool brand glow, upper-right. */}
-      <div
-        className="absolute -top-40 right-[-10rem] h-[38rem] w-[38rem] rounded-full opacity-[0.07] blur-3xl dark:opacity-20"
-        style={{
-          background:
-            'radial-gradient(circle, color-mix(in oklab, var(--gradient-from) 70%, transparent), transparent 68%)',
-          animation: 'aurora-drift-b 46s ease-in-out infinite',
-        }}
-      />
-      {/* Warm achievement glow, lower-left — the gold accent, very faint. */}
-      <div
-        className="absolute bottom-[-12rem] left-[-8rem] h-[34rem] w-[34rem] rounded-full opacity-[0.06] blur-3xl dark:opacity-[0.14]"
-        style={{
-          background:
-            'radial-gradient(circle, color-mix(in oklab, var(--gradient-to) 70%, transparent), transparent 68%)',
-          animation: 'aurora-drift-c 56s ease-in-out infinite',
-        }}
-      />
+      {/* The chevron field, quiet enough to disappear behind dense content. */}
+      <div className="chevron-field absolute inset-0 text-[var(--brand-900)] opacity-[0.028] dark:text-white dark:opacity-[0.035]" />
     </div>
   )
 }

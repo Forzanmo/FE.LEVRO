@@ -2,41 +2,42 @@
 name: Levvro
 description: AI Career Intelligence — see what your CV actually proves, and fix what it doesn’t.
 colors:
-  teal-primary: "#006b6d"
-  teal-core: "#008687"
-  teal-vivid: "#1aa9a8"
-  aqua: "#52c9c6"
-  teal-deep: "#035456"
-  gold-accent: "#e7a929"
-  gold-light: "#f2bb49"
-  surface-light: "#f6fbfc"
-  surface-dark: "#081214"
+  navy-surface: "#0b2540"
+  navy-deep: "#091d33"
+  navy-primary: "#0d4980"
+  navy-mid: "#1a63ab"
+  navy-pale: "#9cc4f2"
+  teal-accent: "#21b7a5"
+  teal-light: "#45c9b7"
+  teal-deep: "#0b7165"
+  surface-light: "#f9fbfe"
+  surface-dark: "#0a131e"
   card-light: "#ffffff"
-  card-dark: "#131d20"
-  sidebar-dark: "#0e181a"
-  ink: "#09090b"
-  paper-ink: "#fafafa"
-  muted-ink: "#52525b"
-  border-light: "#e4e4e7"
-  success: "#10b981"
+  card-dark: "#101b2a"
+  sidebar-dark: "#0d1826"
+  ink: "#1f2937"
+  paper-ink: "#f9fafc"
+  muted-ink: "#5b6b7e"
+  border-light: "#e3e8ed"
+  mist: "#f2f5f8"
+  success: "#1c9e5a"
   warning: "#f59e0b"
   danger: "#f43f5e"
-  info: "#0ea5e9"
 typography:
   display:
-    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "3.75rem"
+    fontFamily: "Poppins, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "3.5rem"
     fontWeight: 600
     lineHeight: 1.1
     letterSpacing: "-0.02em"
   headline:
-    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Poppins, ui-sans-serif, system-ui, sans-serif"
     fontSize: "2.25rem"
     fontWeight: 600
     lineHeight: 1.15
     letterSpacing: "-0.02em"
   title:
-    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Poppins, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1rem"
     fontWeight: 600
     lineHeight: 1.35
@@ -73,16 +74,16 @@ spacing:
   xl: "2rem"
 components:
   button-primary:
-    backgroundColor: "{colors.teal-primary}"
+    backgroundColor: "{colors.navy-primary}"
     textColor: "#ffffff"
     rounded: "{rounded.lg}"
     padding: "0 0.875rem"
     height: "2.25rem"
   button-primary-hover:
-    backgroundColor: "{colors.teal-core}"
+    backgroundColor: "{colors.navy-mid}"
     textColor: "#ffffff"
   button-gradient:
-    backgroundColor: "{colors.teal-core}"
+    backgroundColor: "{colors.navy-surface}"
     textColor: "#ffffff"
     rounded: "{rounded.lg}"
     padding: "0 0.875rem"
@@ -110,98 +111,136 @@ components:
 
 ## 1. Overview
 
-**Creative North Star: "The Golden-Hour Mentor"**
+**Creative North Star: "The Standards Document"**
 
-Levvro should feel like sitting across from a sharp, warm mentor in a calm,
-well-lit room — one who tells an anxious job-seeker exactly where they stand and
-lights the path forward. The system runs on two colours doing two jobs: a **deep
-peacock teal** for calm competence and trust (the room, the light, the voice),
-and a **warm achievement gold** for momentum and "your moment" (the progress, the
-win). Canonical colour is OKLCH; the hex above is the sRGB projection.
+Levvro should feel like being handed a well-made technical report on your own
+career — precise, unhurried, and signed by someone who shows their working. Not a
+brochure and not a dashboard: a document of record, produced by an instrument you
+trust. The system runs on two colours doing two jobs: a **deep navy** for
+authority and calm (the committed folds, every primary action), and a
+**saturated teal** for momentum and recognition (the mark's rising triangle, the
+focus ring, the colour of a thing proven). Canonical colour is OKLCH; the hex
+above is the sRGB projection.
+
+The identity comes from the LEVRRO brand system: navy `#0a2540`, teal `#14b8a6`,
+white breathing room, mist separators, and Poppins setting the wordmark. The mark
+is a rising arrowhead with an open book cut out of it — ascent plus learning —
+and its geometry is the source of the page's texture, not an afterthought bolted
+onto it.
 
 The register is premium, calm, and confident — editorial craft over decoration,
-in the Linear/Notion lineage. Identity lives in colour, type, and motion, never
-in gimmicks. It explicitly rejects the "generic AI-SaaS" tell (indigo/violet/
-fuchsia gradients, glassy cards, gradient-filled text), the cold enterprise HR
-portal, the over-gamified job app, and the busy cheap resume-builder. Restraint
-governs the product surface; the marketing surface may commit harder to colour.
+in the Linear/Notion lineage. Identity lives in colour, type, geometry and
+motion, never in gimmicks. It explicitly rejects the "generic AI-SaaS" tell
+(indigo/violet/fuchsia gradients, glassy cards, gradient-filled text, blurred
+blobs behind everything), the cold enterprise HR portal, the over-gamified job
+app, and the busy cheap resume-builder. Restraint governs the product surface;
+the marketing surface may commit harder to colour.
 
-Every palette value passes a WCAG-AA contrast gate at build time — the design is
-provably legible in both light and dark before it ships.
+Every palette value passes a WCAG-AA contrast gate at build time, and the
+rendered pages pass a second gate that measures real composited pixels — the
+design is provably legible in both light and dark before it ships.
 
 **Key Characteristics:**
-- Two-colour identity: teal (trust/competence) + gold (achievement/momentum).
-- Dark = teal-ink near-black, not pure black; light = near-white with a teal
+- Two-colour identity: navy (authority/trust) + teal (momentum/earned).
+- Dark = navy-ink near-black, not pure black; light = near-white with a navy
   whisper, never a warm cream.
-- One typeface (Geist) carried by weight and size contrast, not a pairing.
-- No screen is ever flat — a living gradient backdrop on every surface.
+- Poppins for display and headings (the wordmark's own face), Geist for body and
+  UI. A geometric against a neo-grotesque — a real contrast axis, not two
+  near-identical sans faces.
+- No screen is ever flat, and the thing filling it is the brand's own geometry:
+  a chevron field derived from the mark. Never a blurred blob.
 - Depth from soft shadows + hairline rings, not heavy borders.
 
 ## 2. Colors
 
-A restrained two-hue system: teal carries the brand, gold marks achievement, and
-a near-neutral zinc/teal-ink set carries everything else. Status colours are
-functional only.
+A restrained two-hue system: navy carries the brand and every interactive
+surface, teal marks what is earned, and a navy-tinted slate set carries
+everything else. Status colours are functional only.
 
 ### Primary
-- **Deep Peacock Teal** (`oklch(0.478 0.085 196)` / `#006b6d`): the primary
-  action, current selection, focus ring, links, and brand text on light. A
-  vivid teal (`oklch(0.668 0.11 194)` / `#1aa9a8`) takes the same role on dark,
-  where it pops against the teal-ink surface with dark ink text on it.
+- **Deep Navy** (`oklch(0.400 0.110 252)` / `#0d4980`): the primary action,
+  current selection, links, and brand text on light. The committed brand surface
+  is one ramp step deeper (`brand-900` / `#0b2540` — the identity navy itself),
+  and dark mode's primary is `brand-600`, a saturated mid blue that still reads
+  as the brand rather than as slate.
+
+  Navy does **not** hand over to teal in dark mode. `brand` climbs to the pale
+  end of its own ramp (`brand-300`) instead, because a product whose brand colour
+  swaps hue by theme has no answer to "which colour is Levvro".
 
 ### Secondary
-- **Achievement Gold** (`oklch(0.775 0.15 80)` / `#e7a929`): the warm terminus
-  of the brand gradient and the colour of completion — a sent document, a
-  streak, the lamp behind the hero's CV. Never used as interactive chrome.
-  Exposed as the `achievement` / `achievement-foreground` / `achievement-muted`
-  roles. Gold needs opposite ends of its ramp depending on the surface: the role
-  resolves to a dark `accent-800` on light backgrounds, and
-  `brand-surface-accent` (`accent-300`) is the separate role for gold ON the
-  committed brand surface, where the dark value measures 2.53:1.
-- **Aqua** (`oklch(0.768 0.106 193)` / `#52c9c6`): the luminous midpoint of the
-  brand gradient (teal → aqua → gold). Not used as a standalone UI colour.
+- **Teal** (`oklch(0.702 0.120 182)` / `#21b7a5`): the accent, and the terminus
+  of the brand gradient. The colour of completion — a sent document, a skill
+  finally evidenced — and of the focus ring. Never a button fill. Exposed as the
+  `achievement` / `achievement-foreground` / `achievement-muted` roles. Teal needs
+  opposite ends of its ramp depending on the surface: the role resolves to
+  `accent-700` on paper (the identity value measures 2.51:1 there), and
+  `brand-surface-accent` (`accent-400`) is the separate role for teal ON the
+  committed navy.
 
 ### Neutral
-- **Ink** (`#09090b`) / **Paper Ink** (`#fafafa`): primary text on light / dark.
-- **Muted Ink** (`#52525b`): secondary text — must still clear 4.5:1, never a
-  light gray "for elegance".
-- **Surface** (`#f6fbfc` light / `#081214` dark): the page base — near-white with
-  a teal whisper, or a deep teal-ink near-black. Cards step one level
-  (`#ffffff` / `#131d20`).
-- **Border** (`#e4e4e7` light; translucent white in dark): hairline dividers.
+- **Ink** (`#1f2937`) / **Paper Ink** (`#f9fafc`): primary text on light / dark.
+- **Muted Ink** (`#5b6b7e`): secondary text — must still clear 4.5:1, never a
+  light gray "for elegance". This is also the floor for muted ink ON a document
+  sheet; `neutral-500` is a decorative tone, not a text colour.
+- **Surface** (`#f9fbfe` light / `#0a131e` dark): the page base — near-white with
+  a navy whisper, or a deep navy-ink near-black. Cards step one level
+  (`#ffffff` / `#101b2a`), and mist (`#f2f5f8`) separates bands.
+- **Border** (`#e3e8ed` light; translucent white in dark): hairline dividers.
 
 ### Functional (status)
-- **Success emerald** (`#10b981`), **Warning amber** (`#f59e0b`), **Danger rose**
-  (`#f43f5e`), **Info sky** (`#0ea5e9`), each with a tinted `-muted` surface for
-  badges and callouts.
+- **Success green** (`#1c9e5a`), **Warning amber** (`#f59e0b`), **Danger rose**
+  (`#f43f5e`), each with a tinted `-muted` surface for badges and callouts.
+- There is **no `info` hue.** The `info` role exists and resolves to the brand
+  navy — see the No-Second-Blue Rule below.
 
 ### Named Rules
 **The No-Purple Rule.** Indigo, violet, and fuchsia are forbidden — that gradient
-is the generic-AI-SaaS tell and reads as "an AI made this". Teal is the identity.
+is the generic-AI-SaaS tell and reads as "an AI made this". Navy and teal are the
+identity. A navy brand sits close enough to indigo that this rule now also means:
+do not let the navy ramp drift past hue 252 toward violet.
 
-**The Gold-Is-Earned Rule.** Gold means **done**, and nothing else: a sent
-document, a streak, the lamp behind the hero's CV. It is never a button fill, a
-border, a to-do marker, or default UI chrome. Its rarity is what makes it read as
-a win. Amber (`warning`) means warning.
+**The No-Second-Blue Rule.** With the brand itself navy, there is no room in the
+palette for another blue. Everything between navy (hue 252) and teal (182) is a
+shade of the two colours the brand already owns, and violet is banned outright.
+So the `info` role resolves to the brand navy rather than to sky, and any screen
+needing a fifth distinguishable status reaches for teal, not for a new hue.
 
-**The Filled-Is-Earned Corollary.** Separating the two by hue alone does not
-work and telling people to try harder did not fix it: in light mode `warning`
-resolves to amber-700 and `achievement` to gold-800, two dark warm values a pixel
-apart, so a filled amber "Thin" chip and a filled gold "5-day streak" chip on the
-same dashboard were the same object meaning opposite things. This rule was
-already recorded as fixed once and the collision came back, which is the evidence
-that a hue rule is not enforceable by eye.
+This is not theoretical: the applications funnel had `screening` on `info` and
+`interview` on `brand`, which were different colours under the old teal identity
+and the *same* colour under this one — two adjacent chips in one pipeline saying
+different things in one blue. `interview` moved to the accent.
 
-So the distinction is **shape**: a **filled warm** pill means earned; a warm pill
-that is **outlined** is a status or a warning. Skill strength is outlined across
-its whole set (border + text keep the hue, the dot reinforces it), so the set
-reads as one taxonomy; the "Sent" document badge stays filled gold, because it is
-the completion this rule exists to protect.
+**The Teal-Is-Earned Rule.** Teal means **done**, and nothing else: a sent
+document, a skill your CV now evidences, a completed step. It is never a button
+fill, a border, a to-do marker, or default UI chrome. Its rarity is what makes it
+read as a win — which is only affordable because navy carries the chrome. Amber
+(`warning`) means warning; green (`success`) means an operation completed.
 
-Cool and neutral chips — the document `draft`/`ready` states, the whole
-applications pipeline — are outside this: they cannot be mistaken for gold, so
-they keep their filled treatment. The rule is about the warm band only. Adding a
-new warm chip anywhere means deciding which side of it you are on.
+This rule inherited its shape from the gold it replaced, and the substitution is
+deliberate: the identity's own reference calls teal the colour of "recognition
+and momentum", and under a navy brand the accent is no longer spent on buttons.
+
+**The Filled-Is-Earned Corollary.** Separating meanings by hue alone does not
+work, and telling people to try harder did not fix it: under the previous palette
+`warning` resolved to amber-700 and `achievement` to gold-800, two dark warm
+values a pixel apart, so a filled amber "Thin" chip and a filled gold "5-day
+streak" chip on the same dashboard were the same object meaning opposite things.
+That was recorded as fixed once and came back, which is the evidence that a hue
+rule is not enforceable by eye.
+
+So the distinction is **shape**: a **filled** pill means earned; a pill that is
+**outlined** is a status or a warning. Skill strength is outlined across its whole
+set (border + text keep the hue, the dot reinforces it), so the set reads as one
+taxonomy; the "Sent" document badge stays filled, because it is the completion
+this rule exists to protect. The rule is kept under navy/teal even though the two
+hues are now far apart, because the next palette change will not ask permission.
+
+**The Green-Is-Not-Teal Rule.** `success` is a true green at hue 148, not
+emerald. Emerald sits at ~165 and the brand teal at 182 — seventeen degrees
+apart, both mid-dark, and they appear on the same dashboard. Two colours that
+close read as one colour, which is the Filled-Is-Earned collision in a different
+pair of hues.
 
 **The Committed-Surface Rule.** A fold that IS the brand — the marketing hero and
 its header, the CTA band, the Designer CV sidebar — uses the `brand-surface`
@@ -220,31 +259,56 @@ file so no call site has to decide.
 
 ## 3. Typography
 
-**Display / Body / Label Font:** Geist (with `ui-sans-serif, system-ui,
-sans-serif` fallback), self-hosted via `next/font/local`.
+**Display / Heading Font:** Poppins (with `ui-sans-serif, system-ui, sans-serif`
+fallback), self-hosted via `next/font/local` in three static weights — 500, 600,
+700. ~24KB, latin subset.
+**Body / Label / UI Font:** Geist (same fallback), self-hosted variable.
 **Numeric / Mono Font:** Geist Mono (with `ui-monospace, monospace`), for
-tabular figures and scores.
+tabular figures and counts.
 
-**Character:** One clean, contemporary grotesque doing every job. There is no
-display/body pairing — hierarchy comes from weight (400/500/600/700) and a fixed
-rem scale, which reads as confident restraint rather than decoration. A distinct
-display face for the marketing hero is a sanctioned future swap of the
-`--font-heading` slot only.
+**Character:** A geometric against a neo-grotesque. Poppins has circular bowls, a
+single-storey `a` and tall ascenders; Geist has a double-storey `a` and tighter
+apertures. They are different enough to read as a deliberate pairing rather than
+as two sans faces someone failed to notice were nearly identical — which is the
+pairing failure worth avoiding.
+
+Poppins is not an aesthetic preference. The LEVRRO wordmark is set in it, so
+headings in any other face would leave the logotype speaking a different language
+from the page around it.
 
 ### Hierarchy
-- **Display** (600, `3.75rem`, line-height 1.1, tracking −0.02em): marketing hero
-  headline only.
-- **Headline** (600, `2.25rem`, 1.15, −0.02em): section headings; `text-wrap:
+- **Display** (600–700, fluid to `3.5rem`, line-height 1.08, tracking −0.02em):
+  marketing hero headline only.
+- **Headline** (600, `2.25rem`, 1.12, −0.016em): section headings; `text-wrap:
   balance`.
 - **Title** (600, `1rem`, 1.35): card and panel titles (weight, not size, sets them apart from body).
 - **Body** (400, `1rem`, 1.5): running copy; cap prose at 65–75ch.
 - **Label** (500, `0.875rem`, 1.35): UI labels, buttons, table headers.
-- **Mono** (500, `1rem`, tabular): metrics, counts, dates, and the numbered steps on the marketing page.
+- **Mono** (500, `1rem`, tabular): metrics, counts and dates — **in the app only**.
+
+  The marketing page used it too, for the three step numbers and one "7 / 11".
+  Eight glyphs is not worth a 31KB face on the first page a stranger loads on a
+  phone, and Geist Sans with `tabular-nums` sets the same digits to the same
+  widths. Mono is also declared `preload: false`, because fonts declared in the
+  root layout are preloaded on every route whether or not it uses them — the
+  same rule this system already applies to root providers.
 
 ### Named Rules
-**The One-Family Rule.** Geist carries everything. Do not introduce a second
-sans; if the hero ever needs more voice, swap the heading slot for a true
-contrast face (serif or distinctive display), never a second grotesque.
+**The Two-Family Rule.** Poppins heads, Geist speaks, Geist Mono counts. Three
+slots, and that is the whole system — do not introduce a fourth family, and in
+particular do not add a second grotesque beside Geist or a second geometric
+beside Poppins. If a surface needs more voice, it needs a different weight or a
+different size, not a new typeface.
+
+**The Geometric-Tracking Rule.** Display tracking is looser under Poppins than it
+was under Geist: −0.02em at the top of the scale rather than −0.032em, relaxing
+to `normal` by 20px. A geometric's round bowls collide long before a
+neo-grotesque's do, and tracking cut for the wrong face is how "designed" becomes
+"cramped". Never tighten a heading past −0.02em.
+
+**The Mobile Headline Floor.** Every `display-*` clamp has its minimum set so the
+hero lands in two to four lines at 375px, not five or six. The clamp minimum is a
+mobile decision, not a leftover of the desktop maximum divided by something.
 
 ## 4. Elevation
 
@@ -302,13 +366,63 @@ outline.
 
 ### Navigation
 - **Sidebar (desktop):** expandable (16rem / 4.5rem collapsed); items are
-  label + Lucide icon. Active item gets a teal left indicator, a filled icon, and
+  label + Lucide icon. Active item gets a navy left indicator, a filled icon, and
   a muted surface. **Bottom nav (mobile)** mirrors the primary destinations.
-- **Header:** sticky and **opaque** (`/92`, or `/85` where backdrop-filter is
-  supported). Sticky bars are never more translucent than that: a translucent bar
-  composites over whatever happens to be scrolling beneath it, so its contrast is
-  unknowable and cannot be proved. The same floor applies to the mobile bottom
-  nav and the coach composer.
+- **Header and bottom nav:** sticky and **fully opaque**. No `/92`, no `/85`, no
+  `backdrop-blur`.
+
+  **The Opaque-Chrome Rule.** A translucent sticky bar composites over whatever
+  happens to be scrolling beneath it, so its effective background is arbitrary
+  and its contrast is not a fact anyone can check. This has now failed three
+  times at three different alphas: `/50` on the marketing header (a near-black
+  label on the dark CTA band, ~1.3:1), `/70` on the bottom nav (active label
+  4.28:1), and `/88` on both (the bottom-nav labels at 4.12:1 and the wordmark at
+  4.45:1 over `/documents/*` on mobile). Each fix lowered the alpha and each
+  lower alpha failed somewhere else, because there is no value that is safe
+  against an arbitrary backdrop. Opaque is the only version whose contrast is
+  provable, and the blur goes with it — there is nothing left to blur.
+
+  The **marketing header** follows the same rule on its own surface: it is the
+  committed navy, opaque, so it reads as part of the drenched fold rather than as
+  a light bar seaming across it.
+
+  **The z-scale is the only source of stacking order.** Every overlay now names
+  a token — `--z-dropdown` for menus and selects, `--z-overlay`/`--z-modal` for
+  the sheet and dialog, `--z-popover`, `--z-tooltip`. The shadcn primitives all
+  shipped with a hardcoded `z-50`, which is below `--z-sticky` (1100): nothing
+  was visibly occluded, because menus open below the bar they would have
+  collided with, but the first overlay that opened upward into sticky chrome
+  would have vanished behind it.
+
+  **The scale is ordered by dependency, not by name.** Two rules fix the order,
+  and neither is a matter of taste:
+
+  1. A transient overlay must escape whatever it was opened from — a menu that
+     cannot get out from under a sticky header disappears at the wrong viewport.
+  2. A transient overlay must also escape a **modal**, because it can be opened
+     from inside one.
+
+  So: `sticky (1000) → banner (1100) → overlay (1200) → modal (1300) →
+  dropdown (1400) → popover (1500) → toast (1600) → tooltip (1700)`.
+
+  `dropdown` used to be 1000, below both. Nothing exercised it while the shadcn
+  primitives hardcoded `z-50` and DOM order quietly decided; the moment they
+  moved onto these tokens, the status `Select` inside "Add application" started
+  rendering its listbox *behind the dialog's own scrim*. `e2e/stacking.spec.ts`
+  hit-tests the centre pixel of an open overlay and asserts the ordering
+  directly, because neither axe nor a contrast gate can see this: the element is
+  present, sized and correctly coloured. It is just behind something.
+- **Every page needs a skip link**, not just the authenticated shell.
+  `components/shared/skip-link.tsx` is the one implementation, paired with
+  `id="main-content"` on the page's `<main>`. It used to live inline in
+  `AppShell`, so the landing page made a keyboard user tab through six header
+  stops before the first word of content (WCAG 2.4.1, Level A).
+- **Marketing, small screens:** the header keeps exactly one action visible
+  ("Get started") at every width and moves the rest into a sheet. Two text links
+  plus two buttons plus a theme toggle do not fit at 320px, and the alternative
+  to a menu is a row of cramped sub-44px targets. Radix's sheet brings the focus
+  trap, escape-to-close, scroll lock and dialog semantics with it, so the mobile
+  menu ends up more accessible than the desktop row it replaces.
 
 ### Choosing from options
 One mechanism, product-wide: `components/ui/choice-group.tsx`. A real
@@ -322,6 +436,79 @@ mutually-exclusive choice — that announces N independent toggles.
 `role="group"` + `aria-pressed` **is** correct for view filters (the CV
 edit/preview toggle), which change what you are looking at rather than picking a
 value.
+
+### The mark, the icons, and the social card
+Every rendering of the identity comes from one traced path. `BrandMark` draws it
+in-app; `app/icon.svg` is the favicon and the source for `app/favicon.ico`
+(16/32/48/256, PNG payloads in an ICO container) and `app/apple-icon.png`;
+`app/opengraph-image.png` and `app/twitter-image.png` are the social card.
+
+Regenerate them all with `node scripts/build-brand-assets.mjs` after any change
+to the mark or the palette — they are rendered artefacts, not hand-drawn, and
+the point of one command is that they cannot drift apart.
+
+Two failures this guards against, both of which happened:
+
+- **A stale `favicon.ico` outlived a whole redesign.** It sat in `src/app/`, so
+  a check of `public/` said the project had none, and nothing imports it and no
+  gate visits it. Next lists it *first* in the document head, so browsers and
+  crawlers kept getting the previous mark — a black circle — while every surface
+  a human looked at was correct.
+- **`twitter:card` declared `summary_large_image` with no image.** The card
+  existed in metadata and the image never did (`siteConfig.ogImage` pointed at a
+  `/og.png` that was never created, and nothing referenced it anyway), so every
+  share rendered blank. The social card is a brand surface; it just is not one
+  anybody on the team looks at.
+
+The social card embeds Poppins and Geist as base64 rather than relying on
+`next/font`, because it renders in an isolated page where the font pipeline does
+not apply — otherwise the most-shared asset in the product ships in whatever
+sans the renderer happens to have.
+
+### The mark and the wordmark
+The mark is a rising arrowhead with an open book cut out of it and a teal
+triangle at the apex — ascent plus learning. It ships as `BrandMark`, a traced
+vector (`components/layout/brand-mark.tsx`), not the source raster: it has to
+render at 24px in a sidebar, 32px in a header and 512px in an app-icon slot, and
+to invert to white on the committed navy. The body is `currentColor` so a parent
+can set it with a text utility; only the apex triangle carries its own fill,
+because it is the one part that stays teal on every surface.
+
+The geometry is traced from the supplied 1024px artwork and **re-coloured to the
+canonical tokens** — the artwork's own values (`#06274c` / `#19b5a8`) are near
+misses of the brand navy and teal, and shipping both would give the product two
+slightly different blues that nobody could name.
+
+The wordmark sets its final letter in the accent (`Levvr` + a teal `o`), carried
+over from the identity's own `LEVRR` + teal `O`. It ties the lockup to the mark's
+apex triangle and gives the accent one guaranteed appearance on every screen —
+scarcity works better when the one place it always shows is the brand's name.
+That letter is also the most contrast-fragile text in the product: it is the
+reason `accent-700` sits at L 0.495 rather than 0.516.
+
+### Signature — The assessment panel
+The marketing hero's product shot (`components/marketing/assessment-panel.tsx`)
+is the skills assessment mid-run: a coverage count, a segmented meter, three
+verdicts, the CV line that earned one of them, and a fourth row resolving from
+"Reading your experience…" into its verdict.
+
+It answers all three hero questions without being read — what this is, who it is
+for, why it is different — which a generic dashboard screenshot does not. Two
+rules govern what may appear in it:
+
+- **Nothing it claims may be something the product cannot do.** The verdicts are
+  the three the dashboard actually issues, the reasoning line is the shape of
+  evidence the coach collects, and the counts reconcile with the meter. A "94%
+  match score" would be exactly the assertion-over-evidence the product exists to
+  argue against, on the first screen a stranger sees.
+- **The resolved state is the CSS default.** The one-shot animation replays how
+  the verdict was reached; it never gates whether the verdict is visible. No
+  `animation-fill-mode`, no class-triggered reveal. If the animation never ticks —
+  background tab, headless renderer, a browser that skipped it — the panel is
+  simply already finished.
+
+A segmented meter, not a smooth bar: the quantity is a count of discrete skills,
+and a continuous bar would imply a precision the assessment does not claim.
 
 ### Signature — The document sheet
 Every CV and cover letter renders on one shared white sheet (the Paper Rule
@@ -361,13 +548,35 @@ drops anything that fails `safeParse`, so length rules run *after*
 still someone's real employment history; the worst case is a trimmed field they
 can see, never a blank editor and no explanation.
 
-### Signature — Living Backdrops
-`AuroraBackdrop` (marketing/auth: CSS wash + drifting glows) and
-`AmbientBackdrop` (app: restrained CSS glows). Both fixed, decorative,
-theme-aware, and frozen under reduced motion — so no surface is ever flat. Pure
-CSS, no WebGL. **Their alphas are a contrast ceiling, not a taste setting:**
-`npm run check:contrast` measures the composited result and fails if they drift
-up. At their original values the hero subhead measured 1.01:1.
+### Signature — The chevron field
+The mark's arrowhead, tiled as a fine hatch (`chevron-field`, a 28×14 mask so one
+utility serves navy-on-paper and white-on-navy by inheriting `color`). It is the
+texture layer on every surface: `BrandBackdrop` (marketing/auth/status) and
+`AmbientBackdrop` (the app) both draw it over two soft atmospheric pools, so no
+surface is ever flat. Pure CSS, server-rendered, no WebGL, no images.
+
+This replaced three blurred drifting blobs. Blurred blobs are the most saturated
+backdrop cliché on the web and they carried nothing: swap the hue and the page
+belongs to any other product. A shape taken from the logo cannot be copied
+without copying the logo.
+
+**It rises, and only on the marketing surface.** One ambient motion, moving in
+one direction, meaning the one thing the brand personality claims (upward). The
+app's copy of the field never moves — someone editing their CV is not being told
+a story, and ambient motion under working content is distraction dressed as
+craft. Below 768px the drift is off entirely: a full-viewport animation is not
+what a phone should spend its battery on.
+
+**Tile size is the difference between texture and wallpaper.** At 48×24 with a
+1.25px stroke the chevrons read AS chevrons across a whole section — patterned,
+not premium. Half that, with a 0.9px stroke, reads as engraving.
+
+**The alphas are a contrast ceiling, not a taste setting:**
+`npm run check:contrast` measures the composited result on the real pages and
+fails if they drift up. Under the previous backdrop the hero subhead measured
+1.01:1, and the densest part of the navy pool — which sits directly under the
+header, where the logo is — put the wordmark's teal `o` three hundredths under AA.
+Neither was visible to the token gate.
 
 ### Touch targets
 Anything under 24px in its visible box expands its hit area with an
@@ -446,14 +655,15 @@ unstyled "404: This page could not be found."
 ## 6. Do's and Don'ts
 
 ### Do:
-- **Do** carry the identity in teal + gold, with one Geist family across the UI.
+- **Do** carry the identity in navy + teal, with Poppins heading and Geist speaking.
 - **Do** keep muted text at ≥4.5:1 — bump toward ink before dropping to gray.
-- **Do** use gold only for completion (the Gold-Is-Earned Rule); amber only for
-  warnings; and reserve a warm *fill* for earned states, outlining warm status
-  chips (the Filled-Is-Earned Corollary).
+- **Do** use teal only for completion (the Teal-Is-Earned Rule); amber only for
+  warnings; green only for operations that succeeded; and reserve a *fill* for
+  earned states, outlining status chips (the Filled-Is-Earned Corollary).
 - **Do** reach for `brand-surface` when a fold should BE the brand, and the shared
   document sheet for anything that gets printed.
-- **Do** give every surface a living backdrop; never ship a flat block of colour.
+- **Do** give every surface the chevron field; never ship a flat block of colour,
+  and never reach for a blurred blob to avoid one.
 - **Do** prove contrast on the rendered page (`npm run check:contrast`), not from
   token math — every composite failure this system has had was invisible to the
   token gate.
@@ -469,7 +679,8 @@ unstyled "404: This page could not be found."
 
 ### Don't:
 - **Don't** use indigo/violet/fuchsia or a purple gradient — the generic AI-SaaS
-  tell (the No-Purple Rule).
+  tell (the No-Purple Rule) — and don't introduce a second blue beside the brand
+  navy (the No-Second-Blue Rule).
 - **Don't** ship gradient-filled text (`background-clip: text`); emphasize with
   weight or a solid teal.
 - **Don't** look like a **cold enterprise / HR portal** — stiff, gray, joyless.

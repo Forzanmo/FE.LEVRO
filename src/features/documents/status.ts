@@ -16,8 +16,10 @@ export const STATUS_META: Record<
 > = {
   draft: { label: 'Draft', tone: 'bg-muted text-muted-foreground', icon: 'edit' },
   ready: { label: 'Ready to send', tone: 'bg-brand-muted text-brand', icon: 'success' },
-  // Sent is the completed state, so it wears gold — the same rule achievements
-  // follow. Gold means done, nowhere else.
+  // Sent is the completed state, so it wears the accent — DESIGN.md's
+  // Teal-Is-Earned Rule. Teal means done, nowhere else. `ready` sits one step
+  // back on the brand navy, which is a different colour at a glance rather than
+  // a lighter version of the same one.
   sent: { label: 'Sent', tone: 'bg-achievement-muted text-achievement', icon: 'send' },
 }
 

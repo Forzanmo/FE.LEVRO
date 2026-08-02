@@ -31,22 +31,24 @@ import { cn } from '@/lib/utils'
  * No icon field: an icon beside a label that already says "Well evidenced" is
  * redundant chrome, and the row has to stay scannable at 5+ skills.
  *
- * These are OUTLINED, and that is load-bearing. In light mode `warning` resolves
- * to amber-700 and `achievement` to gold-800 — two dark warm values a pixel
- * apart — so a filled amber "Thin" pill and the filled gold "5-day streak" pill
- * on the same dashboard were visually the same object meaning opposite things
- * ("something is wrong" and "well done"). DESIGN.md's Gold-Is-Earned Rule names
- * that exact collision as already fixed; it had come back.
+ * These are OUTLINED, and that is load-bearing. The rule predates the navy
+ * identity, when the earned colour was gold and sat a pixel away from `warning`
+ * amber — a filled amber "Thin" pill and a filled gold "5-day streak" pill on
+ * the same dashboard were visually the same object meaning opposite things. The
+ * distinction is shape, not hue: filled = earned, outlined = status. That
+ * survives dark mode, and it survives not being able to tell the two hues apart
+ * at all, which is why it is kept now that the earned colour is teal.
  *
- * The distinction is now shape, not hue: filled warm = earned, outlined =
- * status. That survives dark mode, and it survives not being able to tell amber
- * from gold at all.
+ * `strong` is `achievement`, not `success`. A skill your CV finally evidences is
+ * an earned state, which is exactly what `achievement` means; `success` means an
+ * operation completed (saved, sent). They were the same thing only while
+ * `achievement` was a colour nobody used.
  */
 const STRENGTH_META: Record<SkillStrength, { label: string; dot: string; chip: string }> = {
   strong: {
     label: 'Well evidenced',
-    dot: 'bg-success',
-    chip: 'border-success/40 text-success',
+    dot: 'bg-achievement',
+    chip: 'border-achievement/40 text-achievement',
   },
   partial: {
     label: 'Thin',

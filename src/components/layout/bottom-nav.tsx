@@ -22,10 +22,21 @@ export function BottomNav() {
        * the inset instead of eating into its own content.
        */
       style={{ minHeight: 'var(--bottom-nav-height)' }}
-      // Opaque enough to be its own surface, for the same reason as the
-      // marketing header: at /70 the active label composited onto whatever
-      // happened to be scrolling underneath and measured 4.28:1.
-      className="bg-background/95 supports-[backdrop-filter]:bg-background/88 fixed inset-x-0 bottom-0 z-[var(--z-sticky)] border-t pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+      /*
+       * FULLY OPAQUE, and this is the third time the reasoning has been written
+       * down. A translucent sticky bar composites over whatever happens to be
+       * scrolling beneath it, so its effective background is unknowable and its
+       * contrast cannot be proved. The floor moved from /70 to /88 the last time
+       * this failed; /88 then failed too, on `/documents/*` at mobile, where
+       * 12% of the sheet's chrome showing through dragged the nav labels to
+       * 4.12:1 and the wordmark to 4.45:1.
+       *
+       * There is no translucency value that is provably safe, because the thing
+       * underneath is arbitrary. Opaque is the only version of this bar whose
+       * contrast is a fact rather than a hope. `backdrop-blur` goes with it —
+       * there is nothing left to blur.
+       */
+      className="bg-background fixed inset-x-0 bottom-0 z-[var(--z-sticky)] border-t pb-[env(safe-area-inset-bottom)] md:hidden"
     >
       <ul className="grid h-full grid-cols-5">
         {MOBILE_NAV.map((item) => {

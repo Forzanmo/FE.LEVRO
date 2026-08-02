@@ -37,7 +37,7 @@ const SHEET = cn('print-sheet mx-auto w-full max-w-[46rem] rounded-lg shadow-lg'
 function MinimalistSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mt-6">
-      <h3 className="mb-2 text-xs font-semibold tracking-wider text-[var(--neutral-500)] uppercase">
+      <h3 className="mb-2 text-xs font-semibold tracking-wider text-[var(--neutral-600)] uppercase">
         {title}
       </h3>
       {children}
@@ -58,7 +58,7 @@ function MinimalistCv({ data }: { data: ResumeData }) {
           {data.headline || 'Your headline'}
         </p>
         {contact.length > 0 ? (
-          <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--neutral-500)]">
+          <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--neutral-600)]">
             {/* Index keys, not the value. These are static presentational lists
                 built from user text, and two fields holding the same string —
                 or a CV stored with a duplicate skill — would otherwise collide
@@ -96,11 +96,11 @@ function MinimalistCv({ data }: { data: ResumeData }) {
                   <h4 className="text-sm font-semibold">
                     {exp.role || 'Role'}
                     {exp.company ? (
-                      <span className="font-normal text-[var(--neutral-500)]"> · {exp.company}</span>
+                      <span className="font-normal text-[var(--neutral-600)]"> · {exp.company}</span>
                     ) : null}
                   </h4>
                   {exp.period ? (
-                    <span className="shrink-0 text-xs text-[var(--neutral-500)] tabular-nums">
+                    <span className="shrink-0 text-xs text-[var(--neutral-600)] tabular-nums">
                       {exp.period}
                     </span>
                   ) : null}
@@ -224,7 +224,7 @@ function DesignerCv({ data }: { data: ResumeData }) {
                       className="absolute top-1.5 left-0 size-1.5 rounded-full bg-[var(--brand-500)]"
                     />
                     <h4 className="text-sm font-semibold">{exp.role || 'Role'}</h4>
-                    <p className="text-xs text-[var(--neutral-500)]">
+                    <p className="text-xs text-[var(--neutral-600)]">
                       {exp.company}
                       {exp.company && exp.period ? ' · ' : ''}
                       <span className="tabular-nums">{exp.period}</span>

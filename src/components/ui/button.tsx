@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
  * Disabled is a MUTED SURFACE, not a faded copy of the enabled button.
  *
  * The base used to carry `disabled:opacity-50`, which on the primary variant is
- * white text over 50%-opacity teal: measured at 2.25:1 in light and 2.60:1 in
+ * white text over a 50%-opacity brand fill: measured at 2.25:1 in light and 2.60:1 in
  * dark. Disabled controls are exempt from WCAG 1.4.3, so this passed every
  * automated gate including this project's own — and it was the coach's primary
  * "Continue" button, on the screen where an anxious first-timer is least sure

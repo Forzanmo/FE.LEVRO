@@ -40,7 +40,7 @@ export const SHEET_SURFACE =
 export const SHEET_INK = {
   heading: 'text-[var(--neutral-900)]',
   body: 'text-[var(--neutral-700)]',
-  muted: 'text-[var(--neutral-500)]',
+  muted: 'text-[var(--neutral-600)]',
   accent: 'text-[var(--brand-700)]',
   hairline: 'border-[var(--neutral-200)]',
   chip: 'bg-[var(--neutral-100)] text-[var(--neutral-700)]',

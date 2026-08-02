@@ -61,19 +61,18 @@ export function ProgressRing({
           r={radius}
           fill="none"
           /*
-           * A SOLID stroke whose colour is mixed from teal toward gold in
-           * proportion to the score — so the whole ring warms as the number
-           * rises, monotonically, by construction.
+           * A SOLID stroke whose colour is mixed from the brand navy toward
+           * the accent teal in proportion to the score — so the whole ring
+           * brightens as the number rises, monotonically, by construction, and
+           * arrives at the colour the rest of the product uses for "earned".
            *
            * Two gradient attempts failed here, and the reason is geometric: on
            * a circle, any straight ramp is non-monotonic in sweep angle. The
-           * first ran corner-to-corner and rendered low scores entirely gold.
-           * The second pinned the ramp to a diameter and mixed its far stop by
-           * value — which fixed low scores but left the ramp's warm point at a
-           * fixed 6 o'clock, so a 90 warmed to gold at the halfway mark and
-           * then *cooled back to teal* at its leading edge. Measured, not
-           * assumed: sampling the rendered arc at value 90 gave gold at 180°
-           * and rgb(69,143,128) at 320°.
+           * first ran corner-to-corner and rendered low scores entirely in
+           * the far stop. The second pinned the ramp to a diameter and mixed
+           * its far stop by value — which fixed low scores but left the ramp's
+           * bright point at a fixed 6 o'clock, so a 90 peaked at the halfway
+           * mark and then fell back at its leading edge. Measured, not assumed.
            *
            * DESIGN.md's Warming-Score Rule asks for a ring that reads as
            * progress and warmth and never judges. One colour that is a pure
