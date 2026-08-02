@@ -24,6 +24,13 @@ import { cn } from '@/lib/utils'
  * previously the landing page and the dashboard shared one scale, so the hero's
  * only move was "bigger Geist".
  *
+ * The display maxima are 2.125 / 2.75 / 3.5rem, which is 1.29 and 1.27 between
+ * steps — the >=1.25 this comment has always claimed and did not previously
+ * meet. At the old 2.25 / 3 / 3.5 the top step was 1.167, so the h2 rendered at
+ * 48px against a 56px h1: near-black ink on near-white against white on navy
+ * under a texture overlay, which meant a section heading optically out-shouted
+ * the hero headline it was supposed to sit beneath.
+ *
  * Tracking was retuned when the heading face became Poppins. The old values
  * were cut for Geist, a neo-grotesque with tight apertures that tolerates
  * −0.032em at display sizes. Poppins is a geometric: circular bowls, wide
@@ -46,8 +53,8 @@ export const headingVariants = cva('font-heading font-semibold', {
       '6xl': 'text-5xl leading-[1.06] tracking-[-0.02em] sm:text-6xl',
 
       // Marketing scale — fluid, wider steps (2.25 → 3 → 3.5rem at max).
-      'display-sm': 'text-[clamp(1.625rem,1.15rem+2.1vw,2.25rem)] leading-[1.16] tracking-[-0.012em]',
-      'display-md': 'text-[clamp(1.875rem,1.25rem+3vw,3rem)] leading-[1.12] tracking-[-0.016em]',
+      'display-sm': 'text-[clamp(1.5rem,1.1rem+1.8vw,2.125rem)] leading-[1.16] tracking-[-0.012em]',
+      'display-md': 'text-[clamp(1.75rem,1.2rem+2.6vw,2.75rem)] leading-[1.12] tracking-[-0.016em]',
       'display-lg': 'text-[clamp(2.125rem,1.3rem+4.2vw,3.5rem)] leading-[1.08] tracking-[-0.02em]',
     },
     tone: {

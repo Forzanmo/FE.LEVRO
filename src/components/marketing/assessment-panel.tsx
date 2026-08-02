@@ -240,6 +240,24 @@ export function AssessmentPanel({ className }: { className?: string }) {
              * fading. An opaque backing also makes the crossfade read as one row
              * changing rather than two rows briefly showing through each other.
              */}
+            {/*
+             * The remedy, attached to the gap.
+             *
+             * The panel used to stop at the diagnosis: four unlit segments, a
+             * "Thin", a "Not shown", and nothing about what happens next. For an
+             * audience already afraid the answer is "not good enough", that is a
+             * page that manufactures anxiety and then changes the subject.
+             *
+             * This is not a new promise — it is the affordance the dashboard
+             * already renders on every gap row (`skills-coverage-card.tsx`,
+             * linking to the CV editor). Showing the product's real response is
+             * both the honest answer and a better one than describing it.
+             */}
+            <p className="panel-verdict mt-1.5 ml-4 flex items-center gap-1.5 text-xs text-[var(--accent-700)]">
+              <span aria-hidden="true">&rarr;</span>
+              Add evidence to your CV
+            </p>
+
             <div
               aria-hidden="true"
               className="panel-pending absolute inset-0 flex items-center gap-2.5 bg-white"

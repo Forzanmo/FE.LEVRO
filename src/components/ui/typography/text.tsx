@@ -101,11 +101,23 @@ export const textVariants = cva('', {
     balance: { true: 'text-balance' },
     pretty: { true: 'text-pretty' },
   },
+  /*
+   * `leading` has NO default, deliberately.
+   *
+   * It used to default to `normal`, and cva emits variants in declaration order
+   * — `leading` after `tone` — so tailwind-merge kept `leading-normal` and threw
+   * away the `leading-relaxed` that `tone="onBrand"` sets for light-on-dark
+   * compensation. Measured: both the compensated and uncompensated paragraphs on
+   * the navy surfaces rendered line-height 27px (1.5), never the declared 1.65.
+   * Half of that fix had never applied anywhere.
+   *
+   * With no default, Tailwind's own size-paired line-height applies unless a
+   * caller or a tone asks for something else, which is what both wanted.
+   */
   defaultVariants: {
     size: 'base',
     weight: 'normal',
     tone: 'default',
-    leading: 'normal',
   },
 })
 

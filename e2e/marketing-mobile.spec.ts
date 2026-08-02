@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+import { COACH_QUESTION_COUNT } from '@/services/api/coach-service'
+
 /**
  * The landing page's small-screen behaviour.
  *
@@ -65,6 +67,26 @@ test.describe('Marketing — mobile', () => {
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     )
     expect(overflow).toBe(0)
+  })
+
+  test('the question count the landing page promises matches the assessment', async ({ page }) => {
+    /*
+     * The landing page hardcodes the count rather than importing the ASSESSMENT
+     * dataset into its bundle to read one integer. `coach-service.ts` records
+     * that a hardcoded count went stale exactly once before — the page promised
+     * "Eight questions" while the assessment asked seven — so the number needs a
+     * guard, just not an import.
+     *
+     * This is that guard. Add or remove a question and this fails.
+     */
+    await page.goto('/')
+    const hero = page.locator('main').getByText(/questions · Free to start/)
+    await expect(hero).toContainText(`${COACH_QUESTION_COUNT} questions`)
+    // `.first()`: the phrase now appears twice on purpose — once in the
+    // objection band and once inside step 1's explanation.
+    await expect(
+      page.getByText(new RegExp(`${COACH_QUESTION_COUNT} questions, one at a time`)).first(),
+    ).toBeVisible()
   })
 
   test('the deck progress bar exists only where there is a deck to be partway through', async ({

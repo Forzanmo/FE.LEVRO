@@ -8,8 +8,12 @@ test.describe('Levvro smoke', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
       'what your CV proves',
     )
-    await expect(page.getByRole('link', { name: /See what mine proves/i }).first()).toBeVisible()
-    await expect(page.getByRole('link', { name: /Start your assessment/i }).first()).toBeVisible()
+    // Both primaries carry the SAME label, deliberately. Five differently
+    // worded CTAs all resolving to `/sign-in` made a visitor count doors
+    // instead of recognising one; asserting the sameness is asserting the fix.
+    const primaries = page.getByRole('link', { name: /See what mine proves/i })
+    await expect(primaries).toHaveCount(2)
+    await expect(primaries.first()).toBeVisible()
   })
 
   test('the hero product panel states a verdict, its evidence, and that it is an example', async ({

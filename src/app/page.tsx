@@ -29,10 +29,36 @@ const NAV_LINKS: readonly MarketingNavLink[] = [
   { label: 'What you get', href: '#features' },
 ]
 
+/**
+ * The number of questions the assessment asks.
+ *
+ * Hardcoded rather than imported from `coach-service`, which would pull the
+ * whole ASSESSMENT dataset into the landing page bundle to read one integer —
+ * on the page that dropped a 31KB font for eight glyphs.
+ *
+ * The service's own comment records that a hardcoded count went stale once
+ * before ("Eight questions" while the assessment asked seven). The guard
+ * against that is not an import, it is `e2e/marketing-mobile.spec.ts`, which
+ * asserts this number against `COACH_QUESTION_COUNT` and fails the moment a
+ * question is added or removed.
+ */
+const QUESTION_COUNT = 7
+
 const HOW_IT_WORKS: { title: string; body: string }[] = [
   {
     title: 'Tell us where you are',
-    body: 'A short coaching conversation — one question at a time, always explaining why it asks. No forms, no guessing, no judgment.',
+    /*
+     * Leads with the reassurance and quotes the real first question.
+     *
+     * "No forms, no guessing, no judgment" is the sentence this audience most
+     * needs and it used to be the third clause, in muted grey, below the fold,
+     * inside a horizontal scroller — the least prominent copy in its own
+     * section. And the fear behind "a coaching conversation" is that it is a job
+     * interview in disguise; the actual first question is reassuringly ordinary,
+     * so showing it is worth more than describing it. It is verbatim from
+     * `coach-service.ts`.
+     */
+    body: `No forms, no guessing, no judgment. ${QUESTION_COUNT} questions, one at a time — it opens with “Where are you in your career right now?” — and each one explains why it is asked.`,
   },
   {
     title: 'See what your CV proves',
@@ -44,26 +70,27 @@ const HOW_IT_WORKS: { title: string; body: string }[] = [
   },
 ]
 
+
 /*
- * Honest promises about the product — not fabricated testimonials or outcome
- * stats.
+ * These answer objections. They used to assert virtues.
  *
- * One slot used to go to "Free to start — no credit card", which the hero
- * microcopy already says three folds earlier. That spent a quarter of the trust
- * band answering a fear nobody has here: the blocker at the moment of clicking
- * is not five pounds, it is handing a complete employment history to an AI. The
- * page answered the money question twice and the data question never.
+ * The band previously read: every verdict shows its reasoning (the panel
+ * demonstrates that three folds up), an ATS template, free to start (the hero
+ * microcopy already says it), built for juniors and career shifters (the hero
+ * eyebrow already says it verbatim). Two of four were repeats and one was a
+ * claim the page had already proved — so the row spent its whole width on
+ * things a reader had either seen or did not doubt.
  *
- * The replacement deliberately points at the policy rather than asserting a
- * promise. Writing "never used to train models" here would be inventing a
- * commitment on the product's behalf on the page that argues against exactly
- * that — the honest move is to route the reader to the real answer.
+ * What an anxious reader actually wants to know before clicking is how long
+ * this takes, what it will ask them, and whether they can get out. Every line
+ * below is checkable in the code: the count, the first question verbatim, and
+ * the skip/back/edit capability the coach's own intro promises.
  */
 const REASSURANCES: { label: string; href?: string }[] = [
-  { label: 'Every verdict shows its reasoning' },
-  { label: 'An ATS template, because most CVs are machine-read first' },
+  { label: `${QUESTION_COUNT} questions, one at a time` },
+  { label: 'Skip, go back, or edit any answer' },
   { label: 'Your CV and your data — read how we handle both', href: ROUTES.privacy },
-  { label: 'Built for juniors and career shifters' },
+  { label: 'An ATS template, because most CVs are machine-read first' },
 ]
 
 const FEATURES: { title: string; body: string }[] = [
@@ -153,16 +180,30 @@ function MarketingHeader() {
           <div className="hidden md:block [&_button:hover]:bg-white/10 [&_button]:text-white">
             <ThemeToggle />
           </div>
+          {/*
+           * A LINK, not a second button.
+           *
+           * A ghost "Sign in" and a filled "Get started" sat 8px apart and both
+           * resolved to `/sign-in`, presenting new-versus-returning — the only
+           * distinction a first-time visitor cares about — as a choice that does
+           * not exist. `mobile-nav.tsx` identifies this exact pattern, explains
+           * why it is dishonest and fixes it inside the sheet; the header three
+           * lines away still shipped it. One button, one quieter link.
+           */}
+          <Link
+            href={ROUTES.signIn}
+            className="focus-visible:ring-brand-surface-accent hidden h-9 items-center rounded-lg px-2 text-sm text-white/80 underline-offset-4 outline-none transition-colors hover:text-white hover:underline focus-visible:ring-2 md:inline-flex"
+          >
+            Sign in
+          </Link>
+          {/* The one action that never moves, at every width. `h-11` below `sm`:
+              the sheet architecture exists to avoid sub-44px targets, and this
+              was the one control it keeps outside the sheet, at 32px. */}
           <Button
             asChild
-            variant="ghost"
             size="sm"
-            className="hidden text-white hover:bg-white/10 hover:text-white md:inline-flex"
+            className="text-brand-900 h-11 bg-white px-4 hover:bg-white/90 sm:h-8"
           >
-            <Link href={ROUTES.signIn}>Sign in</Link>
-          </Button>
-          {/* The one action that never moves, at every width. */}
-          <Button asChild size="sm" className="text-brand-900 bg-white hover:bg-white/90">
             <Link href={ROUTES.signIn}>Get started</Link>
           </Button>
           <MobileNav links={NAV_LINKS} />
@@ -288,10 +329,22 @@ export default function HomePage() {
                 Know exactly what your CV proves.
               </Heading>
 
+              {/*
+               * `tone="onBrand"` carries the light-on-dark compensation; this
+               * paragraph was setting its colour through `className` instead and
+               * so received none of it — measured byte-identical to the same
+               * 18px Geist on the light sections below. It is the paragraph
+               * carrying the product's whole promise, and it was the one of four
+               * committed-surface text runs that the fix missed.
+               *
+               * The colour override still wins over the tone's `text-white`
+               * because it comes later through `cn`.
+               */}
               <Text
                 as="p"
                 size="lg"
                 measure="lead"
+                tone="onBrand"
                 className="text-brand-surface-muted mt-5 text-pretty"
               >
                 Levvro reads it the way a recruiter does — then shows you every skill it proves,
@@ -335,8 +388,11 @@ export default function HomePage() {
                 </Button>
               </div>
 
+              {/* Leads with the answer to "what am I about to be put through",
+                  which is the question at the moment of clicking. Cost was
+                  answered twice on this page and duration not at all. */}
               <p className="text-brand-surface-muted mt-6 text-sm">
-                Free to start · No credit card · ATS-safe template included
+                {QUESTION_COUNT} questions · Free to start · No credit card
               </p>
             </div>
 
@@ -551,7 +607,31 @@ export default function HomePage() {
              * hero it was supposed to answer. The glow stays where it earns its
              * place: the primary button on hover.
              */}
-            <div className="bg-gradient-brand-deep relative isolate overflow-hidden rounded-3xl px-6 py-12 text-center text-white sm:px-10 sm:py-14">
+            <div className="bg-brand-surface relative isolate overflow-hidden rounded-3xl px-6 py-12 text-center text-white sm:px-10 sm:py-14">
+              {/*
+               * `brand-surface`, and the hero's own light layer — not
+               * `bg-gradient-brand-deep`.
+               *
+               * The two "committed brand surfaces" on this page were two
+               * different navies: the hero at L 13.85 lit from the top right,
+               * this band starting at L 29.74 — 2.15x the lightness — lit from
+               * the top left. DESIGN.md's Committed-Surface Rule exists verbatim
+               * to stop that ("three surfaces each having their own was how 'the
+               * brand colour' ended up with three different values"), and the
+               * comment here claimed "the same layer stack as the hero" while
+               * carrying a different colour, a different gradient type and a
+               * mirrored light. Now it is the same surface, lit the same way, so
+               * the page genuinely closes where it opened.
+               */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 -z-10"
+                style={{
+                  background:
+                    'radial-gradient(58% 46% at 82% 2%,' +
+                    ' color-mix(in oklab, var(--accent-500) 22%, transparent), transparent 72%)',
+                }}
+              />
               <div
                 aria-hidden="true"
                 className="chevron-field pointer-events-none absolute inset-0 -z-10 text-white opacity-[0.05]"
@@ -582,8 +662,10 @@ export default function HomePage() {
                   // once in :root, so brand-900 stays deep navy in both themes.
                   className="text-brand-900 w-full bg-white shadow-lg transition-transform hover:-translate-y-0.5 hover:bg-white/90 sm:w-auto"
                 >
+                  {/* The same words as the hero's primary. A visitor scrolling
+                      5,900px should recognise the door, not count new ones. */}
                   <Link href={ROUTES.signIn}>
-                    Start your assessment
+                    See what mine proves
                     <Icon name="arrow-right" size="sm" />
                   </Link>
                 </Button>
@@ -596,7 +678,9 @@ export default function HomePage() {
       <footer className="border-border border-t">
         <div className={cn(SHELL, 'grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.5fr_repeat(2,1fr)]')}>
           <div className="space-y-3">
-            <Logo />
+            {/* `w-fit`: the link had no width constraint in its grid column and
+                measured 487x36 at 1440 — a pointer region over empty space. */}
+            <Logo className="w-fit" />
             <Text tone="muted" size="sm" className="max-w-xs">
               {siteConfig.description}
             </Text>
