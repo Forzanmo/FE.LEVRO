@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Logo } from '@/components/layout'
 import { BrandMark } from '@/components/layout/brand-mark'
 import { AssessmentPanel } from '@/components/marketing/assessment-panel'
+import { GapClosing } from '@/components/marketing/gap-closing'
 import { MobileNav, type MarketingNavLink } from '@/components/marketing/mobile-nav'
 import { BrandBackdrop } from '@/components/shared/brand-backdrop'
 import { SkipLink } from '@/components/shared/skip-link'
@@ -69,7 +70,6 @@ const HOW_IT_WORKS: { title: string; body: string }[] = [
     body: 'Levvro writes the CV and the matching cover letter, in the template that suits where you are applying. Every version stays saved and reusable.',
   },
 ]
-
 
 /*
  * These answer objections. They used to assert virtues.
@@ -412,7 +412,16 @@ export default function HomePage() {
          * that changes how it lays out, not two copies of the content.
          */}
         <section id="how-it-works" className={cn(SHELL, 'scroll-mt-20 py-20 sm:py-24 lg:py-28')}>
-          <Reveal className="max-w-2xl">
+          {/*
+           * No `Reveal` on section headings any more.
+           *
+           * Six sections all rising on scroll with the same 18px translate is
+           * the saturated default, not choreography — it makes every section
+           * equally important, which is the definition of flat. The one stagger
+           * left on the page is the three steps below, because a list revealing
+           * its own items in order is motion that means something.
+           */}
+          <div className="max-w-2xl">
             <Heading level={2} size="display-md">
               From uncertain to interviewing, in three steps
             </Heading>
@@ -420,7 +429,7 @@ export default function HomePage() {
               No black box. Every step shows its reasoning, so you always know where you stand and
               what to do next.
             </Text>
-          </Reveal>
+          </div>
 
           <div className="deck-scope relative mt-12 md:mt-14">
             {/* The rail. Desktop only: on a horizontal deck a connecting line
@@ -506,6 +515,9 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* The page's one committed idea — see the note in the component. */}
+        <GapClosing />
+
         {/*
          * Trust — four honest promises on a mist band.
          *
@@ -516,14 +528,19 @@ export default function HomePage() {
          */}
         <section className="bg-muted/60 border-border border-y">
           <div className={cn(SHELL, 'py-10 sm:py-12')}>
-            <Reveal>
+            <div>
               <ul className="grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
                 {REASSURANCES.map((item) => (
                   <li key={item.label} className="flex items-start gap-2.5">
                     {/* Navy, not teal. Four accent ticks on a band of ordinary
                         promises was the single largest source of pre-earned
                         teal on the page. */}
-                    <Icon name="success" size="sm" className="text-brand mt-0.5 shrink-0" aria-hidden />
+                    <Icon
+                      name="success"
+                      size="sm"
+                      className="text-brand mt-0.5 shrink-0"
+                      aria-hidden
+                    />
                     {item.href ? (
                       <Link
                         href={item.href}
@@ -539,7 +556,7 @@ export default function HomePage() {
                   </li>
                 ))}
               </ul>
-            </Reveal>
+            </div>
           </div>
         </section>
 
@@ -555,128 +572,134 @@ export default function HomePage() {
          * words.
          */}
         <section id="features" className={cn(SHELL, 'scroll-mt-20 py-20 sm:py-24 lg:py-28')}>
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,24rem)_1fr] lg:gap-16">
-            <Reveal>
-              <div className="lg:sticky lg:top-28">
-                {/* display-sm, not -md: in a 24rem column the larger step wraps
-                    to five lines and reads cramped rather than confident. */}
-                <Heading level={2} size="display-sm">
-                  Everything you need to become recruiter-ready
-                </Heading>
-                <Text tone="muted" size="lg" measure="lead" className="mt-4">
-                  Evidence-driven, never overwhelming. Each screen has one clear goal.
-                </Text>
-              </div>
-            </Reveal>
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-14">
+            <div className="lg:sticky lg:top-28">
+              {/* display-sm, not -md: in a narrow column the larger step wraps
+                  to five lines and reads cramped rather than confident. */}
+              <Heading level={2} size="display-sm">
+                Four parts, and what each is for
+              </Heading>
+              {/*
+               * The old heading was "Everything you need to become
+               * recruiter-ready" over "Evidence-driven, never overwhelming.
+               * Each screen has one clear goal." — the modal section heading in
+               * this category, above a sentence of internal design-doc language
+               * on a consumer page. A scared 22-year-old does not care how many
+               * goals your screens have.
+               */}
+              <Text tone="muted" size="lg" measure="lead" className="mt-4">
+                Each one answers a question you will actually ask. None of them is a template
+                gallery.
+              </Text>
+            </div>
 
-            {/* The Reveal wraps the whole list, not each row: a wrapper div
-                between <dl> and its <dt>/<dd> pairs is invalid HTML. */}
-            <Reveal>
-              <dl className="border-border divide-border divide-y border-t">
-                {FEATURES.map((feature) => (
-                  <div
-                    key={feature.title}
-                    className="grid gap-2 py-7 sm:grid-cols-[minmax(0,13rem)_1fr] sm:gap-8"
-                  >
-                    <dt>
-                      <Heading level={3} size="lg">
-                        {feature.title}
-                      </Heading>
-                    </dt>
-                    <dd>
-                      <Text tone="muted" measure="prose">
-                        {feature.body}
-                      </Text>
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </Reveal>
+            <dl className="border-border divide-border divide-y border-t">
+              {FEATURES.map((feature) => (
+                <div
+                  key={feature.title}
+                  className="grid gap-2 py-6 sm:grid-cols-[minmax(0,12rem)_1fr] sm:gap-6"
+                >
+                  <dt>
+                    <Heading level={3} size="lg">
+                      {feature.title}
+                    </Heading>
+                  </dt>
+                  <dd>
+                    <Text tone="muted" measure="prose">
+                      {feature.body}
+                    </Text>
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </section>
 
         {/* CTA band — the second committed brand surface, carrying the same
             layer stack as the hero so the page closes where it opened. */}
         <section className={cn(SHELL, 'pb-16 sm:pb-20')}>
-          <Reveal>
+          {/*
+           * No `shadow-brand-glow` here. A teal halo around a near-black band
+           * on a near-black page is the design system's own crypto/neon
+           * *Don't*, applied to itself — and in dark mode it made the closing
+           * CTA the brightest object on the page, out-shouting the committed
+           * hero it was supposed to answer. The glow stays where it earns its
+           * place: the primary button on hover.
+           */}
+          <div className="bg-brand-surface relative isolate overflow-hidden rounded-3xl px-6 py-12 text-center text-white sm:px-10 sm:py-14">
             {/*
-             * No `shadow-brand-glow` here. A teal halo around a near-black band
-             * on a near-black page is the design system's own crypto/neon
-             * *Don't*, applied to itself — and in dark mode it made the closing
-             * CTA the brightest object on the page, out-shouting the committed
-             * hero it was supposed to answer. The glow stays where it earns its
-             * place: the primary button on hover.
+             * `brand-surface`, and the hero's own light layer — not
+             * `bg-gradient-brand-deep`.
+             *
+             * The two "committed brand surfaces" on this page were two
+             * different navies: the hero at L 13.85 lit from the top right,
+             * this band starting at L 29.74 — 2.15x the lightness — lit from
+             * the top left. DESIGN.md's Committed-Surface Rule exists verbatim
+             * to stop that ("three surfaces each having their own was how 'the
+             * brand colour' ended up with three different values"), and the
+             * comment here claimed "the same layer stack as the hero" while
+             * carrying a different colour, a different gradient type and a
+             * mirrored light. Now it is the same surface, lit the same way, so
+             * the page genuinely closes where it opened.
              */}
-            <div className="bg-brand-surface relative isolate overflow-hidden rounded-3xl px-6 py-12 text-center text-white sm:px-10 sm:py-14">
-              {/*
-               * `brand-surface`, and the hero's own light layer — not
-               * `bg-gradient-brand-deep`.
-               *
-               * The two "committed brand surfaces" on this page were two
-               * different navies: the hero at L 13.85 lit from the top right,
-               * this band starting at L 29.74 — 2.15x the lightness — lit from
-               * the top left. DESIGN.md's Committed-Surface Rule exists verbatim
-               * to stop that ("three surfaces each having their own was how 'the
-               * brand colour' ended up with three different values"), and the
-               * comment here claimed "the same layer stack as the hero" while
-               * carrying a different colour, a different gradient type and a
-               * mirrored light. Now it is the same surface, lit the same way, so
-               * the page genuinely closes where it opened.
-               */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 -z-10"
-                style={{
-                  background:
-                    'radial-gradient(58% 46% at 82% 2%,' +
-                    ' color-mix(in oklab, var(--accent-500) 22%, transparent), transparent 72%)',
-                }}
-              />
-              <div
-                aria-hidden="true"
-                className="chevron-field pointer-events-none absolute inset-0 -z-10 text-white opacity-[0.05]"
-              />
-              {/* Moving highlight sweep across the brand surface. */}
-              <span aria-hidden="true" className="brand-sheen" />
-              {/* Same light-on-dark compensation as the hero headline. */}
-              <Heading
-                level={2}
-                size="display-md"
-                tone="onBrand"
-                className="relative mx-auto max-w-[20ch] leading-[1.18] font-bold tracking-[-0.008em]"
-              >
-                Stop guessing what recruiters see
-              </Heading>
-              {/* Full white, not white/85 — at 85% this measured 3.53:1 against
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 -z-10"
+              style={{
+                background:
+                  'radial-gradient(58% 46% at 82% 2%,' +
+                  ' color-mix(in oklab, var(--accent-500) 22%, transparent), transparent 72%)',
+              }}
+            />
+            <div
+              aria-hidden="true"
+              className="chevron-field pointer-events-none absolute inset-0 -z-10 text-white opacity-[0.05]"
+            />
+            {/* Moving highlight sweep across the brand surface. */}
+            <span aria-hidden="true" className="brand-sheen" />
+            {/* Same light-on-dark compensation as the hero headline. */}
+            <Heading
+              level={2}
+              size="display-md"
+              tone="onBrand"
+              className="relative mx-auto max-w-[20ch] leading-[1.18] font-bold tracking-[-0.008em]"
+            >
+              Stop guessing what recruiters see
+            </Heading>
+            {/* Full white, not white/85 — at 85% this measured 3.53:1 against
                   the band's lighter end while the sheen sweeps across it. */}
-              <Text size="lg" tone="onBrand" className="relative mx-auto mt-4 max-w-xl text-pretty">
-                Start with the assessment. You will see which skills your documents evidence before
-                you rewrite a single line.
-              </Text>
-              <div className="relative mt-8 flex justify-center">
-                <Button
-                  asChild
-                  size="xl"
-                  // `text-brand` is theme-reactive (pale steel in dark) and would
-                  // measure ~1.5:1 on this white pill. The brand RAMP is declared
-                  // once in :root, so brand-900 stays deep navy in both themes.
-                  className="text-brand-900 w-full bg-white shadow-lg transition-transform hover:-translate-y-0.5 hover:bg-white/90 sm:w-auto"
-                >
-                  {/* The same words as the hero's primary. A visitor scrolling
+            <Text size="lg" tone="onBrand" className="relative mx-auto mt-4 max-w-xl text-pretty">
+              Start with the assessment. You will see which skills your documents evidence before
+              you rewrite a single line.
+            </Text>
+            <div className="relative mt-8 flex justify-center">
+              <Button
+                asChild
+                size="xl"
+                // `text-brand` is theme-reactive (pale steel in dark) and would
+                // measure ~1.5:1 on this white pill. The brand RAMP is declared
+                // once in :root, so brand-900 stays deep navy in both themes.
+                className="text-brand-900 w-full bg-white shadow-lg transition-transform hover:-translate-y-0.5 hover:bg-white/90 sm:w-auto"
+              >
+                {/* The same words as the hero's primary. A visitor scrolling
                       5,900px should recognise the door, not count new ones. */}
-                  <Link href={ROUTES.signIn}>
-                    See what mine proves
-                    <Icon name="arrow-right" size="sm" />
-                  </Link>
-                </Button>
-              </div>
+                <Link href={ROUTES.signIn}>
+                  See what mine proves
+                  <Icon name="arrow-right" size="sm" />
+                </Link>
+              </Button>
             </div>
-          </Reveal>
+          </div>
         </section>
       </main>
 
       <footer className="border-border border-t">
-        <div className={cn(SHELL, 'grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.5fr_repeat(2,1fr)]')}>
+        <div
+          className={cn(
+            SHELL,
+            'grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.5fr_repeat(2,1fr)]',
+          )}
+        >
           <div className="space-y-3">
             {/* `w-fit`: the link had no width constraint in its grid column and
                 measured 487x36 at 1440 — a pointer region over empty space. */}
