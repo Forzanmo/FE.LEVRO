@@ -167,7 +167,7 @@ export function AssessmentPanel({ className }: { className?: string }) {
               <span
                 key={i}
                 className={cn(
-                  'panel-meter h-1.5 flex-1 rounded-full',
+                  'meter-segment h-1.5 flex-1 rounded-full',
                   i < EVIDENCED_COUNT ? 'bg-[var(--accent-600)]' : 'bg-[var(--neutral-200)]',
                 )}
                 style={{ animationDelay: `${i * 55}ms` }}

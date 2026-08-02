@@ -83,6 +83,37 @@ export function SkillsCoverageCard({ skills }: { skills: SkillsSummary }) {
           What your CV and cover letters currently prove — {strong} of {skills.skills.length} well
           evidenced.
         </CardDescription>
+
+        {/*
+         * The same segmented meter the marketing hero shows.
+         *
+         * The landing page's example panel renders this exact object for this
+         * exact number, and then the product a visitor signed up for stated the
+         * same thing as a clause at the end of a sentence. Delivering the shape
+         * that was promised is worth more here than any new ornament: this is
+         * the "where do I stand" moment the whole product is organised around,
+         * and it was the only card on the dashboard without a visual answer.
+         *
+         * Segmented, not continuous, for the reason the marketing panel is —
+         * the quantity is a count of discrete skills, and a smooth bar would
+         * imply a precision the assessment does not claim.
+         */}
+        <div
+          className="mt-3 flex gap-1"
+          role="img"
+          aria-label={`${strong} of ${skills.skills.length} skills well evidenced`}
+        >
+          {skills.skills.map((skill, i) => (
+            <span
+              key={skill.id}
+              className={cn(
+                'meter-segment h-1.5 flex-1 rounded-full',
+                i < strong ? 'bg-achievement' : 'bg-progress-track',
+              )}
+              style={{ animationDelay: `${i * 55}ms` }}
+            />
+          ))}
+        </div>
       </CardHeader>
       <CardContent>
         <Accordion type="single" collapsible className="w-full">

@@ -366,7 +366,7 @@ export default function HomePage() {
             </Text>
           </Reveal>
 
-          <div className="relative mt-12 md:mt-14">
+          <div className="deck-scope relative mt-12 md:mt-14">
             {/* The rail. Desktop only: on a horizontal deck a connecting line
                 between cards would run through the gaps and read as a seam. */}
             <div
@@ -391,7 +391,7 @@ export default function HomePage() {
               tabIndex={0}
               aria-label="How it works, in three steps"
               className={cn(
-                '-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2',
+                'deck-scroller -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2',
                 // `snap-start` snaps to the scroll container's PADDING box, which
                 // cancels the `px-5` and parked card 1 at x=0 while the heading
                 // above it sat at x=20 — the page's single left edge visibly
@@ -428,6 +428,25 @@ export default function HomePage() {
                 </Reveal>
               ))}
             </ol>
+
+            {/*
+             * How far through the deck you have swiped. Scroll-driven from the
+             * scroller's own position — no listener, no observer, no JS at all.
+             * Mobile only: above `md` the three steps are a grid and there is
+             * nothing to be partway through.
+             *
+             * Enhancement, not affordance. The cards are 82% wide so the next
+             * one always peeks, which is what says "there is more"; this says
+             * "how much more". Browsers without scroll timelines render nothing
+             * rather than a bar parked at a third, which would be an indicator
+             * that lies.
+             */}
+            <div
+              aria-hidden="true"
+              className="deck-progress bg-border mx-5 mt-1 h-0.5 overflow-hidden rounded-full md:hidden"
+            >
+              <span className="deck-progress-bar bg-brand block h-full w-full rounded-full" />
+            </div>
           </div>
         </section>
 

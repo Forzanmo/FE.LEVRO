@@ -349,6 +349,17 @@ body {
     clip-path: inset(0 0 0 100%);
   }
 }
+/*
+ * The coverage meter fills once, on mount, in both places it appears: the
+ * marketing hero's example panel and the dashboard's real skills card. Same
+ * keyframe, same easing, same per-segment delay — a visitor who saw the promise
+ * on the landing page meets the identical object when they arrive at the thing
+ * it was promising.
+ *
+ * No fill-mode, so the resting state is "already full". A meter that starts
+ * empty and depends on an animation to show a count is a meter that reports
+ * zero on a background tab.
+ */
 @keyframes meter-fill {
   from {
     transform: scaleX(0);
@@ -375,9 +386,54 @@ body {
 .panel-pending-dot {
   animation: pending-pulse 1.1s var(--ease-standard) infinite;
 }
-.panel-meter {
+.meter-segment {
   transform-origin: left center;
   animation: meter-fill 1.15s var(--ease-decelerate);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Swipe deck progress — scroll-driven, no JS                                 */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * A bar that tracks how far through the how-it-works deck the reader has
+ * swiped, driven by the scroller's own position via a named scroll timeline.
+ * No JavaScript, no scroll listener, no IntersectionObserver.
+ *
+ * It is an ENHANCEMENT, not the affordance. The cards are 82% wide precisely so
+ * the next one is always visibly peeking, and that is what tells a thumb there
+ * is more; this adds "how much more". So where scroll timelines are not
+ * supported the track simply is not rendered, and nothing is lost — the
+ * alternative, a static bar parked at a third, would be an indicator that lies.
+ */
+.deck-scope {
+  timeline-scope: --deck;
+}
+.deck-scroller {
+  scroll-timeline: --deck inline;
+}
+.deck-progress {
+  display: none;
+}
+
+@supports (animation-timeline: --deck) and (timeline-scope: --deck) {
+  .deck-progress {
+    display: block;
+  }
+  .deck-progress-bar {
+    transform-origin: left center;
+    animation: deck-progress linear both;
+    animation-timeline: --deck;
+  }
+}
+
+@keyframes deck-progress {
+  from {
+    transform: scaleX(0.34);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 
 /*
