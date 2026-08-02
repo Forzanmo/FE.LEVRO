@@ -43,11 +43,12 @@ export function CoachMessage({
          * surface. History stays a <p>: only one question is ever current.
          */}
         {emphasized ? (
-          <h2 className="font-heading text-xl leading-snug font-semibold tracking-tight text-pretty">
+          <h2 className="font-heading text-xl leading-snug font-semibold tracking-normal text-pretty">
             {prompt}
           </h2>
         ) : (
-          <p className="text-foreground/90 text-base text-pretty">{prompt}</p>
+          // 45ch ≈ 67 real characters; unbounded this measured 88 per line.
+          <p className="text-foreground/90 max-w-[45ch] text-base text-pretty">{prompt}</p>
         )}
 
         {reasoning ? (
@@ -80,11 +81,21 @@ export function CoachMessage({
               )}
             >
               <div className="overflow-hidden">
-                {/* `max-w-[68ch]`: this measured 89 characters per line, against
-                    DESIGN.md's own 65–75ch cap for prose. It is the one block of
-                    running text in the assessment, read by someone deciding
-                    whether to trust the question. */}
-                <p className="text-muted-foreground bg-muted/60 mt-1.5 max-w-[68ch] rounded-lg px-3 py-2 text-sm">
+                {/*
+                 * 45ch, not 68ch — and the earlier value is why this note is
+                 * longer than it looks like it should be.
+                 *
+                 * This was capped at `68ch` on the belief that it meant 68
+                 * characters. CSS `ch` is the advance of "0", which in Geist is
+                 * 1.487x the average advance of running lowercase prose, so
+                 * `68ch` was ~101 characters per line — the cap was set, the
+                 * comment recorded it as fixed, and the line stayed a third
+                 * over the 65-75 band. `45ch` is ~67 real characters.
+                 *
+                 * It is the one block of running text in the assessment, read
+                 * by someone deciding whether to trust the question.
+                 */}
+                <p className="text-muted-foreground bg-muted/60 mt-1.5 max-w-[45ch] rounded-lg px-3 py-2 text-sm">
                   {reasoning}
                 </p>
               </div>

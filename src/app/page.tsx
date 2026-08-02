@@ -269,7 +269,22 @@ export default function HomePage() {
                 For juniors and career shifters
               </p>
 
-              <Heading level={1} size="display-lg" tone="inherit" className="mt-4 max-w-[16ch]">
+              {/*
+               * Leading and tracking are relaxed from the size's own values
+               * (1.08 / −0.02em) because this one is white on deep navy. Light
+               * type on a dark ground reads lighter and tighter than the same
+               * type on paper, and at 15.5:1 halation makes it worse rather
+               * than better — the compensation belongs on all three axes, so
+               * the weight steps up too. `Text` carries its own version of this
+               * in `tone="onBrand"`; a heading cannot, because its leading is
+               * per-size and a tone variant would clobber every step at once.
+               */}
+              <Heading
+                level={1}
+                size="display-lg"
+                tone="inherit"
+                className="mt-4 max-w-[16ch] leading-[1.14] font-bold tracking-[-0.014em]"
+              >
                 Know exactly what your CV proves.
               </Heading>
 
@@ -524,11 +539,12 @@ export default function HomePage() {
               />
               {/* Moving highlight sweep across the brand surface. */}
               <span aria-hidden="true" className="brand-sheen" />
+              {/* Same light-on-dark compensation as the hero headline. */}
               <Heading
                 level={2}
                 size="display-md"
                 tone="onBrand"
-                className="relative mx-auto max-w-[20ch]"
+                className="relative mx-auto max-w-[20ch] leading-[1.18] font-bold tracking-[-0.008em]"
               >
                 Stop guessing what recruiters see
               </Heading>

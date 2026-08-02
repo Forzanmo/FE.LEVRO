@@ -55,6 +55,22 @@ export const fontMono = localFont({
   preload: false,
 })
 
+/**
+ * All three weights ship in ONE family, and all three preload.
+ *
+ * The 500 and 700 faces render zero glyphs on the landing page (every heading
+ * there is 600), so 15.6KB of critical-path bytes buy nothing on the first page
+ * a visitor sees — the same argument that moved Geist Mono off the preload
+ * above. It is left in place deliberately.
+ *
+ * Splitting them into a second `localFont` with `preload: false` was tried and
+ * reverted: two declarations produce two DIFFERENT font families, so
+ * `font-heading font-bold` would stop resolving to Poppins 700 and the browser
+ * would synthesise a fake bold instead — a correctness bug in the ATS CV
+ * template's headings, traded for 15KB. The alternative, dropping the faces and
+ * mapping their call sites onto 600, changes how a document a candidate emails
+ * to a recruiter is set. Neither is worth it.
+ */
 export const fontHeading = localFont({
   src: [
     { path: '../assets/fonts/poppins-500.woff2', weight: '500', style: 'normal' },

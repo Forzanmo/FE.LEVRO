@@ -306,6 +306,49 @@ to `normal` by 20px. A geometric's round bowls collide long before a
 neo-grotesque's do, and tracking cut for the wrong face is how "designed" becomes
 "cramped". Never tighten a heading past −0.02em.
 
+**The Tokens-Must-Project Rule.** `lib/design/tokens.ts` calls itself the single
+source of truth, and for line-height and letter-spacing it silently was not:
+`build-tokens.mts` emitted the three font-family variables and nothing else, so
+`leading-tight`, `leading-snug`, `tracking-tight` and `tracking-tighter` all
+resolved to Tailwind's built-in defaults. The sizes only *appeared* to agree
+because tokens.ts restates Tailwind's size scale verbatim.
+
+The cost was not cosmetic. `tracking-tight` rendered **−0.025em** against a
+declared −0.02em — past the Geometric-Tracking floor above, at nine heading call
+sites, on a rule this project wrote for itself. A token nothing reads is a
+comment. The generator now projects `--leading-*` and `--tracking-*`; sizes are
+deliberately left alone, because overriding `--text-*` in Tailwind v4 drops the
+paired `--text-*--line-height` defaults for no gain.
+
+**The `ch`-Is-Not-Characters Rule.** The readability target is 65–75 *real
+characters*. CSS `ch` is the advance of the "0" glyph, which in Geist is
+**1.487×** the average advance of running lowercase prose — measured, not
+assumed. So `max-w-[66ch]` is ~98 characters per line, not 66.
+
+This has now been got wrong three times in this codebase, each time with a
+comment recording it as fixed: the `measure` variants in `text.tsx`, and the
+coach's reasoning disclosure, which was capped at `68ch` (~101 characters) by a
+note that said it had brought the line inside the 65–75 band. Every `ch` value
+in the product is now the character target divided by 1.487 — `prose` 45ch,
+`lead` 36ch, `tight` 28ch. If you set a new one, do the division.
+
+**The Light-On-Dark Rule.** Light type on a committed navy surface gets
+compensation on three axes, not one: leading +0.05–0.1, tracking +0.01–0.02em,
+and one weight step. Perceived weight drops on all three, and at the contrast
+these surfaces run (15.5:1 for the hero headline) halation makes it worse, not
+better.
+
+`Text`'s `tone="onBrand"` carries this. A heading cannot — its leading is
+per-size, so a tone variant would clobber every step at once — so the two
+committed headlines set it explicitly and say why. Before this, the hero
+headline, hero subhead, CTA heading and CTA body were **byte-identical** to the
+same type on the light sections below them.
+
+**Uppercase gets `tracking-caps` (0.08em).** Capitals sit too close at default
+spacing; 14px Poppins 700 caps at 0% ran "PROFESSIONAL EXPERIENCE" into a solid
+block on the ATS CV template. Six uppercase sites were carrying four different
+trackings between them, so the value is a token, not a per-site decision.
+
 **The Mobile Headline Floor.** Every `display-*` clamp has its minimum set so the
 hero lands in two to four lines at 375px, not five or six. The clamp minimum is a
 mobile decision, not a leftover of the desktop maximum divided by something.

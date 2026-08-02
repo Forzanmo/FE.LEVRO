@@ -86,7 +86,7 @@ export function ChoiceGroup<T extends ChoiceOption>(props: SingleProps<T> | Mult
 
   return (
     <fieldset className={cn('min-w-0', className)}>
-      <legend className={hideLegend ? 'sr-only' : 'text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase'}>
+      <legend className={hideLegend ? 'sr-only' : 'text-muted-foreground mb-2 text-xs font-semibold tracking-caps uppercase'}>
         {legend}
         {multiple ? <span className="sr-only"> (choose all that apply)</span> : null}
       </legend>

@@ -9,6 +9,18 @@
   --font-mono: var(--font-mono);
   --font-heading: var(--font-heading);
 
+  /* Leading + tracking scales */
+  --leading-none: 1;
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+  --tracking-tighter: -0.03em;
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.02em;
+  --tracking-caps: 0.08em;
+
   /* Radius scale — derived from the base --radius */
   --radius-xs: calc(var(--radius) * 0.5);
   --radius-sm: calc(var(--radius) * 0.7);

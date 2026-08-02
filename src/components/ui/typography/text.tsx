@@ -39,8 +39,17 @@ export const textVariants = cva('', {
        * SAME deep navy in both themes — so the colour must NOT be theme-reactive.
        * Replaces the old `inverse` tone (`primary-foreground`), which inverted
        * to near-black in dark mode on a surface that never changed.
+       *
+       * It also carries the light-on-dark compensation. Light type on a dark
+       * ground reads lighter and tighter than the same type on paper — the
+       * perceived weight drops, and at the contrast these surfaces run (8:1 for
+       * this copy, 15.5:1 for the heading above it) halation makes it worse, not
+       * better. Measured before this: the hero subhead and the CTA body were
+       * byte-identical to the same 18px/400 Geist on the light sections, on all
+       * three axes. A hair of tracking and a looser leading put the perceived
+       * weight back; the weight step is left to call sites that want it.
        */
-      onBrand: 'text-white',
+      onBrand: 'text-white tracking-[0.01em] leading-relaxed',
       /** Sets no colour — the surrounding surface owns it. */
       inherit: '',
     },
@@ -67,13 +76,24 @@ export const textVariants = cva('', {
      * — and the landing page's most important paragraph landed at ~76ch, over
      * the cap. `ch` units track the actual font, which `max-w-3xl` does not.
      */
+    /*
+     * The values are `ch`, but the READABILITY target is real characters, and
+     * those are not the same unit. CSS `ch` is the advance of "0", which in
+     * Geist is 1.487x the average advance of running lowercase prose — measured,
+     * not assumed. So `max-w-[52ch]` was not ~52 characters per line, it was
+     * ~77, over the 65-75 cap, on the hero subhead — the exact paragraph this
+     * variant was introduced to fix. The comment recording that fix said "~76ch"
+     * and was measuring the wrong thing.
+     *
+     * Each value below is the real-character target divided by 1.487.
+     */
     measure: {
-      /** ~66ch — running prose. */
-      prose: 'max-w-[66ch]',
-      /** ~52ch — intros and lead paragraphs, which read better narrower. */
-      lead: 'max-w-[52ch]',
-      /** ~40ch — captions, helper text, empty-state copy. */
-      tight: 'max-w-[40ch]',
+      /** ~67 real characters — running prose. */
+      prose: 'max-w-[45ch]',
+      /** ~54 real characters — intros and lead paragraphs, which read narrower. */
+      lead: 'max-w-[36ch]',
+      /** ~42 real characters — captions, helper text, empty-state copy. */
+      tight: 'max-w-[28ch]',
       /** Opt out where the container already constrains the line. */
       none: '',
     },

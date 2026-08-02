@@ -601,9 +601,21 @@ export const typography = {
   },
   letterSpacing: {
     tighter: '-0.03em',
+    /** The floor. DESIGN.md's Geometric-Tracking Rule: never tighter than this. */
     tight: '-0.02em',
     normal: '0em',
     wide: '0.02em',
+    /**
+     * All-caps labels only.
+     *
+     * Capitals sit too close at default spacing — 14px Poppins 700 caps at 0%
+     * ran "PROFESSIONAL EXPERIENCE" together into a solid block on the ATS CV
+     * template. Short uppercase runs want 5-12%; this is the middle of that
+     * band and is deliberately a token rather than a per-site arbitrary value,
+     * because there are six uppercase sites and they were carrying four
+     * different trackings between them.
+     */
+    caps: '0.08em',
   },
 } as const
 

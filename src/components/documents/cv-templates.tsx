@@ -37,7 +37,7 @@ const SHEET = cn('print-sheet mx-auto w-full max-w-[46rem] rounded-lg shadow-lg'
 function MinimalistSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mt-6">
-      <h3 className="mb-2 text-xs font-semibold tracking-wider text-[var(--neutral-600)] uppercase">
+      <h3 className="mb-2 text-xs font-semibold tracking-caps text-[var(--neutral-600)] uppercase">
         {title}
       </h3>
       {children}
@@ -172,7 +172,7 @@ function DesignerCv({ data }: { data: ResumeData }) {
 
           {contact.length > 0 ? (
             <div className="mt-6">
-              <h3 className="text-xs font-semibold tracking-wider text-white/75 uppercase">
+              <h3 className="text-xs font-semibold tracking-caps text-white/75 uppercase">
                 Contact
               </h3>
               <ul className="mt-2 space-y-1.5">
@@ -187,7 +187,7 @@ function DesignerCv({ data }: { data: ResumeData }) {
 
           {data.skills.length > 0 ? (
             <div className="mt-6">
-              <h3 className="text-xs font-semibold tracking-wider text-white/75 uppercase">
+              <h3 className="text-xs font-semibold tracking-caps text-white/75 uppercase">
                 Skills
               </h3>
               <ul className="mt-2 space-y-1.5">
@@ -274,14 +274,14 @@ function AtsCv({ data }: { data: ResumeData }) {
 
       {data.summary ? (
         <section className="mt-5">
-          <h3 className="text-sm font-bold uppercase">Summary</h3>
+          <h3 className="text-sm font-bold tracking-caps uppercase">Summary</h3>
           <p className="mt-1 text-sm leading-relaxed">{data.summary}</p>
         </section>
       ) : null}
 
       {data.experience.length > 0 ? (
         <section className="mt-5">
-          <h3 className="text-sm font-bold uppercase">Professional Experience</h3>
+          <h3 className="text-sm font-bold tracking-caps uppercase">Professional Experience</h3>
           <div className="mt-1 space-y-4">
             {data.experience.map((exp) => (
               <div key={exp.id}>
@@ -307,7 +307,7 @@ function AtsCv({ data }: { data: ResumeData }) {
 
       {data.skills.length > 0 ? (
         <section className="mt-5">
-          <h3 className="text-sm font-bold uppercase">Skills</h3>
+          <h3 className="text-sm font-bold tracking-caps uppercase">Skills</h3>
           <p className="mt-1 text-sm">{data.skills.join(', ')}</p>
         </section>
       ) : null}

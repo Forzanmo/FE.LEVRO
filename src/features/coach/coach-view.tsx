@@ -13,6 +13,7 @@ import { TypingIndicator } from '@/components/coach/typing-indicator'
 import { UserAnswer } from '@/components/coach/user-answer'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { Heading } from '@/components/ui/typography'
 import { ROUTES } from '@/lib/constants/routes'
 
 import type { CoachAnswer, CoachQuestion } from './types'
@@ -40,7 +41,7 @@ function ResumePrompt({ onResume, onRestart }: { onResume: () => void; onRestart
   return (
     <div className="mx-auto flex w-full max-w-md flex-col items-start gap-4 py-16">
       <div className="space-y-1.5">
-        <h1 className="font-heading text-xl font-semibold tracking-tight">
+        <h1 className="font-heading text-xl font-semibold tracking-normal">
           Pick up where you left off
         </h1>
         <p className="text-muted-foreground text-sm">
@@ -116,7 +117,16 @@ export function CoachView() {
     <div className="mx-auto flex w-full max-w-2xl flex-col">
       <div className="flex items-start justify-between gap-4 pb-4">
         <div className="min-w-0">
-          <h1 className="font-heading text-lg font-semibold tracking-tight">Career assessment</h1>
+          {/*
+             * `2xl`, not `text-lg`. This is the page title and it rendered at
+             * 18px while the coach question inside it renders at 20px — the h1
+             * was the third-largest thing on its own screen, and 1.67x smaller
+             * than the h1 `PageHeader` gives every other route. Tracking goes
+             * to normal because DESIGN.md relaxes it by 20px.
+             */}
+            <Heading level={1} size="2xl">
+              Career assessment
+            </Heading>
           <p className="text-muted-foreground text-sm">
             A few questions, then we draft your CV from your answers.
           </p>
