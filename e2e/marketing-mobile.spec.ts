@@ -67,6 +67,31 @@ test.describe('Marketing — mobile', () => {
     expect(overflow).toBe(0)
   })
 
+  test('the deck progress bar exists only where there is a deck to be partway through', async ({
+    page,
+  }) => {
+    /*
+     * This shipped broken. The bar is hidden above `md` by CSS inside a
+     * `@supports` block, and the first version relied on a `md:hidden` utility
+     * class to do it — which lost, because Tailwind utilities live in
+     * `@layer utilities` and unlayered CSS beats any layer at equal
+     * specificity. The result was a 1176x2 rule slicing across every desktop
+     * viewport, `transform: none`, reporting a scroll position of 100% for a
+     * deck that is a static grid at that width.
+     *
+     * A cascade bug is invisible to typecheck, lint, axe and a contrast gate.
+     * It needs a test that looks at the rendered box.
+     */
+    await page.goto('/')
+    const bar = page.locator('.deck-progress')
+
+    await page.setViewportSize({ width: 390, height: 844 })
+    await expect(bar).toBeVisible()
+
+    await page.setViewportSize({ width: 1280, height: 900 })
+    await expect(bar).toBeHidden()
+  })
+
   test('the how-it-works deck is reachable by keyboard', async ({ page }) => {
     // It is a horizontal scroller whose cards contain no links, so without an
     // explicit tabindex there is no way to reach steps 2 and 3 without a

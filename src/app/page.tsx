@@ -443,7 +443,7 @@ export default function HomePage() {
              */}
             <div
               aria-hidden="true"
-              className="deck-progress bg-border mx-5 mt-1 h-0.5 overflow-hidden rounded-full md:hidden"
+              className="deck-progress bg-border mx-5 mt-1 h-0.5 overflow-hidden rounded-full"
             >
               <span className="deck-progress-bar bg-brand block h-full w-full rounded-full" />
             </div>

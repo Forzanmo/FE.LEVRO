@@ -416,9 +416,25 @@ body {
   display: none;
 }
 
+/*
+ * The breakpoint lives HERE, not on the element.
+ *
+ * This shipped with `md:hidden` in the markup doing the hiding, and it did not
+ * work: Tailwind's utilities are inside `@layer utilities`, this block is
+ * unlayered, and unlayered CSS beats any layer at equal specificity. So the bar
+ * rendered at every desktop width — measured 1176x2 at 1440 — with
+ * `transform: none`, i.e. scaleX(1), parked at 100%.
+ *
+ * A 2px rule slicing across the page under the three steps, reporting a scroll
+ * position that does not exist above `md` because the deck is a grid there.
+ * Exactly the failure the note below warns about, shipped at a full one instead
+ * of a third.
+ */
 @supports (animation-timeline: --deck) and (timeline-scope: --deck) {
-  .deck-progress {
-    display: block;
+  @media (max-width: 767px) {
+    .deck-progress {
+      display: block;
+    }
   }
   .deck-progress-bar {
     transform-origin: left center;
