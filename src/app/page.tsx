@@ -44,12 +44,26 @@ const HOW_IT_WORKS: { title: string; body: string }[] = [
   },
 ]
 
-// Honest promises about the product — not fabricated testimonials or outcome stats.
-const REASSURANCES: string[] = [
-  'Every verdict shows its reasoning',
-  'An ATS template, because most CVs are machine-read first',
-  'Free to start — no credit card',
-  'Built for juniors and career shifters',
+/*
+ * Honest promises about the product — not fabricated testimonials or outcome
+ * stats.
+ *
+ * One slot used to go to "Free to start — no credit card", which the hero
+ * microcopy already says three folds earlier. That spent a quarter of the trust
+ * band answering a fear nobody has here: the blocker at the moment of clicking
+ * is not five pounds, it is handing a complete employment history to an AI. The
+ * page answered the money question twice and the data question never.
+ *
+ * The replacement deliberately points at the policy rather than asserting a
+ * promise. Writing "never used to train models" here would be inventing a
+ * commitment on the product's behalf on the page that argues against exactly
+ * that — the honest move is to route the reader to the real answer.
+ */
+const REASSURANCES: { label: string; href?: string }[] = [
+  { label: 'Every verdict shows its reasoning' },
+  { label: 'An ATS template, because most CVs are machine-read first' },
+  { label: 'Your CV and your data — read how we handle both', href: ROUTES.privacy },
+  { label: 'Built for juniors and career shifters' },
 ]
 
 const FEATURES: { title: string; body: string }[] = [
@@ -216,9 +230,18 @@ export default function HomePage() {
               SHELL,
               'grid items-center gap-12 pt-12 pb-16',
               'sm:pt-16 sm:pb-20',
-              // Asymmetric on purpose: the copy column takes the remainder, the
-              // panel gets a fixed measure, and the two are not equal halves.
-              'lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:gap-16 lg:pt-24 lg:pb-28',
+              /*
+               * Asymmetric on purpose: the copy column takes the remainder, the
+               * panel gets a fixed measure, and the two are not equal halves.
+               *
+               * Two steps, not one. At a single 30rem the measured columns were
+               * 416/480 at 1024 and 512/480 at 1120 — the product shot was
+               * WIDER than the headline it was supposed to support, on the most
+               * common laptop width there is, and the intended asymmetry only
+               * arrived at 1280. The copy leads at every width now.
+               */
+              'lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:gap-12 lg:pt-24 lg:pb-28',
+              'xl:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] xl:gap-16',
             )}
           >
             {/*
@@ -235,7 +258,14 @@ export default function HomePage() {
              * on the dashboard's skills card.
              */}
             <div className="hero-stagger min-w-0">
-              <p className="text-brand-surface-accent text-sm font-medium sm:text-base">
+              {/*
+               * Not the accent. "For juniors and career shifters" is an audience
+               * label, not something the reader has earned, and DESIGN.md's
+               * Teal-Is-Earned Rule is only worth anything if the flagship page
+               * keeps it. Teal above the fold now appears exactly where evidence
+               * does — the meter and the verdict chips — and in the wordmark.
+               */}
+              <p className="text-brand-surface-muted text-sm font-medium sm:text-base">
                 For juniors and career shifters
               </p>
 
@@ -272,19 +302,19 @@ export default function HomePage() {
                   </Link>
                 </Button>
                 {/*
-                 * The hairline exists only below `sm`. On desktop this sits
-                 * beside a solid white button and reads as the secondary action
-                 * from position alone. Full-width and centred on a phone, with
-                 * no edge at all, it read as a caption under the primary button
-                 * rather than as something tappable — the ring restores the
-                 * affordance without giving it the weight of a second CTA.
+                 * The hairline stays at every width. It was `sm:ring-0` on the
+                 * theory that position alone marks the secondary action on
+                 * desktop — but at 1440 that leaves 16px of white text sitting
+                 * 257px away from the primary with no edge of any kind, which
+                 * reads as a caption, not a control. A 25% white ring is still
+                 * unmistakably the lesser of the two.
                  */}
                 <Button
                   asChild
                   size="xl"
                   variant="ghost"
                   fullWidth
-                  className="text-white ring-1 ring-white/25 ring-inset hover:bg-white/10 hover:text-white sm:w-auto sm:ring-0"
+                  className="text-white ring-1 ring-white/25 ring-inset hover:bg-white/10 hover:text-white sm:w-auto"
                 >
                   <Link href="#how-it-works">How it works</Link>
                 </Button>
@@ -326,7 +356,10 @@ export default function HomePage() {
                 between cards would run through the gaps and read as a seam. */}
             <div
               aria-hidden="true"
-              className="bg-border absolute top-[1.4375rem] right-0 left-0 hidden h-px md:block"
+              // Ends at the centre of the third marker rather than running the
+              // full width: ~500px of rail past step 3 with nothing on it
+              // implied a fourth step that does not exist.
+              className="bg-border absolute top-[1.4375rem] left-0 hidden h-px md:right-[calc(33.333%-1.4375rem)] md:block"
             />
             {/*
              * `tabIndex={0}` + a label, because a scrollable region with no
@@ -344,6 +377,12 @@ export default function HomePage() {
               aria-label="How it works, in three steps"
               className={cn(
                 '-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2',
+                // `snap-start` snaps to the scroll container's PADDING box, which
+                // cancels the `px-5` and parked card 1 at x=0 while the heading
+                // above it sat at x=20 — the page's single left edge visibly
+                // breaking on the first screen after the hero. `scroll-padding`
+                // is the one inset the snapport does respect.
+                'scroll-pl-5 md:scroll-pl-0',
                 '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
                 'focus-visible:ring-ring rounded-lg outline-none focus-visible:ring-2',
                 'md:mx-0 md:grid md:grid-cols-3 md:gap-10 md:overflow-visible md:px-0 md:pb-0',
@@ -389,17 +428,24 @@ export default function HomePage() {
           <div className={cn(SHELL, 'py-10 sm:py-12')}>
             <Reveal>
               <ul className="grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
-                {REASSURANCES.map((label) => (
-                  <li key={label} className="flex items-start gap-2.5">
-                    <Icon
-                      name="success"
-                      size="sm"
-                      className="text-achievement mt-0.5 shrink-0"
-                      aria-hidden
-                    />
-                    <Text as="span" size="sm" tone="muted" className="text-pretty">
-                      {label}
-                    </Text>
+                {REASSURANCES.map((item) => (
+                  <li key={item.label} className="flex items-start gap-2.5">
+                    {/* Navy, not teal. Four accent ticks on a band of ordinary
+                        promises was the single largest source of pre-earned
+                        teal on the page. */}
+                    <Icon name="success" size="sm" className="text-brand mt-0.5 shrink-0" aria-hidden />
+                    {item.href ? (
+                      <Link
+                        href={item.href}
+                        className="text-muted-foreground hover:text-foreground focus-visible:ring-ring inline-block min-h-6 rounded-sm text-sm text-pretty underline-offset-4 outline-none transition-colors hover:underline focus-visible:ring-2"
+                      >
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <Text as="span" size="sm" tone="muted" className="text-pretty">
+                        {item.label}
+                      </Text>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -463,7 +509,15 @@ export default function HomePage() {
             layer stack as the hero so the page closes where it opened. */}
         <section className={cn(SHELL, 'pb-16 sm:pb-20')}>
           <Reveal>
-            <div className="bg-gradient-brand-deep shadow-brand-glow relative isolate overflow-hidden rounded-3xl px-6 py-14 text-center text-white sm:px-10 sm:py-16">
+            {/*
+             * No `shadow-brand-glow` here. A teal halo around a near-black band
+             * on a near-black page is the design system's own crypto/neon
+             * *Don't*, applied to itself — and in dark mode it made the closing
+             * CTA the brightest object on the page, out-shouting the committed
+             * hero it was supposed to answer. The glow stays where it earns its
+             * place: the primary button on hover.
+             */}
+            <div className="bg-gradient-brand-deep relative isolate overflow-hidden rounded-3xl px-6 py-12 text-center text-white sm:px-10 sm:py-14">
               <div
                 aria-hidden="true"
                 className="chevron-field pointer-events-none absolute inset-0 -z-10 text-white opacity-[0.05]"
@@ -476,7 +530,7 @@ export default function HomePage() {
                 tone="onBrand"
                 className="relative mx-auto max-w-[20ch]"
               >
-                Find out what your CV proves
+                Stop guessing what recruiters see
               </Heading>
               {/* Full white, not white/85 — at 85% this measured 3.53:1 against
                   the band's lighter end while the sheen sweeps across it. */}

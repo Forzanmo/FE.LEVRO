@@ -51,18 +51,28 @@ const VERDICT: Record<Verdict, { label: string; chip: string; dot: string }> = {
 const EVIDENCED_COUNT = 7
 const TOTAL_COUNT = 11
 
+/*
+ * The worked example is deliberately NOT a software engineer.
+ *
+ * The eyebrow beside this panel says "For juniors and career shifters", and the
+ * panel is the artefact that answers "what is this" before anyone reads a word.
+ * When it listed React, TypeScript and system design it answered "this is for
+ * software engineers", and a shifter moving into marketing, ops or teaching had
+ * their question answered wrongly in the first second. That the team building it
+ * did not notice is the point: they are the sample.
+ */
 const ROWS: { skill: string; verdict: Verdict; evidence?: string }[] = [
   {
-    skill: 'React & component architecture',
+    skill: 'Campaign reporting',
     verdict: 'evidenced',
-    evidence: '“Rebuilt the checkout as 14 shared components” — Experience, line 3',
+    evidence: '“Owned the weekly performance report for six campaigns” — Experience, line 2',
   },
-  { skill: 'TypeScript', verdict: 'evidenced' },
-  { skill: 'Automated testing', verdict: 'thin' },
+  { skill: 'Stakeholder communication', verdict: 'evidenced' },
+  { skill: 'Budget ownership', verdict: 'thin' },
 ]
 
 /** The row that resolves on load — the product thinking, made visible. */
-const RESOLVING = { skill: 'System design', verdict: 'absent' as const }
+const RESOLVING = { skill: 'Paid media strategy', verdict: 'absent' as const }
 
 function VerdictChip({ verdict }: { verdict: Verdict }) {
   const meta = VERDICT[verdict]
@@ -111,20 +121,26 @@ export function AssessmentPanel({ className }: { className?: string }) {
           <div className="min-w-0">
             <p className={cn('text-sm font-semibold', SHEET_INK.heading)}>Skills assessment</p>
             <p className={cn('mt-0.5 truncate text-xs', SHEET_INK.muted)}>
-              Target role · Frontend Engineer
+              Target role · Marketing Coordinator
             </p>
           </div>
+          {/*
+           * "Example", not "Live".
+           *
+           * The chip used to read Live beside a pulsing dot, on a hard-coded
+           * 7 / 11 — a perpetual liveness indicator on a static mock. On the one
+           * page whose entire argument is evidence over assertion, an unlabelled
+           * fabricated assessment of a fictional person was the weakest thing
+           * here. Naming it costs nothing and is the only version of this panel
+           * consistent with what it is selling.
+           */}
           <span
             className={cn(
-              'flex shrink-0 items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium',
+              'shrink-0 rounded-full px-2 py-1 text-xs font-medium',
               SHEET_INK.chip,
             )}
           >
-            <span
-              aria-hidden="true"
-              className="panel-pending-dot size-1.5 rounded-full bg-[var(--accent-600)]"
-            />
-            Live
+            Example
           </span>
         </div>
 

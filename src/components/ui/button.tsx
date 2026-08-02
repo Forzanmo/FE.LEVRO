@@ -6,6 +6,14 @@ import { Loader2Icon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 /**
+ * The transition names its properties instead of using `transition-all`.
+ *
+ * `all` includes width, height, padding and margin, so every button was one
+ * stray class away from animating layout on hover — against this project's own
+ * motion rule, and the thing that turns a hover into a reflow. The list is
+ * exactly what the variants below actually change: colour, ring, shadow, the
+ * brightness filter, and the 1px active translate.
+ *
  * Disabled is a MUTED SURFACE, not a faded copy of the enabled button.
  *
  * The base used to carry `disabled:opacity-50`, which on the primary variant is
@@ -22,7 +30,7 @@ import { cn } from '@/lib/utils'
  * show through the flat fill.
  */
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:bg-muted disabled:text-muted-foreground disabled:border-transparent disabled:shadow-none disabled:inset-ring-0 disabled:bg-none aria-busy:opacity-100! aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow,filter,transform,opacity] duration-150 outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:bg-muted disabled:text-muted-foreground disabled:border-transparent disabled:shadow-none disabled:inset-ring-0 disabled:bg-none aria-busy:opacity-100! aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {

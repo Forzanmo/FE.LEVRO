@@ -37,8 +37,14 @@ export interface MarketingNavLink {
  * Every row is a 48px tap target — above the 44px floor, and sized for thumbs
  * rather than for how much text is in the label.
  *
- * This is the page's only client component. It is a leaf, so the marketing page
- * stays a server component and the interactive JS is scoped to the menu.
+ * It is a leaf, so the marketing page itself stays a server component and this
+ * menu's interactive JS is scoped to the menu.
+ *
+ * It is NOT the page's only client component, which this comment used to claim:
+ * `components/shared/reveal.tsx` is also `'use client'` and pulls `motion/react`
+ * onto the landing page for six scroll-triggered translates. That is worth
+ * revisiting — the page removed a 31KB font for eight glyphs — but a CSS-only
+ * scroll reveal needs `animation-timeline`, which is not yet safe to rely on.
  */
 export function MobileNav({ links }: { links: readonly MarketingNavLink[] }) {
   const [open, setOpen] = React.useState(false)
@@ -91,18 +97,36 @@ export function MobileNav({ links }: { links: readonly MarketingNavLink[] }) {
           </ul>
         </nav>
 
+        {/*
+         * ONE button, not two.
+         *
+         * This was a filled "Create your account" directly above an outlined
+         * "Sign in" — two visually distinct actions with the identical `href`,
+         * presenting new-versus-returning (the only distinction a first-time
+         * visitor cares about at that moment) as a choice that does not exist.
+         * Worse, "Create your account" does not create an account: `/sign-up`
+         * has no page yet, so the next screen is titled Sign in and has to walk
+         * back the promise this one made.
+         *
+         * Until there is a real registration route, the honest shape is a single
+         * primary action and a quieter line naming the other case, both pointing
+         * at the combined screen that actually handles both.
+         */}
         <div className="border-border mt-auto flex flex-col gap-3 border-t p-5">
           <SheetClose asChild>
             <Button asChild size="xl" fullWidth>
-              <Link href={ROUTES.signIn}>Create your account</Link>
+              <Link href={ROUTES.signIn}>Get started — it&rsquo;s free</Link>
             </Button>
           </SheetClose>
           <SheetClose asChild>
-            <Button asChild variant="outline" size="xl" fullWidth>
-              <Link href={ROUTES.signIn}>Sign in</Link>
-            </Button>
+            <Link
+              href={ROUTES.signIn}
+              className="text-muted-foreground hover:text-foreground focus-visible:ring-ring inline-flex min-h-11 items-center justify-center rounded-lg text-sm outline-none transition-colors focus-visible:ring-2"
+            >
+              Already have an account? Sign in
+            </Link>
           </SheetClose>
-          <div className="flex items-center justify-between pt-1">
+          <div className="border-border flex items-center justify-between border-t pt-4">
             <span className="text-muted-foreground text-sm">Appearance</span>
             <ThemeToggle />
           </div>

@@ -12,7 +12,9 @@ test.describe('Levvro smoke', () => {
     await expect(page.getByRole('link', { name: /Start your assessment/i }).first()).toBeVisible()
   })
 
-  test('the hero product panel states a verdict and the evidence behind it', async ({ page }) => {
+  test('the hero product panel states a verdict, its evidence, and that it is an example', async ({
+    page,
+  }) => {
     // The panel is the page's whole argument — a verdict is worthless here
     // without the line of the CV that earned it, and the counts have to
     // reconcile with the meter beside them. If a redesign drops the reasoning
@@ -21,8 +23,19 @@ test.describe('Levvro smoke', () => {
     await page.goto('/')
     await expect(page.getByText('Skills assessment')).toBeVisible()
     await expect(page.getByText('Evidenced').first()).toBeVisible()
-    await expect(page.getByText(/Rebuilt the checkout as 14 shared components/)).toBeVisible()
+    await expect(page.getByText(/Owned the weekly performance report for six campaigns/)).toBeVisible()
     await expect(page.getByRole('img', { name: '7 of 11 skills evidenced' })).toBeVisible()
+
+    // Labelled as an example. It is a fabricated assessment of a fictional
+    // person on the page that argues evidence over assertion; unlabelled, it is
+    // the page contradicting itself.
+    await expect(page.getByText('Example')).toBeVisible()
+
+    // NOT a software engineer. The eyebrow beside this panel says "For juniors
+    // and career shifters"; when the worked example listed React and TypeScript
+    // it told most of that audience the product was not for them.
+    await expect(page.getByText(/Target role · Marketing Coordinator/)).toBeVisible()
+    await expect(page.getByText('TypeScript')).toHaveCount(0)
   })
 
   test('dashboard leads with the skills read-out', async ({ page }) => {
