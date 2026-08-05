@@ -4,8 +4,33 @@ import type { ResumeData } from '@/lib/validators/resume-schema'
  * Resume service. Returns the AI-generated starting resume (mocked here). A real
  * implementation would call the generation endpoint; the shape is identical, so
  * the editor and preview are unaffected.
+ *
+ * `getSeed()` is the *output of the assessment* and is only valid once one has
+ * been taken — `useResume` decides which of the two to load, after mount. This
+ * one stays ungated on purpose: it is synchronous and feeds `defaultValues`, so
+ * a localStorage read inside it would resolve differently on server and client
+ * and swap the whole form on hydration.
  */
 export const resumeService = {
+  /**
+   * A blank CV. The hydration-stable default, and what a visitor who has not
+   * taken the assessment actually has: their own empty page, not a stranger's
+   * two years at Northwind pre-filled as though it were theirs.
+   */
+  getEmpty(): ResumeData {
+    return {
+      fullName: '',
+      headline: '',
+      email: '',
+      phone: '',
+      location: '',
+      website: '',
+      summary: '',
+      experience: [],
+      skills: [],
+    }
+  },
+
   getSeed(): ResumeData {
     return {
       fullName: 'Alex Rivera',

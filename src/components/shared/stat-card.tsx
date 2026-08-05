@@ -6,10 +6,10 @@ import { cn } from '@/lib/utils'
 export type StatTone = 'brand' | 'success' | 'warning' | 'info' | 'neutral'
 
 const toneSurface: Record<StatTone, string> = {
-  // The brand stat is the row's hero. A deep-teal gradient (theme-independent
+  // The brand stat is the row's hero. A deep-navy gradient (theme-independent
   // ramp values, not the flipping --brand role) keeps the white icon above the
-  // 3:1 non-text-contrast bar in BOTH themes — the teal→gold gradient's gold end
-  // dropped white icons below 3:1 (WCAG 1.4.11).
+  // 3:1 non-text-contrast bar in BOTH themes — the full navy→teal gradient's
+  // teal end dropped white icons below 3:1 (WCAG 1.4.11).
   brand: 'bg-gradient-brand-deep text-white shadow-sm ring-1 ring-inset ring-white/15',
   success: 'bg-success-muted text-success',
   warning: 'bg-warning-muted text-warning',
@@ -39,7 +39,7 @@ export function StatCard({ label, value, icon, tone = 'brand', delta, className 
           <Text as="span" size="xs" tone="muted" weight="medium">
             {label}
           </Text>
-          <div className="font-heading text-3xl leading-none font-semibold tracking-tight tabular-nums">
+          <div className="font-mono text-3xl leading-none font-semibold tracking-tight tabular-nums">
             {value}
           </div>
           {delta ? (
@@ -60,10 +60,7 @@ export function StatCard({ label, value, icon, tone = 'brand', delta, className 
         </div>
         {icon ? (
           <span
-            className={cn(
-              'grid size-10 shrink-0 place-items-center rounded-xl',
-              toneSurface[tone],
-            )}
+            className={cn('grid size-10 shrink-0 place-items-center rounded-xl', toneSurface[tone])}
           >
             <Icon name={icon} size="sm" />
           </span>

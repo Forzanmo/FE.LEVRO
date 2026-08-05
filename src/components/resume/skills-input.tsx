@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import { Icon } from '@/components/ui/icon'
+import { RESUME_LIMITS } from '@/lib/validators/resume-schema'
 
 /** Tag input for skills. Enter or comma adds; Backspace on empty removes last. */
 export function SkillsInput({
@@ -15,10 +16,14 @@ export function SkillsInput({
   id?: string
 }) {
   const [draft, setDraft] = useState('')
+  const full = value.length >= RESUME_LIMITS.skills
 
   const add = () => {
-    const trimmed = draft.trim().replace(/,$/, '')
-    if (trimmed && !value.includes(trimmed)) onChange([...value, trimmed])
+    // Trim to the cap rather than refusing the entry: someone pasting a phrase
+    // meant to add a skill, and the chip they get back shows exactly what was
+    // kept. Silently dropping their input would just look broken.
+    const trimmed = draft.trim().replace(/,$/, '').slice(0, RESUME_LIMITS.skill)
+    if (trimmed && !full && !value.includes(trimmed)) onChange([...value, trimmed])
     setDraft('')
   }
 
@@ -36,7 +41,15 @@ export function SkillsInput({
             type="button"
             onClick={() => removeAt(skill)}
             aria-label={`Remove ${skill}`}
-            className="hover:text-destructive rounded p-0.5 outline-none"
+            /*
+             * Two fixes. `after:` expands an 18px visual target to clear the
+             * 24px touch floor without changing the chip's layout — the same
+             * pattern the Switch and the coach disclosure use. And `outline-none`
+             * had no replacement, so this button was invisible to keyboard focus
+             * entirely; removing an outline without providing another indicator
+             * is a keyboard regression, not a styling choice.
+             */
+            className="hover:text-destructive focus-visible:ring-ring relative rounded p-0.5 outline-none after:absolute after:-inset-1.5 focus-visible:ring-2"
           >
             <Icon name="close" size="xs" />
           </button>
@@ -45,6 +58,8 @@ export function SkillsInput({
       <input
         id={id}
         value={draft}
+        disabled={full}
+        maxLength={RESUME_LIMITS.skill}
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ',') {
@@ -55,8 +70,14 @@ export function SkillsInput({
           }
         }}
         onBlur={add}
-        placeholder={value.length ? 'Add another…' : 'Type a skill and press Enter'}
-        className="min-w-[9rem] flex-1 bg-transparent px-1 py-0.5 text-sm outline-none"
+        placeholder={
+          full
+            ? `${RESUME_LIMITS.skills} skills is the maximum`
+            : value.length
+              ? 'Add another…'
+              : 'Type a skill and press Enter'
+        }
+        className="min-w-[9rem] flex-1 bg-transparent px-1 py-0.5 text-sm outline-none disabled:cursor-not-allowed"
         aria-label="Add a skill"
       />
     </div>

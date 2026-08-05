@@ -1,5 +1,4 @@
 export { AppProviders } from './app-providers'
 export { ThemeProvider } from './theme-provider'
 export { QueryProvider } from './query-provider'
-export { StoreProvider } from './store-provider'
 export { AuthProvider } from './auth-provider'

@@ -52,3 +52,11 @@ next-env.d.ts
 .claude/settings.local.json
 .impeccable/config.local.json
 .impeccable/hook.cache.json
+
+# The supplied LEVRRO brand-identity microsite. A local reference drop, not
+# project source: a separate Vite app with its own dependencies and lockfile.
+# It is the provenance for the navy/teal palette and the Poppins pairing, and
+# those values are recorded in DESIGN.md and lib/design/tokens.ts — which is
+# where they belong. tsconfig and eslint exclude the folder so that a copy
+# sitting in the working tree is never compiled or linted.
+levrro-brand-identity-clone/

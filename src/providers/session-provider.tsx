@@ -2,7 +2,13 @@
 
 import { createContext, useContext, useMemo, useSyncExternalStore } from 'react'
 
-import { authService, type AuthPlan, type SessionUser, type StoredSession } from '@/services/auth/auth-service'
+import { env } from '@/config/env'
+import {
+  authService,
+  type AuthPlan,
+  type SessionUser,
+  type StoredSession,
+} from '@/services/auth/auth-service'
 
 export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated'
 
@@ -28,7 +34,11 @@ const listeners = new Set<() => void>()
 
 function getSnapshot(): StoredSession {
   if (!initialized) {
-    cache = authService.getSession() ?? authService.seedReturningUser()
+    // No stored session means a first visit, and a first visit is signed OUT.
+    // Demo mode is the only path back to the old auto-authenticated default.
+    cache =
+      authService.getSession() ??
+      (env.isDemoMode ? authService.seedReturningUser() : authService.signedOut())
     initialized = true
   }
   return cache as StoredSession
@@ -56,7 +66,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<SessionContextValue>(
     () => ({
-      status: session === null ? 'loading' : session.authenticated ? 'authenticated' : 'unauthenticated',
+      status:
+        session === null ? 'loading' : session.authenticated ? 'authenticated' : 'unauthenticated',
       user: session?.user ?? null,
       hasOnboarded: session?.hasOnboarded ?? false,
       plan: session?.plan,

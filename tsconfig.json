@@ -31,5 +31,12 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "e2e", ".storybook", "playwright.config.ts", "**/*.stories.tsx"]
+  "//exclude": "Only build output, dependencies, and reference material. `e2e`, `.storybook`, `playwright.config.ts` and `**/*.stories.tsx` used to be excluded here while `verify` linted `src scripts` only — so the specs and all the stories were checked by nothing at all, and that is precisely where residue from the deleted roadmap survived a whole refactor. A gate with a hole in it is worse than no gate: it reports green over the code least likely to be read. `levrro-brand-identity-clone` is the supplied brand-identity microsite. It is gitignored — a local reference drop rather than project source — but it is excluded here too, because a copy sitting in the working tree is a separate Vite app with its own dependencies and type-checking it reports 40 phantom errors that bury the real ones.",
+  "exclude": [
+    "node_modules",
+    ".next",
+    "out",
+    "storybook-static",
+    "levrro-brand-identity-clone"
+  ]
 }

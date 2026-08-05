@@ -20,6 +20,14 @@ const eslintConfig = defineConfig([
     "coverage/**",
     "playwright-report/**",
     "test-results/**",
+    // Vendored agent tooling, not project source.
+    ".claude/**",
+    // The supplied LEVRRO brand-identity microsite. Gitignored, but excluded
+    // here too: if a copy is sitting in the working tree it is a separate Vite
+    // app with its own conventions, and linting it reports a dozen errors
+    // nobody in this repo can act on. A gate that is expected to fail stops
+    // being read.
+    "levrro-brand-identity-clone/**",
   ]),
   ...storybook.configs["flat/recommended"]
 ]);

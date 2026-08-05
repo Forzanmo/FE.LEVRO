@@ -3,11 +3,20 @@
  * until keys are configured — the SessionProvider consumes this, so swapping to
  * real Clerk only touches the provider, not the screens.
  *
- * The default (first visit) is a signed-in, onboarded returning user so the app
- * is reviewable without a login wall; explicit sign-out flips it and drives the
- * real sign-in → onboarding → coach flow.
+ * **A first visit is signed OUT.** This used to seed an authenticated, onboarded
+ * "returning user" so the app was reviewable without a login wall, and the cost
+ * of that convenience was the entire top of the funnel: `/sign-in` and
+ * `/onboarding` both redirected to `/dashboard`, every marketing CTA landed on a
+ * populated dashboard, and no visitor could create an account — so the product
+ * shipped with no way to acquire a user. It also greeted strangers by the name
+ * of a person who is not them, on a product whose first principle is that trust
+ * is earned through transparency.
+ *
+ * The reviewable-without-a-login-wall behaviour still exists, but it is now
+ * opt-in via `NEXT_PUBLIC_DEMO_MODE=1` (see `config/env.ts`) rather than the
+ * default that every real visitor gets.
  */
-export type AuthPlan = 'assets' | 'assets-roadmap'
+export type AuthPlan = 'cv' | 'cv-letters'
 
 export interface SessionUser {
   id: string
@@ -56,7 +65,14 @@ function write(session: StoredSession): StoredSession {
 export const authService = {
   getSession: read,
 
-  /** First-visit default: an onboarded returning user (keeps the app open). */
+  /** The signed-out default for a first visit. Not persisted: writing it would
+   *  be indistinguishable from a deliberate sign-out on the next read. */
+  signedOut(): StoredSession {
+    return { authenticated: false, user: null, hasOnboarded: false }
+  },
+
+  /** Demo mode only (`NEXT_PUBLIC_DEMO_MODE=1`): an onboarded returning user, so
+   *  the whole product is browsable without a login wall. */
   seedReturningUser(): StoredSession {
     return write({ authenticated: true, user: DEMO_USER, hasOnboarded: true })
   },
@@ -68,6 +84,13 @@ export const authService = {
 
   signOut(): StoredSession {
     return write({ authenticated: false, user: null, hasOnboarded: false })
+  },
+
+  /** Persist profile edits. Returns null when there is no session to update. */
+  updateProfile(patch: { name: string }): StoredSession | null {
+    const current = read()
+    if (!current?.user) return null
+    return write({ ...current, user: { ...current.user, name: patch.name } })
   },
 
   completeOnboarding(plan: AuthPlan): StoredSession {

@@ -9,7 +9,9 @@ export function TypingIndicator() {
   const reduceMotion = useReducedMotion()
 
   return (
-    <div className="flex items-center gap-3" role="status" aria-label="Coach is typing">
+    // No `aria-label` on the container: it would override the sr-only text
+    // below, leaving that span dead. One accessible name, from the content.
+    <div className="flex items-center gap-3" role="status">
       <CoachAvatar />
       <span className="bg-muted flex items-center gap-1 rounded-full px-3 py-2.5">
         {[0, 1, 2].map((i) => (

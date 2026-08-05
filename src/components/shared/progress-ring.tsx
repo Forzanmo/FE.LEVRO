@@ -13,13 +13,13 @@ export interface ProgressRingProps {
   className?: string
   /** Accessible label for the meter. */
   label?: string
-  /** Centre content (e.g. the numeric score). */
+  /** Centre content (e.g. an icon or a numeric readout). */
   children?: React.ReactNode
 }
 
 /**
- * Career-score progress ring. Animated once on mount (respecting reduced
- * motion) with a brand gradient stroke over a token-driven track.
+ * Circular progress meter. Animated once on mount (respecting reduced motion),
+ * stroked in a value-warmed brand colour over a token-driven track.
  */
 export function ProgressRing({
   value,
@@ -29,7 +29,6 @@ export function ProgressRing({
   label = 'Progress',
   children,
 }: ProgressRingProps) {
-  const gradientId = React.useId()
   const reduceMotion = useReducedMotion()
   const clamped = Math.max(0, Math.min(100, value))
 
@@ -48,19 +47,12 @@ export function ProgressRing({
       aria-label={label}
     >
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
-        <defs>
-          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="var(--gradient-from)" />
-            <stop offset="50%" stopColor="var(--gradient-via)" />
-            <stop offset="100%" stopColor="var(--gradient-to)" />
-          </linearGradient>
-        </defs>
         <circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="var(--score-track)"
+          stroke="var(--progress-track)"
           strokeWidth={strokeWidth}
         />
         <motion.circle
@@ -68,7 +60,26 @@ export function ProgressRing({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke={`url(#${gradientId})`}
+          /*
+           * A SOLID stroke whose colour is mixed from the brand navy toward
+           * the accent teal in proportion to the score — so the whole ring
+           * brightens as the number rises, monotonically, by construction, and
+           * arrives at the colour the rest of the product uses for "earned".
+           *
+           * Two gradient attempts failed here, and the reason is geometric: on
+           * a circle, any straight ramp is non-monotonic in sweep angle. The
+           * first ran corner-to-corner and rendered low scores entirely in
+           * the far stop. The second pinned the ramp to a diameter and mixed
+           * its far stop by value — which fixed low scores but left the ramp's
+           * bright point at a fixed 6 o'clock, so a 90 peaked at the halfway
+           * mark and then fell back at its leading edge. Measured, not assumed.
+           *
+           * DESIGN.md's Warming-Score Rule asks for a ring that reads as
+           * progress and warmth and never judges. One colour that is a pure
+           * function of the score satisfies that literally, cannot regress, and
+           * reads more confidently at 132px than a three-stop ramp does.
+           */
+          stroke={`color-mix(in oklab, var(--gradient-to) ${Math.round(clamped)}%, var(--gradient-from))`}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}

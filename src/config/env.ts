@@ -12,6 +12,14 @@ export const env = {
    *  against the mock auth service so it boots with zero configuration. */
   isClerkEnabled: Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY),
   isDev: process.env.NODE_ENV === 'development',
+  /**
+   * Browse the whole product without signing in, as an onboarded demo user.
+   *
+   * Opt-in on purpose. This was the default, and it meant `/sign-in` and
+   * `/onboarding` were unreachable and nobody could create an account. A review
+   * convenience must never be the thing a real visitor gets.
+   */
+  isDemoMode: process.env.NEXT_PUBLIC_DEMO_MODE === '1',
 } as const
 
 export type Env = typeof env

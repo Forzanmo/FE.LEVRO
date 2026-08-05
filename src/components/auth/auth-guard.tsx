@@ -24,6 +24,23 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     else if (needsOnboarding) router.replace(ROUTES.onboarding)
   }, [needsAuth, needsOnboarding, router])
 
-  if (needsAuth || needsOnboarding) return null
+  /*
+   * Returning `null` here emptied the page with no announcement: a screen-reader
+   * user got silence, and everyone got a blank flash, while the redirect
+   * resolved. A named status region says what is happening instead.
+   */
+  if (needsAuth || needsOnboarding) {
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        className="flex min-h-svh items-center justify-center px-6"
+      >
+        <span className="text-muted-foreground text-sm">
+          {needsAuth ? 'Taking you to sign in…' : 'Setting up your account…'}
+        </span>
+      </div>
+    )
+  }
   return <>{children}</>
 }

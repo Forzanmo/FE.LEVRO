@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Meta, StoryObj } from '@storybook/nextjs'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 import { OptionGroup } from './option-group'
 
@@ -14,7 +14,13 @@ function Demo({ multiple }: { multiple: boolean }) {
   const [value, setValue] = useState<string[]>([])
   return (
     <div className="max-w-sm">
-      <OptionGroup options={OPTIONS} multiple={multiple} value={value} onChange={setValue} />
+      <OptionGroup
+        options={OPTIONS}
+        multiple={multiple}
+        value={value}
+        onChange={setValue}
+        legend="Where are you in your career right now?"
+      />
     </div>
   )
 }

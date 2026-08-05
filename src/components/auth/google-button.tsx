@@ -25,7 +25,13 @@ function GoogleMark() {
   )
 }
 
-export function GoogleButton({ onClick, label = 'Continue with Google' }: { onClick: () => void; label?: string }) {
+export function GoogleButton({
+  onClick,
+  label = 'Continue with Google',
+}: {
+  onClick: () => void
+  label?: string
+}) {
   return (
     <Button variant="outline" size="xl" fullWidth onClick={onClick} className="gap-3">
       <GoogleMark />

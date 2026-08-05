@@ -1,75 +1,70 @@
 'use client'
 
-import { useId } from 'react'
-
+import { ChoiceGroup } from '@/components/ui/choice-group'
 import { Icon } from '@/components/ui/icon'
 import type { QuestionOption } from '@/features/coach/types'
 import { cn } from '@/lib/utils'
 
 /**
- * Selectable options built on native radio/checkbox inputs, so keyboard support
- * (arrow-key roving for single, space-toggle for multi) and screen-reader
- * semantics come for free. The visible chip is a styled <label>.
+ * The coach's answer options.
+ *
+ * Layout only — `ChoiceGroup` owns the fieldset, the legend, the native
+ * radio/checkbox inputs, and the focus-visible convention, so this file no
+ * longer reimplements keyboard handling or accessible naming. See
+ * `components/ui/choice-group.tsx` for why that mechanism is shared.
  */
 export function OptionGroup({
   options,
   multiple,
   value,
   onChange,
+  legend,
 }: {
   options: QuestionOption[]
   multiple: boolean
   value: string[]
   onChange: (value: string[]) => void
+  /**
+   * The question these options answer. The visible question lives in a separate
+   * `role="log"` region, so it cannot label this group by proximity — without a
+   * legend a screen-reader user hears "radio button, 1 of 4, Student / new grad"
+   * with no question attached.
+   */
+  legend: string
 }) {
-  const name = useId()
+  const shared = { legend, options, className: 'flex flex-col gap-2' } as const
 
-  const toggle = (v: string) => {
-    if (!multiple) {
-      onChange([v])
-      return
-    }
-    onChange(value.includes(v) ? value.filter((x) => x !== v) : [...value, v])
-  }
+  const row = (option: QuestionOption, selected: boolean) => (
+    <span
+      className={cn(
+        'flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-sm transition-colors',
+        'group-has-[:focus-visible]/choice:ring-ring group-has-[:focus-visible]/choice:ring-2',
+        selected ? 'border-brand bg-brand-muted text-foreground' : 'border-border hover:bg-muted',
+      )}
+    >
+      <span
+        aria-hidden="true"
+        className={cn(
+          'grid size-4 shrink-0 place-items-center border',
+          // rounded-sm, not a one-off 6px: the checkbox indicator belongs on the
+          // documented radius scale like everything else.
+          multiple ? 'rounded-sm' : 'rounded-full',
+          selected ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/40',
+        )}
+      >
+        {selected ? <Icon name="check" size="xs" className="size-3" /> : null}
+      </span>
+      <span className="flex-1">{option.label}</span>
+    </span>
+  )
 
-  return (
-    <fieldset className="flex flex-col gap-2">
-      {options.map((option) => {
-        const checked = value.includes(option.value)
-        return (
-          <label
-            key={option.value}
-            className={cn(
-              'flex cursor-pointer items-center gap-3 rounded-xl border px-3.5 py-2.5 text-sm transition-colors',
-              'has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-2',
-              checked
-                ? 'border-brand bg-brand-muted text-foreground'
-                : 'border-border hover:bg-muted',
-            )}
-          >
-            <input
-              type={multiple ? 'checkbox' : 'radio'}
-              name={name}
-              value={option.value}
-              checked={checked}
-              onChange={() => toggle(option.value)}
-              className="sr-only"
-            />
-            <span
-              className={cn(
-                'grid size-4 shrink-0 place-items-center border',
-                multiple ? 'rounded-[6px]' : 'rounded-full',
-                checked
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-muted-foreground/40',
-              )}
-            >
-              {checked ? <Icon name="check" size="xs" className="size-3" /> : null}
-            </span>
-            <span className="flex-1">{option.label}</span>
-          </label>
-        )
-      })}
-    </fieldset>
+  return multiple ? (
+    <ChoiceGroup {...shared} multiple value={value} onChange={onChange}>
+      {(option, { selected }) => row(option, selected)}
+    </ChoiceGroup>
+  ) : (
+    <ChoiceGroup {...shared} value={value[0] ?? null} onChange={(v) => onChange([v])}>
+      {(option, { selected }) => row(option, selected)}
+    </ChoiceGroup>
   )
 }

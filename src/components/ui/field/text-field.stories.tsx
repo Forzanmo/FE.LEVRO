@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/nextjs'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 import { Icon } from '@/components/ui/icon'
 
@@ -28,5 +28,9 @@ export const WithError: Story = {
 }
 
 export const WithAdornment: Story = {
-  args: { leftAdornment: <Icon name="search" size="sm" />, label: 'Search', placeholder: 'Search…' },
+  args: {
+    leftAdornment: <Icon name="search" size="sm" />,
+    label: 'Search',
+    placeholder: 'Search…',
+  },
 }

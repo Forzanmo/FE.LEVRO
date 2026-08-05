@@ -12,11 +12,17 @@ export interface NavItem {
 export const PRIMARY_NAV: readonly NavItem[] = [
   { label: 'Dashboard', href: ROUTES.dashboard, icon: 'dashboard' },
   { label: 'AI Coach', href: ROUTES.coach, icon: 'coach' },
-  { label: 'Roadmap', href: ROUTES.roadmap, icon: 'roadmap' },
-  { label: 'Resume', href: ROUTES.resume, icon: 'resume' },
+  { label: 'Documents', href: ROUTES.documents, icon: 'resume' },
+  // "Edit CV", not "Resume": the product calls this artifact a CV everywhere
+  // else, and two nouns for one object is the mental-model drift that makes an
+  // app feel like several apps.
+  { label: 'Edit CV', href: ROUTES.resume, icon: 'edit' },
   { label: 'Cover Letter', href: ROUTES.coverLetter, icon: 'cover-letter' },
   { label: 'Applications', href: ROUTES.applications, icon: 'applications' },
-  { label: 'Achievements', href: ROUTES.achievements, icon: 'achievements' },
+  // Achievements removed with the roadmap that fed it (PRODUCT.md, "Planned").
+  // A badge wall with no progression behind it is the gamification the product's
+  // anti-references rule out, and it was the one screen stacking two of the
+  // absolute bans — a hero-metric row above an identical-card grid.
 ]
 
 export const SECONDARY_NAV: readonly NavItem[] = [
@@ -27,7 +33,28 @@ export const SECONDARY_NAV: readonly NavItem[] = [
 export const MOBILE_NAV: readonly NavItem[] = [
   { label: 'Dashboard', href: ROUTES.dashboard, icon: 'dashboard' },
   { label: 'Coach', href: ROUTES.coach, icon: 'coach' },
-  { label: 'Roadmap', href: ROUTES.roadmap, icon: 'roadmap' },
-  { label: 'Resume', href: ROUTES.resume, icon: 'resume' },
-  { label: 'Apps', href: ROUTES.applications, icon: 'applications' },
+  { label: 'Docs', href: ROUTES.documents, icon: 'resume' },
+  // "Edit CV", not "Resume": the product calls this artifact a CV everywhere
+  // else, and two nouns for one object is the mental-model drift that makes an
+  // app feel like several apps.
+  { label: 'Edit CV', href: ROUTES.resume, icon: 'edit' },
+  /*
+   * "Tracker", not "Apps".
+   *
+   * On a phone, "Apps" reads as software before it reads as job applications —
+   * the one place the word has a dominant competing meaning is the device this
+   * label only ever appears on.
+   *
+   * The full noun is not an option: measured at `text-xs font-medium`,
+   * "Applications" is 71px against a 56–70px column at 320–390px, so `truncate`
+   * would clip it to "Applicat…" on essentially every phone. "Pipeline" is
+   * recruiter jargon and "Jobs" promises a job board this product does not have,
+   * both of which PRODUCT.md's plain-language bar rules out. "Tracker" is the
+   * verb the page itself uses — "Track every application from applied to offer".
+   *
+   * The sidebar keeps "Applications". That is a container/contents pair, not the
+   * Resume-vs-CV problem: those were two names for one artifact, which is what
+   * actually confuses people.
+   */
+  { label: 'Tracker', href: ROUTES.applications, icon: 'applications' },
 ]

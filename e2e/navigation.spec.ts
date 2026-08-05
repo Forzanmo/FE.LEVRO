@@ -1,10 +1,18 @@
 import { expect, test } from '@playwright/test'
 
+import { seedAssessed } from './support/journey'
+
 test.describe('Navigation + theme', () => {
+  test.beforeEach(async ({ page }) => {
+    await seedAssessed(page)
+  })
+
   test('sidebar navigates between app routes', async ({ page }) => {
     await page.goto('/dashboard')
 
-    await page.locator('aside').getByRole('link', { name: 'Resume' }).click()
+    // "Edit CV", not "Resume": `navigation.ts` renamed the artifact on purpose,
+    // so this assertion is now also a guard against the noun drifting back.
+    await page.locator('aside').getByRole('link', { name: 'Edit CV' }).click()
     await expect(page).toHaveURL(/\/resume/)
 
     await page.locator('aside').getByRole('link', { name: 'Applications' }).click()
