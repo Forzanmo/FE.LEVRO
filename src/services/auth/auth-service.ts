@@ -1,12 +1,15 @@
-/**
- * Mock auth session, persisted to localStorage. Stands in for Clerk (Google)
- * until keys are configured — the SessionProvider consumes this, so swapping to
- * real Clerk only touches the provider, not the screens.
- *
- * The default (first visit) is a signed-in, onboarded returning user so the app
- * is reviewable without a login wall; explicit sign-out flips it and drives the
- * real sign-in → onboarding → coach flow.
- */
+import {
+  getProfileApiV1ProfileGet,
+  loginApiV1AuthTokenPost,
+  logoutApiV1AuthLogoutPost,
+  meApiV1AuthMeGet,
+  registerApiV1AuthRegisterPost,
+  updateProfileApiV1ProfilePatch,
+} from '@/api/generated'
+import type { ProfileResponse, UserResponse } from '@/api/generated'
+import { unwrapApiResult } from '@/lib/api/http-client'
+import { refreshAccessToken, setAccessToken } from '@/lib/api/runtime'
+
 export type AuthPlan = 'assets' | 'assets-roadmap'
 
 export interface SessionUser {
@@ -14,6 +17,8 @@ export interface SessionUser {
   name: string
   email: string
   initials: string
+  emailVerified: boolean
+  isAdmin: boolean
 }
 
 export interface StoredSession {
@@ -21,62 +26,142 @@ export interface StoredSession {
   user: SessionUser | null
   hasOnboarded: boolean
   plan?: AuthPlan
+  profile?: ProfileResponse
 }
 
-const STORAGE_KEY = 'levvro:auth'
-
-const DEMO_USER: SessionUser = {
-  id: 'demo-user',
-  name: 'Alex Rivera',
-  email: 'alex.rivera@example.com',
-  initials: 'AR',
+export interface Credentials {
+  email: string
+  password: string
 }
 
-function read(): StoredSession | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as StoredSession) : null
-  } catch {
-    return null
+export const signedOutSession: StoredSession = {
+  authenticated: false,
+  user: null,
+  hasOnboarded: false,
+}
+
+function displayName(email: string, profile: ProfileResponse): string {
+  const configured = profile.data.full_name
+  if (typeof configured === 'string' && configured.trim()) return configured.trim()
+  return email.split('@')[0]?.replace(/[._-]+/g, ' ') || 'Levvro user'
+}
+
+function toSession(user: UserResponse, profile: ProfileResponse): StoredSession {
+  const name = displayName(user.email, profile)
+  const initials = name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('')
+
+  return {
+    authenticated: true,
+    user: {
+      id: user.id,
+      name,
+      email: user.email,
+      initials: initials || 'LU',
+      emailVerified: user.email_verified,
+      isAdmin: user.is_admin ?? false,
+    },
+    hasOnboarded: profile.data.onboarding_completed === true,
+    plan:
+      profile.data.plan === 'assets' || profile.data.plan === 'assets-roadmap'
+        ? profile.data.plan
+        : undefined,
+    profile,
   }
 }
 
-function write(session: StoredSession): StoredSession {
-  if (typeof window !== 'undefined') {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(session))
-    } catch {
-      /* ignore quota errors */
-    }
-  }
-  return session
+async function fetchSession(): Promise<StoredSession> {
+  const [userResult, profileResult] = await Promise.all([
+    meApiV1AuthMeGet(),
+    getProfileApiV1ProfileGet(),
+  ])
+  return toSession(unwrapApiResult(userResult), unwrapApiResult(profileResult))
 }
 
 export const authService = {
-  getSession: read,
+  async restore(): Promise<StoredSession> {
+    const token = await refreshAccessToken(false)
+    if (!token) return signedOutSession
 
-  /** First-visit default: an onboarded returning user (keeps the app open). */
-  seedReturningUser(): StoredSession {
-    return write({ authenticated: true, user: DEMO_USER, hasOnboarded: true })
+    try {
+      return await fetchSession()
+    } catch {
+      setAccessToken(null)
+      return signedOutSession
+    }
   },
 
-  /** Mock "Continue with Google" — a fresh sign-in that still needs onboarding. */
-  signInWithGoogle(): StoredSession {
-    return write({ authenticated: true, user: DEMO_USER, hasOnboarded: false })
+  async signIn(credentials: Credentials): Promise<StoredSession> {
+    const token = unwrapApiResult(
+      await loginApiV1AuthTokenPost({ body: credentials }),
+    )
+    setAccessToken(token.access_token)
+    return fetchSession()
   },
 
-  signOut(): StoredSession {
-    return write({ authenticated: false, user: null, hasOnboarded: false })
+  async register(credentials: Credentials): Promise<StoredSession> {
+    unwrapApiResult(await registerApiV1AuthRegisterPost({ body: credentials }))
+    return this.signIn(credentials)
   },
 
-  completeOnboarding(plan: AuthPlan): StoredSession {
-    const current = read()
-    return write({
-      authenticated: true,
-      user: current?.user ?? DEMO_USER,
-      hasOnboarded: true,
-      plan,
-    })
+  async signOut(): Promise<StoredSession> {
+    try {
+      unwrapApiResult(await logoutApiV1AuthLogoutPost())
+    } finally {
+      setAccessToken(null)
+    }
+    return signedOutSession
+  },
+
+  async completeOnboarding(session: StoredSession, plan: AuthPlan): Promise<StoredSession> {
+    if (!session.profile) throw new Error('Profile is not available.')
+    const profile = unwrapApiResult(
+      await updateProfileApiV1ProfilePatch({
+        body: {
+          expected_revision: session.profile.revision,
+          data: {
+            ...session.profile.data,
+            onboarding_completed: true,
+            plan,
+          },
+        },
+      }),
+    )
+    if (!session.user) return signedOutSession
+    return toSession(
+      {
+        id: session.user.id,
+        email: session.user.email,
+        email_verified: session.user.emailVerified,
+        is_admin: session.user.isAdmin,
+        created_at: new Date().toISOString(),
+      },
+      profile,
+    )
+  },
+
+  async updateProfile(session: StoredSession, patch: Record<string, unknown>): Promise<StoredSession> {
+    if (!session.profile || !session.user) throw new Error('Profile is not available.')
+    const profile = unwrapApiResult(
+      await updateProfileApiV1ProfilePatch({
+        body: {
+          expected_revision: session.profile.revision,
+          data: { ...session.profile.data, ...patch },
+        },
+      }),
+    )
+    return toSession(
+      {
+        id: session.user.id,
+        email: session.user.email,
+        email_verified: session.user.emailVerified,
+        is_admin: session.user.isAdmin,
+        created_at: new Date().toISOString(),
+      },
+      profile,
+    )
   },
 }

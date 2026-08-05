@@ -1,55 +1,81 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 
-import { resumeService } from '@/services/api/resume-service'
-import { resumeStorage } from '@/services/storage/resume-storage'
 import { resumeSchema, type ResumeData } from '@/lib/validators/resume-schema'
+import { resumeService, type ResumeSession } from '@/services/api/resume-service'
 
 export type SaveStatus = 'idle' | 'saving' | 'saved'
 
 const AUTOSAVE_DELAY = 700
+const resumeKey = ['resume-draft'] as const
+const EMPTY_RESUME: ResumeData = {
+  fullName: '',
+  headline: '',
+  email: '',
+  phone: '',
+  location: '',
+  website: '',
+  summary: '',
+  experience: [],
+  skills: [],
+}
 
-/**
- * Resume form + autosave. Seeds from the generated resume on the server (stable
- * for hydration), hydrates any saved draft on mount, then debounce-persists
- * every change through the storage service, exposing a save status.
- */
 export function useResume() {
+  const queryClient = useQueryClient()
+  const query = useQuery({ queryKey: resumeKey, queryFn: () => resumeService.get() })
   const form = useForm<ResumeData>({
     resolver: zodResolver(resumeSchema),
-    defaultValues: resumeService.getSeed(),
+    defaultValues: EMPTY_RESUME,
     mode: 'onBlur',
   })
-
   const [status, setStatus] = useState<SaveStatus>('idle')
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const revision = useRef(0)
+  const hydrated = useRef(false)
 
-  // Load a previously saved draft once, after hydration.
   useEffect(() => {
-    const saved = resumeStorage.load()
-    if (saved) form.reset(saved)
-  }, [form])
+    if (!query.data) return
+    revision.current = query.data.revision
+    if (hydrated.current) return
+    form.reset(query.data.data)
+    hydrated.current = true
+  }, [form, query.data])
 
-  // Debounced autosave on any change.
   useEffect(() => {
-    // RHF's watch() isn't memoization-safe by the compiler's rules; benign here.
+    // React Hook Form's subscription API is intentionally not compiler-memoized.
     // eslint-disable-next-line react-hooks/incompatible-library
-    const subscription = form.watch((data) => {
+    const subscription = form.watch((value) => {
+      if (!hydrated.current) return
       setStatus('saving')
       if (timer.current) clearTimeout(timer.current)
-      timer.current = setTimeout(() => {
-        resumeStorage.save(data as ResumeData)
-        setStatus('saved')
+      timer.current = setTimeout(async () => {
+        try {
+          const next = await resumeService.save(value as ResumeData, revision.current)
+          revision.current = next.revision
+          queryClient.setQueryData<ResumeSession>(resumeKey, next)
+          setStatus('saved')
+        } catch {
+          setStatus('idle')
+          toast.error('Could not save your resume')
+        }
       }, AUTOSAVE_DELAY)
     })
     return () => {
       subscription.unsubscribe()
       if (timer.current) clearTimeout(timer.current)
     }
-  }, [form])
+  }, [form, queryClient])
 
-  return { form, status }
+  return {
+    form,
+    status,
+    isLoading: query.isPending,
+    isError: query.isError,
+    retry: () => void query.refetch(),
+  }
 }

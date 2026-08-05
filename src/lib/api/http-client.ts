@@ -1,5 +1,3 @@
-import { env } from '@/config/env'
-
 /** Error thrown for non-2xx responses, carrying status + parsed body. */
 export class ApiError extends Error {
   constructor(
@@ -12,11 +10,39 @@ export class ApiError extends Error {
   }
 }
 
-const BASE_URL = `${env.appUrl}/api`
+interface ApiResult<T> {
+  data?: T
+  error?: unknown
+  response?: Response
+}
+
+function errorMessage(body: unknown, fallback: string): string {
+  if (typeof body === 'string' && body) return body
+  if (body && typeof body === 'object') {
+    const nestedError = 'error' in body ? body.error : undefined
+    if (nestedError && typeof nestedError === 'object' && 'message' in nestedError) {
+      const nestedMessage = nestedError.message
+      if (typeof nestedMessage === 'string') return nestedMessage
+    }
+    const detail = 'detail' in body ? body.detail : undefined
+    if (typeof detail === 'string') return detail
+    const message = 'message' in body ? body.message : undefined
+    if (typeof message === 'string') return message
+  }
+  return fallback
+}
+
+/** Convert a generated-client result into data or the app's standard error. */
+export function unwrapApiResult<T>(result: ApiResult<T>): T {
+  if (result.data !== undefined) return result.data
+  const status = result.response?.status ?? 0
+  throw new ApiError(status, errorMessage(result.error, 'The request could not be completed.'), result.error)
+}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${BASE_URL}${path}`, {
+  const response = await fetch(path, {
     ...init,
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...init?.headers,
@@ -30,7 +56,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     } catch {
       /* non-JSON error body */
     }
-    throw new ApiError(response.status, response.statusText, body)
+    throw new ApiError(response.status, errorMessage(body, response.statusText), body)
   }
 
   if (response.status === 204) return undefined as T

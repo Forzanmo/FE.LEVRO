@@ -24,6 +24,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     else if (needsOnboarding) router.replace(ROUTES.onboarding)
   }, [needsAuth, needsOnboarding, router])
 
-  if (needsAuth || needsOnboarding) return null
+  if (status === 'loading' || needsAuth || needsOnboarding) return null
   return <>{children}</>
 }

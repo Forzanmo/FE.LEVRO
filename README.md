@@ -10,7 +10,7 @@ Built with a production-grade, scalable frontend architecture.
 - **Motion** (animation) · **Lucide** (icons via a unified `Icon`)
 - **TanStack Query** (server state) · **Redux Toolkit** (UI state)
 - **React Hook Form** + **Zod** · **TanStack Table** · **Recharts** (charts)
-- **Clerk** (auth) · **Sonner** (toasts) · **next-themes** (dark/light)
+- **FastAPI email/password sessions** · **Sonner** (toasts) · **next-themes** (dark/light)
 - **Storybook** (design system) · **Playwright** (E2E)
 
 **One styling system** — Tailwind v4 + shadcn/Radix + CVA — over **one design-token
@@ -32,11 +32,18 @@ The generated CSS is committed and rebuilt automatically on `predev` / `prebuild
 
 ## Getting started
 
+Use Node.js 24 LTS. Start the FastAPI backend on port 8000 first, then:
+
 ```bash
-npm install
-cp .env.example .env.local   # optional — runs with mock auth if unset
+npm ci
+cp .env.example .env.local
+npm run api:generate
 npm run dev                  # http://localhost:3000
 ```
+
+`LEVRRO_BACKEND_ORIGIN` is server-only. The browser calls same-origin `/api/v1/*`, and Next.js proxies
+those requests to FastAPI. Access tokens stay in memory and the rotating refresh token stays in the
+backend's HTTP-only cookie.
 
 ## Scripts
 
@@ -44,6 +51,7 @@ npm run dev                  # http://localhost:3000
 | --- | --- |
 | `npm run dev` | Start the dev server (regenerates tokens first) |
 | `npm run build` | Production build |
+| `npm run api:generate` | Regenerate the typed client from the committed backend OpenAPI contract |
 | `npm run tokens` | Regenerate design-token CSS from `tokens.ts` |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint |
@@ -67,7 +75,7 @@ src/
   providers/           Composed client providers (Store→Query→Auth→Theme→Appearance)
   stores/              Redux Toolkit store + slices (UI state only)
   styles/              Global CSS + generated token layers
-  config/              Site, fonts, env
+  config/              Site and fonts
 ```
 
 ### Principles
@@ -77,17 +85,22 @@ src/
 - No hardcoded colors / magic numbers — reference tokens only.
 - Mobile-first, accessible-first (ARIA, keyboard, reduced-motion honored globally).
 
-## Pending setup (offline environment note)
+## Product routes
 
-Storybook and Playwright are **configured and declared** in `package.json`, but their
-packages were not installed during scaffolding due to a restricted network. When online:
+- `/applications/[id]` is the backend-driven opportunity, CV extraction, guided interview, generation,
+  and document workflow.
+- `/documents/[id]` edits generated sections and creates durable PDF exports.
+- `/admin` is visible only when `/api/v1/auth/me` returns `is_admin: true`; it includes question-set
+  versioning/publishing and aggregate AI, email, and funnel operations.
+
+- `/dashboard`, `/coach`, `/roadmap`, `/achievements`, `/resume`, and `/cover-letter` use authenticated
+  `/api/v1/product/*` resources. Assessment answers, roadmap completion, resume drafts, and the latest
+  standalone cover letter are durable user-owned records; dashboard scores and achievements are derived
+  from those records, applications, profile data, and privacy-safe product events.
+
+## Browser tests
 
 ```bash
-npm install                    # installs Storybook, Playwright, Prettier, etc.
-npx playwright install chromium
-npm run storybook              # or: npm run test:e2e
+npx playwright install chromium   # once per machine
+npm run test:e2e                  # production build + 22 Chromium journeys
 ```
-
-If Storybook's Next.js framework needs reconciling with this Next version, run
-`npx storybook@latest init` (the provided `.storybook/*` config and `*.stories.tsx`
-are compatible).

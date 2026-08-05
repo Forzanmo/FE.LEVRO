@@ -6,19 +6,33 @@ import { ResumeEditor } from '@/components/resume/resume-editor'
 import { ResumePreview } from '@/components/resume/resume-preview'
 import { SaveStatus } from '@/components/resume/save-status'
 import { PageHeader } from '@/components/shared/page-header'
+import { EmptyState } from '@/components/shared/empty-state'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
+import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
 import { useResume } from './use-resume'
 
 export function ResumeView() {
-  const { form, status } = useResume()
+  const { form, status, isLoading, isError, retry } = useResume()
   const data = form.watch()
   const [tab, setTab] = useState<'edit' | 'preview'>('edit')
 
   const downloadPdf = () => {
     if (typeof window !== 'undefined') window.print()
+  }
+
+  if (isLoading) return <Skeleton className="h-[38rem] rounded-xl" />
+  if (isError) {
+    return (
+      <EmptyState
+        icon="warning"
+        title="Couldn’t load your resume"
+        description="Your draft is safe. Try loading it again."
+        action={<Button onClick={retry} leftIcon={<Icon name="refresh" size="sm" />}>Try again</Button>}
+      />
+    )
   }
 
   return (

@@ -10,7 +10,6 @@ import { CoverLetterPreview } from '@/components/cover-letter/cover-letter-previ
 import { PageHeader } from '@/components/shared/page-header'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
-import { useSession } from '@/providers/session-provider'
 import { coverLetterService } from '@/services/api/cover-letter-service'
 import {
   coverLetterSchema,
@@ -28,7 +27,6 @@ const DEFAULTS: CoverLetterFormValues = {
 }
 
 export function CoverLetterView() {
-  const { user } = useSession()
   const form = useForm<CoverLetterFormValues>({
     resolver: zodResolver(coverLetterSchema),
     defaultValues: DEFAULTS,
@@ -38,9 +36,14 @@ export function CoverLetterView() {
 
   const onGenerate = form.handleSubmit(async (values) => {
     setIsGenerating(true)
-    const result = await coverLetterService.generate(values, user?.name ?? 'Your Name')
-    setLetter(result)
-    setIsGenerating(false)
+    try {
+      const result = await coverLetterService.generate(values)
+      setLetter(result)
+    } catch {
+      toast.error('Could not generate the cover letter')
+    } finally {
+      setIsGenerating(false)
+    }
   })
 
   const copy = async () => {

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 test.describe('AI Coach', () => {
   test('answering advances the assessment; Back returns', async ({ page }) => {

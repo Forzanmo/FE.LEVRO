@@ -7,11 +7,15 @@ import { QuestDetail } from '@/components/roadmap/quest-detail'
 import { QuestTree } from '@/components/roadmap/quest-tree'
 import { RoadmapHeader } from '@/components/roadmap/roadmap-header'
 import { PageHeader } from '@/components/shared/page-header'
+import { EmptyState } from '@/components/shared/empty-state'
+import { Button } from '@/components/ui/button'
+import { Icon } from '@/components/ui/icon'
+import { Skeleton } from '@/components/ui/skeleton'
 
 import { useRoadmap } from './use-roadmap'
 
 export function RoadmapView() {
-  const { cols, nodes, stats, complete, uncomplete, isComplete } = useRoadmap()
+  const { cols, nodes, stats, complete, uncomplete, isComplete, isPending, isError, retry } = useRoadmap()
 
   const [selectedId, setSelectedId] = useState<string | null>(
     () => nodes.find((n) => n.status === 'available')?.id ?? nodes[0]?.id ?? null,
@@ -20,7 +24,9 @@ export function RoadmapView() {
   const [celebrateId, setCelebrateId] = useState<string | null>(null)
   const [pulseEdges, setPulseEdges] = useState<string[]>([])
 
-  const selected = nodes.find((n) => n.id === selectedId) ?? null
+  const effectiveSelectedId =
+    selectedId ?? nodes.find((node) => node.status === 'available')?.id ?? nodes[0]?.id ?? null
+  const selected = nodes.find((node) => node.id === effectiveSelectedId) ?? null
 
   const requiresLabels = useMemo(
     () =>
@@ -28,7 +34,7 @@ export function RoadmapView() {
     [selected, nodes],
   )
 
-  const handleComplete = (id: string) => {
+  const handleComplete = async (id: string) => {
     const node = nodes.find((n) => n.id === id)
     if (!node) return
 
@@ -40,7 +46,12 @@ export function RoadmapView() {
         n.requires.every((r) => r === id || isComplete(r)),
     )
 
-    complete(id)
+    try {
+      await complete(id)
+    } catch {
+      toast.error('Could not save roadmap progress')
+      return
+    }
 
     // The earned moment: a one-shot gold pulse on the node + a celebratory toast.
     setCelebrateId(id)
@@ -60,8 +71,9 @@ export function RoadmapView() {
       action: {
         label: 'Undo',
         onClick: () => {
-          uncomplete(id)
-          setCelebrateId((current) => (current === id ? null : current))
+          void uncomplete(id)
+            .then(() => setCelebrateId((current) => (current === id ? null : current)))
+            .catch(() => toast.error('Could not undo roadmap progress'))
         },
       },
     })
@@ -79,14 +91,25 @@ export function RoadmapView() {
         description="Your quest to recruiter-ready. Complete a quest to unlock what’s next — finished quests stay on the map."
       />
 
-      <RoadmapHeader stats={stats} />
+      {isPending ? (
+        <Skeleton className="h-[32rem] rounded-xl" />
+      ) : isError ? (
+        <EmptyState
+          icon="warning"
+          title="Couldn’t load your roadmap"
+          description="Your progress is safe. Try loading it again."
+          action={<Button onClick={retry} leftIcon={<Icon name="refresh" size="sm" />}>Try again</Button>}
+        />
+      ) : (
+        <>
+          <RoadmapHeader stats={stats} />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
+          <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
         <div className="bg-card ring-foreground/10 overflow-x-auto rounded-xl p-4 ring-1 sm:p-6">
           <QuestTree
             cols={cols}
             nodes={nodes}
-            selectedId={selectedId}
+            selectedId={effectiveSelectedId}
             celebrateId={celebrateId}
             pulseEdges={pulseEdges}
             onSelect={setSelectedId}
@@ -95,7 +118,9 @@ export function RoadmapView() {
         <div className="lg:sticky lg:top-[calc(var(--header-height)+1.5rem)] lg:self-start">
           <QuestDetail node={selected} requiresLabels={requiresLabels} onComplete={handleComplete} />
         </div>
-      </div>
+          </div>
+        </>
+      )}
 
       <div className="sr-only" role="status" aria-live="polite">
         {announcement}

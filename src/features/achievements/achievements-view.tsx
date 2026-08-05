@@ -1,11 +1,15 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 
 import { AchievementCard } from '@/components/achievements/achievement-card'
 import { EmptyState } from '@/components/shared/empty-state'
 import { PageHeader } from '@/components/shared/page-header'
 import { StatCard } from '@/components/shared/stat-card'
+import { Button } from '@/components/ui/button'
+import { Icon } from '@/components/ui/icon'
+import { Skeleton } from '@/components/ui/skeleton'
 import { achievementsService } from '@/services/api/achievements-service'
 import type { AchievementStatus } from './types'
 import { cn } from '@/lib/utils'
@@ -18,8 +22,27 @@ const FILTERS: { value: 'all' | AchievementStatus; label: string }[] = [
 ]
 
 export function AchievementsView() {
-  const achievements = useMemo(() => achievementsService.getAchievements(), [])
+  const { data: achievements = [], isPending, isError, refetch } = useQuery({
+    queryKey: ['achievements'],
+    queryFn: () => achievementsService.getAchievements(),
+  })
   const [filter, setFilter] = useState<'all' | AchievementStatus>('all')
+
+  if (isPending) return <Skeleton className="h-[32rem] rounded-xl" />
+  if (isError) {
+    return (
+      <EmptyState
+        icon="warning"
+        title="Couldn’t load achievements"
+        description="Your progress is safe. Try loading it again."
+        action={
+          <Button onClick={() => refetch()} leftIcon={<Icon name="refresh" size="sm" />}>
+            Try again
+          </Button>
+        }
+      />
+    )
+  }
 
   const earned = achievements.filter((a) => a.status === 'earned')
   const inProgress = achievements.filter((a) => a.status === 'in-progress')

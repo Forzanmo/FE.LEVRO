@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 test.describe('Applications table', () => {
   test('search filters the rows', async ({ page }) => {
@@ -38,6 +38,7 @@ test.describe('Applications table', () => {
     await page.goto('/applications')
     const table = page.locator('table')
 
+    await expect(table.getByText('Vercel')).toBeVisible({ timeout: 15_000 })
     await page.getByRole('button', { name: 'Delete Vercel application' }).click()
     await expect(table.getByText('Vercel')).toHaveCount(0)
 

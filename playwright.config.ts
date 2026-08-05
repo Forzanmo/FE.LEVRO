@@ -4,19 +4,19 @@ const PORT = 3000
 const BASE_URL = `http://localhost:${PORT}`
 
 /**
- * Playwright E2E configuration. Boots the Next dev server automatically (reusing
- * an already-running one locally) and runs specs from ./e2e.
+ * Playwright E2E configuration. The package pretest hook builds first, then
+ * this boots the production server and runs specs from ./e2e.
  */
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
-  // The dev server compiles routes on first hit; cap workers + allow generous
-  // time so a cold route under parallel load doesn't spuriously time out.
-  // (Run against `next build && next start` for maximum speed/reliability.)
+  // The workspace may live on a mounted Windows volume, where parallel
+  // Turbopack development compilation is unreliable. Production mode also
+  // matches the behavior we actually deploy.
   timeout: 60_000,
-  workers: process.env.CI ? 1 : 3,
+  workers: 1,
   reporter: process.env.CI ? 'github' : 'list',
   use: {
     baseURL: BASE_URL,
@@ -24,7 +24,7 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    command: 'npm run dev',
+    command: 'npm run start',
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 test.describe('Roadmap quest tree', () => {
   test('completing an available quest updates progress', async ({ page }) => {

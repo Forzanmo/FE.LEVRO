@@ -1,10 +1,10 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 test.describe('Cover Letter generator', () => {
   test('generates a letter from the form', async ({ page }) => {
     await page.goto('/cover-letter')
 
-    await expect(page.getByText('Your letter will appear here')).toBeVisible()
+    await expect(page.getByText('Your letter will appear here')).toBeVisible({ timeout: 15_000 })
 
     await page.getByLabel('Company').fill('Vercel')
     await page.getByLabel('Role').fill('Frontend Engineer')

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 test.describe('Navigation + theme', () => {
   test('sidebar navigates between app routes', async ({ page }) => {

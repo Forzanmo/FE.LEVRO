@@ -56,9 +56,16 @@ export function OnboardingView() {
 
   const firstName = user?.name?.split(' ')[0]
 
-  const handleContinue = () => {
-    completeOnboarding(plan)
-    router.push(ROUTES.coach)
+  const [submitting, setSubmitting] = useState(false)
+
+  const handleContinue = async () => {
+    setSubmitting(true)
+    try {
+      await completeOnboarding(plan)
+      router.push(ROUTES.coach)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -121,6 +128,7 @@ export function OnboardingView() {
           size="xl"
           variant="gradient"
           onClick={handleContinue}
+          isLoading={submitting}
           rightIcon={<Icon name="arrow-right" size="sm" />}
         >
           Continue to your coach

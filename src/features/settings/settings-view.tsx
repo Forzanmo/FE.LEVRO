@@ -43,8 +43,31 @@ function SettingsSection({
   )
 }
 
-function ProfileForm({ initialName, email }: { initialName: string; email: string }) {
+function ProfileForm({
+  initialName,
+  email,
+  onSave,
+}: {
+  initialName: string
+  email: string
+  onSave: (name: string) => Promise<void>
+}) {
   const [name, setName] = useState(initialName)
+  const [saving, setSaving] = useState(false)
+
+  const save = async () => {
+    setSaving(true)
+    try {
+      await onSave(name.trim())
+      toast.success('Profile saved')
+    } catch (error) {
+      toast.error('Could not save profile', {
+        description: error instanceof Error ? error.message : 'Please try again.',
+      })
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -53,7 +76,7 @@ function ProfileForm({ initialName, email }: { initialName: string; email: strin
         <TextField label="Email" value={email} readOnly disabled />
       </div>
       <div className="flex justify-end">
-        <Button onClick={() => toast.success('Profile saved')}>Save changes</Button>
+        <Button onClick={save} isLoading={saving}>Save changes</Button>
       </div>
     </div>
   )
@@ -99,14 +122,35 @@ const NOTIFICATIONS: { id: string; label: string; description: string; default: 
   { id: 'reminders', label: 'Roadmap reminders', description: 'Nudges to complete your next quest.', default: false },
 ]
 
-function NotificationsSection() {
+function NotificationsSection({
+  initial,
+  onSave,
+}: {
+  initial: Record<string, boolean>
+  onSave: (preferences: Record<string, boolean>) => Promise<void>
+}) {
   const [prefs, setPrefs] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(NOTIFICATIONS.map((n) => [n.id, n.default])),
+    Object.fromEntries(NOTIFICATIONS.map((n) => [n.id, initial[n.id] ?? n.default])),
   )
+  const [saving, setSaving] = useState(false)
+
+  const save = async () => {
+    setSaving(true)
+    try {
+      await onSave(prefs)
+      toast.success('Notification preferences saved')
+    } catch (error) {
+      toast.error('Could not save preferences', {
+        description: error instanceof Error ? error.message : 'Please try again.',
+      })
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
-    <div className="divide-border divide-y">
-      {NOTIFICATIONS.map((item) => (
+    <div>
+      <div className="divide-border divide-y">{NOTIFICATIONS.map((item) => (
         <div key={item.id} className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
           <div className="space-y-0.5">
             <Label htmlFor={`notif-${item.id}`}>{item.label}</Label>
@@ -120,17 +164,18 @@ function NotificationsSection() {
             onCheckedChange={(checked) => setPrefs((p) => ({ ...p, [item.id]: checked }))}
           />
         </div>
-      ))}
+      ))}</div>
+      <div className="mt-4 flex justify-end"><Button variant="outline" onClick={save} isLoading={saving}>Save preferences</Button></div>
     </div>
   )
 }
 
 export function SettingsView() {
-  const { user, signOut } = useSession()
+  const { user, profileData, signOut, updateProfile } = useSession()
   const router = useRouter()
 
-  const handleSignOut = () => {
-    signOut()
+  const handleSignOut = async () => {
+    await signOut()
     router.push(ROUTES.signIn)
   }
 
@@ -143,6 +188,7 @@ export function SettingsView() {
           key={user?.id ?? 'loading'}
           initialName={user?.name ?? ''}
           email={user?.email ?? ''}
+          onSave={(fullName) => updateProfile({ full_name: fullName })}
         />
       </SettingsSection>
 
@@ -151,7 +197,14 @@ export function SettingsView() {
       </SettingsSection>
 
       <SettingsSection title="Notifications" description="Decide what we email you about.">
-        <NotificationsSection />
+        <NotificationsSection
+          initial={
+            profileData.notification_preferences && typeof profileData.notification_preferences === 'object'
+              ? profileData.notification_preferences as Record<string, boolean>
+              : {}
+          }
+          onSave={(notificationPreferences) => updateProfile({ notification_preferences: notificationPreferences })}
+        />
       </SettingsSection>
 
       <SettingsSection title="Account">

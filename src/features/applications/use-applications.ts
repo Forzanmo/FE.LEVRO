@@ -1,47 +1,63 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 import { applicationsService } from '@/services/api/applications-service'
 
 import type { Application } from './types'
 import type { ApplicationFormValues } from '@/lib/validators/application-schema'
 
+const applicationsKey = ['applications'] as const
+
 export interface UseApplications {
   applications: Application[]
+  isLoading: boolean
+  error: Error | null
   add: (values: ApplicationFormValues) => void
   remove: (id: string) => void
   restore: (application: Application) => void
 }
 
-/**
- * Mutators are `useCallback`-stable so downstream `columns`/handlers passed to
- * TanStack Table keep stable references (unstable columns cause a re-render
- * loop). `data` is a stable `useState` value for the same reason.
- */
 export function useApplications(): UseApplications {
-  const [applications, setApplications] = useState<Application[]>(() =>
-    applicationsService.getApplications(),
-  )
+  const queryClient = useQueryClient()
+  const query = useQuery({
+    queryKey: applicationsKey,
+    queryFn: applicationsService.getApplications,
+  })
 
-  const add = useCallback((values: ApplicationFormValues) => {
-    const application: Application = {
-      id: crypto.randomUUID(),
-      appliedAt: new Date().toISOString(),
-      ...values,
-    }
-    setApplications((prev) => [application, ...prev])
-  }, [])
+  const refresh = () => queryClient.invalidateQueries({ queryKey: applicationsKey })
 
-  const remove = useCallback((id: string) => {
-    setApplications((prev) => prev.filter((a) => a.id !== id))
-  }, [])
+  const createMutation = useMutation({
+    mutationFn: applicationsService.create,
+    onSuccess: () => {
+      void refresh()
+      toast.success('Application added')
+    },
+    onError: (error: Error) => toast.error('Could not add application', { description: error.message }),
+  })
 
-  const restore = useCallback((application: Application) => {
-    setApplications((prev) =>
-      prev.some((a) => a.id === application.id) ? prev : [application, ...prev],
-    )
-  }, [])
+  const deleteMutation = useMutation({
+    mutationFn: applicationsService.remove,
+    onSuccess: () => void refresh(),
+    onError: (error: Error) => toast.error('Could not remove application', { description: error.message }),
+  })
 
-  return { applications, add, remove, restore }
+  const restoreMutation = useMutation({
+    mutationFn: applicationsService.restore,
+    onSuccess: () => {
+      void refresh()
+      toast.success('Application restored')
+    },
+    onError: (error: Error) => toast.error('Could not restore application', { description: error.message }),
+  })
+
+  return {
+    applications: query.data ?? [],
+    isLoading: query.isLoading,
+    error: query.error,
+    add: (values) => createMutation.mutate(values),
+    remove: (id) => deleteMutation.mutate(id),
+    restore: (application) => restoreMutation.mutate(application),
+  }
 }

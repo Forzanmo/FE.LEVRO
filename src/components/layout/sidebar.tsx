@@ -6,6 +6,8 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { PRIMARY_NAV, SECONDARY_NAV } from '@/lib/constants/navigation'
 import { toggleSidebar, useAppDispatch, useAppSelector } from '@/stores'
 import { cn } from '@/lib/utils'
+import { useSession } from '@/providers/session-provider'
+import { ROUTES } from '@/lib/constants/routes'
 
 import { Logo } from './logo'
 import { NavItem } from './nav-item'
@@ -14,6 +16,10 @@ import { NavItem } from './nav-item'
 export function Sidebar({ className }: { className?: string }) {
   const collapsed = useAppSelector((state) => state.ui.sidebarCollapsed)
   const dispatch = useAppDispatch()
+  const { user } = useSession()
+  const secondaryNavigation = user?.isAdmin
+    ? [...SECONDARY_NAV, { label: 'Admin', href: ROUTES.admin, icon: 'lock' as const }]
+    : SECONDARY_NAV
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -36,7 +42,7 @@ export function Sidebar({ className }: { className?: string }) {
         </nav>
 
         <div className="space-y-1 px-3 py-2">
-          {SECONDARY_NAV.map((item) => (
+          {secondaryNavigation.map((item) => (
             <NavItem key={item.href} item={item} collapsed={collapsed} />
           ))}
         </div>

@@ -24,8 +24,8 @@ function UserMenu() {
   const { user, signOut } = useSession()
   const router = useRouter()
 
-  const handleSignOut = () => {
-    signOut()
+  const handleSignOut = async () => {
+    await signOut()
     router.push(ROUTES.signIn)
   }
 
@@ -55,6 +55,14 @@ function UserMenu() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        {user?.isAdmin ? (
+          <DropdownMenuItem asChild className="gap-2">
+            <Link href={ROUTES.admin}>
+              <Icon name="lock" size="sm" />
+              Admin panel
+            </Link>
+          </DropdownMenuItem>
+        ) : null}
         <DropdownMenuItem onClick={handleSignOut} className="text-destructive gap-2">
           <Icon name="logout" size="sm" />
           Sign out

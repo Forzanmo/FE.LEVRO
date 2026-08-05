@@ -12,6 +12,9 @@ import { ProcessingScreen } from '@/components/coach/processing-screen'
 import { TypingIndicator } from '@/components/coach/typing-indicator'
 import { UserAnswer } from '@/components/coach/user-answer'
 import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/shared/empty-state'
+import { Icon } from '@/components/ui/icon'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ROUTES } from '@/lib/constants/routes'
 
 import type { CoachAnswer, CoachQuestion } from './types'
@@ -41,6 +44,18 @@ export function CoachView() {
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'end' })
   }, [coach.index, coach.phase, reduceMotion])
+
+  if (coach.isLoading) return <Skeleton className="mx-auto h-[36rem] w-full max-w-2xl rounded-xl" />
+  if (coach.isError) {
+    return (
+      <EmptyState
+        icon="warning"
+        title="Couldn’t load your assessment"
+        description="Your answers are safe. Try loading the coach again."
+        action={<Button onClick={coach.retry} leftIcon={<Icon name="refresh" size="sm" />}>Try again</Button>}
+      />
+    )
+  }
 
   if (coach.phase === 'complete') {
     return <ProcessingScreen onComplete={() => router.push(ROUTES.dashboard)} />

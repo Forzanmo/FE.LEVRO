@@ -1,40 +1,57 @@
+import { getResumeApiV1ProductResumeGet, saveResumeApiV1ProductResumePut } from '@/api/generated'
+import type { ResumeData as ApiResumeData, ResumeResponse } from '@/api/generated'
 import type { ResumeData } from '@/lib/validators/resume-schema'
+import { unwrapApiResult } from '@/lib/api/http-client'
+import '@/lib/api/runtime'
 
-/**
- * Resume service. Returns the AI-generated starting resume (mocked here). A real
- * implementation would call the generation endpoint; the shape is identical, so
- * the editor and preview are unaffected.
- */
+export interface ResumeSession {
+  data: ResumeData
+  revision: number
+}
+
+function fromApi(response: ResumeResponse): ResumeSession {
+  return {
+    revision: response.revision,
+    data: {
+      fullName: response.data.full_name,
+      headline: response.data.headline,
+      email: response.data.email,
+      phone: response.data.phone,
+      location: response.data.location,
+      website: response.data.website,
+      summary: response.data.summary,
+      experience: response.data.experience,
+      skills: response.data.skills,
+    },
+  }
+}
+
+function toApi(data: ResumeData): ApiResumeData {
+  return {
+    full_name: data.fullName,
+    headline: data.headline,
+    email: data.email,
+    phone: data.phone,
+    location: data.location,
+    website: data.website,
+    summary: data.summary,
+    experience: data.experience,
+    skills: data.skills,
+  }
+}
+
 export const resumeService = {
-  getSeed(): ResumeData {
-    return {
-      fullName: 'Alex Rivera',
-      headline: 'Frontend Engineer',
-      email: 'alex.rivera@example.com',
-      phone: '+1 (555) 123-4567',
-      location: 'Remote · Berlin, DE',
-      website: 'alexrivera.dev',
-      summary:
-        'Frontend engineer focused on accessible, high-performance React interfaces. Two internships shipping production features; comfortable owning a task end to end.',
-      experience: [
-        {
-          id: 'seed-e1',
-          role: 'Frontend Intern',
-          company: 'Northwind Studio',
-          period: '2023 — 2024',
-          highlights:
-            'Shipped a component library adopted across four products.\nCut First Contentful Paint by 38% on the marketing site.\nAdded keyboard and screen-reader support to the checkout flow.',
-        },
-        {
-          id: 'seed-e2',
-          role: 'Junior Developer (Freelance)',
-          company: 'Self-employed',
-          period: '2022 — 2023',
-          highlights:
-            'Built three client sites in Next.js sharing one design system.\nSet up CI and Lighthouse budgets to hold performance.',
-        },
-      ],
-      skills: ['TypeScript', 'React', 'Next.js', 'Tailwind CSS', 'Testing', 'Accessibility'],
-    }
+  async get(): Promise<ResumeSession> {
+    return fromApi(unwrapApiResult(await getResumeApiV1ProductResumeGet()))
+  },
+
+  async save(data: ResumeData, expectedRevision: number): Promise<ResumeSession> {
+    return fromApi(
+      unwrapApiResult(
+        await saveResumeApiV1ProductResumePut({
+          body: { data: toApi(data), expected_revision: expectedRevision },
+        }),
+      ),
+    )
   },
 }

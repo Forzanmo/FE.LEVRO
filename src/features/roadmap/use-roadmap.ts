@@ -1,79 +1,84 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { roadmapService } from '@/services/api/roadmap-service'
+import { roadmapService, type RoadmapSession } from '@/services/api/roadmap-service'
 
 import type { QuestNodeWithStatus, QuestStatus, RoadmapStats } from './types'
 
 const XP_PER_LEVEL = 200
+const roadmapKey = ['roadmap'] as const
 
 export interface UseRoadmap {
   cols: number
   nodes: QuestNodeWithStatus[]
   stats: RoadmapStats
-  complete: (id: string) => void
-  uncomplete: (id: string) => void
+  complete: (id: string) => Promise<void>
+  uncomplete: (id: string) => Promise<void>
   isComplete: (id: string) => boolean
+  isPending: boolean
+  isError: boolean
+  isSaving: boolean
+  retry: () => void
 }
 
 export function useRoadmap(): UseRoadmap {
-  const data = useMemo(() => roadmapService.getRoadmap(), [])
-  const [completed, setCompleted] = useState<Set<string>>(() => new Set(data.initialCompleted))
+  const queryClient = useQueryClient()
+  const query = useQuery({ queryKey: roadmapKey, queryFn: () => roadmapService.getRoadmap() })
+  const data = query.data
+  const completed = useMemo(() => new Set(data?.initialCompleted ?? []), [data?.initialCompleted])
+
+  const mutation = useMutation({
+    mutationFn: ({ id, action, revision }: { id: string; action: 'complete' | 'uncomplete'; revision: number }) =>
+      action === 'complete'
+        ? roadmapService.complete(id, revision)
+        : roadmapService.uncomplete(id, revision),
+    onSuccess: (next) => queryClient.setQueryData<RoadmapSession>(roadmapKey, next),
+  })
 
   const statusOf = (id: string, requires: string[]): QuestStatus => {
     if (completed.has(id)) return 'completed'
-    return requires.every((r) => completed.has(r)) ? 'available' : 'locked'
+    return requires.every((requirement) => completed.has(requirement)) ? 'available' : 'locked'
   }
 
-  const nodes: QuestNodeWithStatus[] = data.nodes.map((node) => ({
+  const nodes: QuestNodeWithStatus[] = (data?.nodes ?? []).map((node) => ({
     ...node,
     status: statusOf(node.id, node.requires),
   }))
 
   const stats: RoadmapStats = useMemo(() => {
-    const totalXp = data.nodes.reduce((sum, n) => sum + n.xp, 0)
-    const earnedXp = data.nodes
-      .filter((n) => completed.has(n.id))
-      .reduce((sum, n) => sum + n.xp, 0)
-    const total = data.nodes.length
-    const completedCount = data.nodes.filter((n) => completed.has(n.id)).length
+    const catalog = data?.nodes ?? []
+    const totalXp = catalog.reduce((sum, node) => sum + node.xp, 0)
+    const earnedXp = catalog
+      .filter((node) => completed.has(node.id))
+      .reduce((sum, node) => sum + node.xp, 0)
+    const completedCount = catalog.filter((node) => completed.has(node.id)).length
     return {
       earnedXp,
       totalXp,
-      total,
+      total: catalog.length,
       completedCount,
       level: Math.floor(earnedXp / XP_PER_LEVEL) + 1,
-      progress: total === 0 ? 0 : Math.round((completedCount / total) * 100),
+      progress: catalog.length === 0 ? 0 : Math.round((completedCount / catalog.length) * 100),
     }
-  }, [data.nodes, completed])
+  }, [data?.nodes, completed])
 
-  const complete = (id: string) => {
-    const node = data.nodes.find((n) => n.id === id)
-    if (!node) return
-    if (statusOf(id, node.requires) !== 'available') return
-    setCompleted((prev) => {
-      const next = new Set(prev)
-      next.add(id)
-      return next
-    })
-  }
-
-  const uncomplete = (id: string) => {
-    setCompleted((prev) => {
-      if (!prev.has(id)) return prev
-      const next = new Set(prev)
-      next.delete(id)
-      return next
-    })
+  const mutate = async (id: string, action: 'complete' | 'uncomplete') => {
+    if (!data) return
+    await mutation.mutateAsync({ id, action, revision: data.revision })
   }
 
   return {
-    cols: data.cols,
+    cols: data?.cols ?? 3,
     nodes,
     stats,
-    complete,
-    uncomplete,
-    isComplete: (id: string) => completed.has(id),
+    complete: (id) => mutate(id, 'complete'),
+    uncomplete: (id) => mutate(id, 'uncomplete'),
+    isComplete: (id) => completed.has(id),
+    isPending: query.isPending,
+    isError: query.isError,
+    isSaving: mutation.isPending,
+    retry: () => void query.refetch(),
   }
 }

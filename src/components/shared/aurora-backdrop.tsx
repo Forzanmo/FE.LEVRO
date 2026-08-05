@@ -40,7 +40,10 @@ export function AuroraBackdrop({ className }: { className?: string }) {
     const cores = nav.hardwareConcurrency ?? 0
     const mem = nav.deviceMemory // undefined off Chromium — don't penalize
     const saveData = nav.connection?.saveData ?? false
-    setShowMesh(cores >= 4 && (mem === undefined || mem >= 4) && !saveData)
+    const frame = window.requestAnimationFrame(() => {
+      setShowMesh(cores >= 4 && (mem === undefined || mem >= 4) && !saveData)
+    })
+    return () => window.cancelAnimationFrame(frame)
   }, [reduceMotion])
 
   return (

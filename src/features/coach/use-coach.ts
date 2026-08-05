@@ -1,9 +1,11 @@
 'use client'
 
 import { useEffect, useMemo, useReducer } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useReducedMotion } from 'motion/react'
+import { toast } from 'sonner'
 
-import { coachService } from '@/services/api/coach-service'
+import { coachService, type CoachSession } from '@/services/api/coach-service'
 
 import type { AnswerValue, CoachAnswer, CoachQuestion } from './types'
 
@@ -16,47 +18,46 @@ interface CoachState {
 }
 
 type CoachAction =
+  | { type: 'HYDRATE'; answers: Record<string, CoachAnswer>; completed: boolean }
   | { type: 'REVEAL' }
-  | { type: 'ANSWER'; value: AnswerValue }
-  | { type: 'SKIP' }
+  | { type: 'ANSWER'; answer: CoachAnswer }
   | { type: 'BACK' }
   | { type: 'EDIT'; index: number }
   | { type: 'RESTART' }
 
 const TYPING_MS = 750
+const coachKey = ['coach-assessment'] as const
 
 function makeReducer(questions: CoachQuestion[]) {
   const total = questions.length
-
-  const record = (state: CoachState, answer: CoachAnswer): CoachState => {
-    const answers = { ...state.answers, [answer.questionId]: answer }
-    const next = state.index + 1
-    if (next >= total) return { ...state, answers, phase: 'complete' }
-    // Re-visiting an already-answered question skips the "typing" beat.
-    const nextAnswered = Boolean(answers[questions[next].id])
-    return { index: next, answers, phase: nextAnswered ? 'awaiting' : 'typing' }
-  }
-
   return (state: CoachState, action: CoachAction): CoachState => {
     switch (action.type) {
+      case 'HYDRATE': {
+        const firstUnanswered = questions.findIndex((question) => !action.answers[question.id])
+        return {
+          answers: action.answers,
+          index: firstUnanswered < 0 ? Math.max(0, total - 1) : firstUnanswered,
+          phase: action.completed || (total > 0 && firstUnanswered < 0) ? 'complete' : 'typing',
+        }
+      }
       case 'REVEAL':
         return state.phase === 'typing' ? { ...state, phase: 'awaiting' } : state
-      case 'ANSWER':
-        return record(state, { questionId: questions[state.index].id, value: action.value })
-      case 'SKIP':
-        return record(state, {
-          questionId: questions[state.index].id,
-          value: '',
-          skipped: true,
-        })
+      case 'ANSWER': {
+        const answers = { ...state.answers, [action.answer.questionId]: action.answer }
+        const next = state.index + 1
+        if (next >= total) return { ...state, answers, phase: 'complete' }
+        return {
+          index: next,
+          answers,
+          phase: answers[questions[next].id] ? 'awaiting' : 'typing',
+        }
+      }
       case 'BACK':
         return state.index === 0 ? state : { ...state, index: state.index - 1, phase: 'awaiting' }
       case 'EDIT':
         return { ...state, index: action.index, phase: 'awaiting' }
       case 'RESTART':
         return { index: 0, answers: {}, phase: 'typing' }
-      default:
-        return state
     }
   }
 }
@@ -75,24 +76,62 @@ export interface UseCoach {
   back: () => void
   editAt: (index: number) => void
   restart: () => void
+  isLoading: boolean
+  isError: boolean
+  isSaving: boolean
+  retry: () => void
 }
 
 export function useCoach(): UseCoach {
-  const { intro, questions } = useMemo(() => coachService.getAssessment(), [])
+  const queryClient = useQueryClient()
+  const query = useQuery({ queryKey: coachKey, queryFn: () => coachService.getAssessment() })
+  const questions = useMemo(() => query.data?.questions ?? [], [query.data?.questions])
+  const intro = query.data?.intro ?? ''
   const reducer = useMemo(() => makeReducer(questions), [questions])
+  const [state, dispatch] = useReducer(reducer, { index: 0, answers: {}, phase: 'typing' })
   const reduceMotion = useReducedMotion()
 
-  const [state, dispatch] = useReducer(reducer, { index: 0, answers: {}, phase: 'typing' })
-
-  // Simulate the coach composing before each new question is revealed.
   useEffect(() => {
-    if (state.phase !== 'typing') return
-    const delay = reduceMotion ? 0 : TYPING_MS
-    const timer = setTimeout(() => dispatch({ type: 'REVEAL' }), delay)
-    return () => clearTimeout(timer)
-  }, [state.phase, state.index, reduceMotion])
+    if (query.data) {
+      dispatch({
+        type: 'HYDRATE',
+        answers: query.data.answers,
+        completed: Boolean(query.data.completedAt),
+      })
+    }
+  }, [query.data])
 
-  const answeredCount = Object.values(state.answers).filter((a) => !a.skipped).length
+  useEffect(() => {
+    if (state.phase !== 'typing' || questions.length === 0) return
+    const timer = setTimeout(
+      () => dispatch({ type: 'REVEAL' }),
+      reduceMotion ? 0 : TYPING_MS,
+    )
+    return () => clearTimeout(timer)
+  }, [state.phase, state.index, reduceMotion, questions.length])
+
+  const answerMutation = useMutation({
+    mutationFn: ({ answer, revision }: { answer: CoachAnswer; revision: number }) =>
+      coachService.saveAnswer(answer, revision),
+    onSuccess: (session, variables) => {
+      queryClient.setQueryData<CoachSession>(coachKey, session)
+      dispatch({ type: 'ANSWER', answer: variables.answer })
+    },
+    onError: () => toast.error('Could not save your answer'),
+  })
+  const restartMutation = useMutation({
+    mutationFn: () => coachService.restart(),
+    onSuccess: (session) => {
+      queryClient.setQueryData<CoachSession>(coachKey, session)
+      dispatch({ type: 'RESTART' })
+    },
+    onError: () => toast.error('Could not restart the assessment'),
+  })
+
+  const persist = (answer: CoachAnswer) => {
+    if (!query.data || answerMutation.isPending) return
+    answerMutation.mutate({ answer, revision: query.data.revision })
+  }
 
   return {
     intro,
@@ -102,11 +141,21 @@ export function useCoach(): UseCoach {
     phase: state.phase,
     index: state.index,
     total: questions.length,
-    answeredCount,
-    submit: (value) => dispatch({ type: 'ANSWER', value }),
-    skip: () => dispatch({ type: 'SKIP' }),
+    answeredCount: Object.values(state.answers).filter((answer) => !answer.skipped).length,
+    submit: (value) => {
+      const question = questions[state.index]
+      if (question) persist({ questionId: question.id, value })
+    },
+    skip: () => {
+      const question = questions[state.index]
+      if (question) persist({ questionId: question.id, value: '', skipped: true })
+    },
     back: () => dispatch({ type: 'BACK' }),
     editAt: (index) => dispatch({ type: 'EDIT', index }),
-    restart: () => dispatch({ type: 'RESTART' }),
+    restart: () => restartMutation.mutate(),
+    isLoading: query.isPending,
+    isError: query.isError,
+    isSaving: answerMutation.isPending || restartMutation.isPending,
+    retry: () => void query.refetch(),
   }
 }

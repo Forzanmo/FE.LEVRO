@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 test.describe('Levvro smoke', () => {
   test('landing renders the hero and primary CTA', async ({ page }) => {
@@ -32,6 +32,6 @@ test.describe('Levvro smoke', () => {
     await page.getByRole('button', { name: 'Account menu' }).click()
     await page.getByRole('menuitem', { name: 'Sign out' }).click()
     await expect(page).toHaveURL(/\/sign-in/)
-    await expect(page.getByRole('button', { name: /Continue with Google/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Sign in', exact: true }).last()).toBeVisible()
   })
 })

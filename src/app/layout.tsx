@@ -45,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={cn(fontVariables, 'h-full')}>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={cn(fontVariables, 'h-full')}>
       <body className="bg-background text-foreground flex min-h-full flex-col antialiased">
         <AppProviders>{children}</AppProviders>
       </body>

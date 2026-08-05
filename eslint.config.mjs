@@ -20,6 +20,7 @@ const eslintConfig = defineConfig([
     "coverage/**",
     "playwright-report/**",
     "test-results/**",
+    "src/api/generated/**",
   ]),
   ...storybook.configs["flat/recommended"]
 ]);
