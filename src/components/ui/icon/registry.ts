@@ -74,6 +74,8 @@ export const iconRegistry = {
   // Navigation
   dashboard: LayoutDashboardIcon,
   coach: BotIcon,
+  /** STUB — the roadmap is planned, not built (PRODUCT.md, "Planned"). Kept so
+   *  the icon choice survives the gap; no call site should use it until then. */
   roadmap: RouteIcon,
   resume: FileTextIcon,
   'cover-letter': MailIcon,

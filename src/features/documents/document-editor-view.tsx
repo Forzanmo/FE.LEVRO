@@ -84,7 +84,10 @@ export function DocumentEditorView({ documentId }: { documentId: string }) {
   const [accent, setAccent] = useState<Accent>('#315c5b')
   const [exportJobId, setExportJobId] = useState<string | null>(null)
 
-  const document = useQuery({ queryKey: documentKey, queryFn: () => documentsService.get(documentId) })
+  const document = useQuery({
+    queryKey: documentKey,
+    queryFn: () => documentsService.getGenerated(documentId),
+  })
   const setDocument = (data: NonNullable<typeof document.data>) => queryClient.setQueryData(documentKey, data)
 
   const sectionMutation = useMutation({

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 
 import { Reveal } from '@/components/shared/reveal'
 import { Button } from '@/components/ui/button'
+import { ChoiceGroup } from '@/components/ui/choice-group'
 import { Icon, type IconName } from '@/components/ui/icon'
 import { Heading, Text } from '@/components/ui/typography'
 import { useSession } from '@/providers/session-provider'
@@ -21,31 +22,38 @@ const PLANS: {
   recommended?: boolean
 }[] = [
   {
-    id: 'assets',
-    title: 'Resume + Cover Letter',
-    description: 'Get recruiter-ready assets, generated and refined with you.',
+    id: 'cv',
+    title: 'Just my CV',
+    description: 'One strong CV, built from your answers and tailored per role.',
     icon: 'resume',
-    features: ['Career Readiness Score', 'AI-generated resume', 'Tailored cover letters'],
+    features: [
+      'Skills mapped against your target role',
+      'Three templates: Minimalist, Designer, ATS',
+      'Every version saved and reusable',
+    ],
   },
   {
-    id: 'assets-roadmap',
-    title: 'Resume + Cover Letter + Roadmap',
-    description: 'Everything above, plus a step-by-step quest to close your gaps.',
-    icon: 'roadmap',
+    id: 'cv-letters',
+    title: 'CV + cover letters',
+    description: 'Everything above, plus a matching letter for each application.',
+    icon: 'cover-letter',
     features: [
-      'Everything in Resume + Cover Letter',
-      'Interactive quest roadmap',
-      'Guided path to interview-ready',
+      'Everything in Just my CV',
+      'Cover letters written from the same evidence',
+      'One library for every document',
     ],
     recommended: true,
   },
 ]
 
+/** The ChoiceGroup contract: value + accessible label, layout comes from PLANS. */
+const PLAN_OPTIONS = PLANS.map((p) => ({ value: p.id, label: `${p.title} — ${p.description}` }))
+
 export function OnboardingView() {
   const { status, hasOnboarded, user, completeOnboarding } = useSession()
   const router = useRouter()
   const handled = useRef(false)
-  const [plan, setPlan] = useState<AuthPlan>('assets-roadmap')
+  const [plan, setPlan] = useState<AuthPlan>('cv-letters')
 
   useEffect(() => {
     if (status === 'loading' || handled.current) return
@@ -56,16 +64,9 @@ export function OnboardingView() {
 
   const firstName = user?.name?.split(' ')[0]
 
-  const [submitting, setSubmitting] = useState(false)
-
   const handleContinue = async () => {
-    setSubmitting(true)
-    try {
-      await completeOnboarding(plan)
-      router.push(ROUTES.coach)
-    } finally {
-      setSubmitting(false)
-    }
+    await completeOnboarding(plan)
+    router.push(ROUTES.coach)
   }
 
   return (
@@ -79,56 +80,63 @@ export function OnboardingView() {
         </Text>
       </Reveal>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        {PLANS.map((option, i) => {
-          const selected = plan === option.id
+      {/*
+       * Real radios, via the shared ChoiceGroup. These were `aria-pressed`
+       * toggle buttons, which announce "pressed / not pressed" per card for what
+       * is a mutually-exclusive choice and give no roving arrow-key navigation —
+       * wrong semantics for a one-of-two decision.
+       */}
+      <ChoiceGroup
+        legend="What should we build for you first?"
+        options={PLAN_OPTIONS}
+        value={plan}
+        onChange={(v) => setPlan(v as AuthPlan)}
+        className="mt-8 grid gap-4 sm:grid-cols-2"
+      >
+        {(option, { selected }) => {
+          const detail = PLANS.find((p) => p.id === option.value)!
           return (
-            <Reveal key={option.id} delay={0.1 + i * 0.08} className="h-full">
-              <button
-                type="button"
-                onClick={() => setPlan(option.id)}
-                aria-pressed={selected}
-                className={cn(
-                  'focus-visible:ring-ring focus-visible:ring-offset-background relative h-full w-full rounded-2xl border-2 p-5 text-left transition outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-                  selected
-                    ? 'border-brand bg-brand-muted/40'
-                    : 'border-border hover:border-brand/40 hover:-translate-y-0.5 hover:bg-muted/40',
-                )}
-              >
-                {option.recommended ? (
-                  <span className="bg-primary text-primary-foreground absolute top-4 right-4 rounded-full px-2 py-0.5 text-xs font-medium">
-                    Recommended
-                  </span>
-                ) : null}
-                <span className="bg-brand-muted text-brand grid size-11 place-items-center rounded-xl">
-                  <Icon name={option.icon} size="md" />
+            <span
+              className={cn(
+                'relative block h-full rounded-2xl border p-5 transition',
+                'group-has-[:focus-visible]/choice:ring-ring group-has-[:focus-visible]/choice:ring-offset-background group-has-[:focus-visible]/choice:ring-2 group-has-[:focus-visible]/choice:ring-offset-2',
+                selected
+                  ? 'border-brand bg-brand-muted/40'
+                  : 'border-border hover:border-brand/40 hover:bg-muted/40',
+              )}
+            >
+              {detail.recommended ? (
+                <span className="bg-primary text-primary-foreground absolute top-4 right-4 rounded-full px-2 py-0.5 text-xs font-medium">
+                  Recommended
                 </span>
-                <Heading level={2} size="lg" className="mt-3">
-                  {option.title}
-                </Heading>
-                <Text tone="muted" size="sm" className="mt-1">
-                  {option.description}
-                </Text>
-                <ul className="mt-3 space-y-1.5">
-                  {option.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm">
-                      <Icon name="check" size="xs" tone="success" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </button>
-            </Reveal>
+              ) : null}
+              <span className="bg-brand-muted text-brand grid size-11 place-items-center rounded-xl">
+                <Icon name={detail.icon} size="md" />
+              </span>
+              <Heading level={2} size="lg" className="mt-3">
+                {detail.title}
+              </Heading>
+              <Text tone="muted" size="sm" className="mt-1">
+                {detail.description}
+              </Text>
+              <ul className="mt-3 space-y-1.5">
+                {detail.features.map((feature) => (
+                  <li key={feature} className="flex items-center gap-2 text-sm">
+                    <Icon name="check" size="xs" tone="success" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </span>
           )
-        })}
-      </div>
+        }}
+      </ChoiceGroup>
 
       <Reveal delay={0.28} className="mt-8 flex justify-center">
         <Button
           size="xl"
           variant="gradient"
           onClick={handleContinue}
-          isLoading={submitting}
           rightIcon={<Icon name="arrow-right" size="sm" />}
         >
           Continue to your coach

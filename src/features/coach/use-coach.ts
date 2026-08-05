@@ -80,6 +80,11 @@ export interface UseCoach {
   isError: boolean
   isSaving: boolean
   retry: () => void
+  hydrated: boolean
+  resumable: boolean
+  persisted: boolean
+  resume: () => void
+  discardSaved: () => void
 }
 
 export function useCoach(): UseCoach {
@@ -157,5 +162,10 @@ export function useCoach(): UseCoach {
     isError: query.isError,
     isSaving: answerMutation.isPending || restartMutation.isPending,
     retry: () => void query.refetch(),
+    hydrated: !query.isPending,
+    resumable: false,
+    persisted: !query.isError,
+    resume: () => undefined,
+    discardSaved: () => restartMutation.mutate(),
   }
 }

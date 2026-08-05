@@ -1,14 +1,12 @@
 # Product
 
-## Register
-
-product
-
-<!-- Levvro ships two first-class surfaces. The default register is `product` (the
-authenticated app is the bulk of the experience). Public marketing routes — the
-homepage `/` and any future about/pricing/blog — are a `brand` surface and should
-be designed with brand-register rules per task. Override the register when working
-on those. -->
+<!-- The `## Register` section was removed: the brand/product register axis it
+encoded is no longer read by tooling, having been replaced by per-surface visitor
+modes. The distinction it described still holds and is worth stating plainly:
+the authenticated app is the bulk of the experience and is designed as a tool
+that serves the task, while the public marketing routes (the homepage `/` and any
+future about/pricing/blog) are a surface where the design IS the product. Choose
+per surface, from the surface in focus. -->
 
 ## Platform
 
@@ -28,30 +26,51 @@ that actually made me confident to go through a real interview."
 
 ## Product Purpose
 
-Levvro turns career uncertainty into a measurable roadmap toward getting hired.
-Rather than starting by generating a resume, it starts with an AI coaching
-conversation to understand the person, assess where they stand, and calculate a
-transparent Career Readiness Score with detailed reasoning across skills, projects,
-resume quality, communication, and portfolio. From that assessment it builds a
-personalized, interactive roadmap that coaches the user forward one focused step at a
-time, producing the recruiter-ready assets — resume and cover letter — at the right
-stage of the journey rather than up front.
+Levvro turns career uncertainty into a clear, evidence-backed path toward getting
+hired. Rather than starting by generating a CV, it starts with an AI coaching
+conversation to understand the person and assess where they stand, then shows exactly
+which skills their CV proves and which it does not — each verdict with its reasoning
+attached. From that assessment it produces the recruiter-ready assets — CV and cover
+letter — at the right stage of the journey rather than up front.
 
-The product's home is the Career Health Dashboard, which brings together the Career
-Score, roadmap progress, the AI Coach, an activity heatmap, achievements, recent
-activity, and job applications. Levvro exists because the path to "hired" is invisible
-and overwhelming, and the market is full of tools that make documents look better
-without making candidates more hireable; Levvro makes the path legible, evidence-
-based, and paced so the user never wastes time. Success looks like measurable
-movement — a rising Career Score, completed roadmap steps, and users who land
-interviews and offers.
+Levvro exists because the path to "hired" is invisible and overwhelming, and the
+market is full of tools that make documents look better without making candidates more
+hireable; Levvro makes the path legible, evidence-based, and paced so the user never
+wastes time.
+
+### Shipping today
+
+The product's home is the dashboard, which brings together the skills-coverage
+read-out (what the documents prove, gaps first, each with its evidence), the AI Coach,
+the document library, recent activity, and job applications. Success looks like
+movement a user can see: gaps closing, documents produced from real evidence, and
+users who land interviews and offers.
+
+### Planned — not built, do not describe as present tense
+
+These are the product's intended direction. Nothing in the UI may promise them, and no
+copy may imply they exist today. This section is deliberately separate because both
+were once described here as shipped, and the sign-in screen went on selling the score
+for months after it was removed from the code.
+
+- **Career Readiness Score.** A single transparent score with detailed reasoning
+  across skills, projects, CV quality, communication, and portfolio. The
+  skills-coverage card is the current, narrower answer to the same question; the score
+  is meant to sit above it, not replace it.
+- **Interactive roadmap.** A personalized sequence that coaches the user forward one
+  focused step at a time, and the mechanism the dashboard's "next step" affordance
+  should eventually route into. Until it exists, the dashboard closes gaps by linking
+  directly to the coach and the CV editor.
+- **Achievements.** Removed along with the roadmap that fed it, and worth rebuilding
+  only alongside it — a badge wall with no progression behind it reads as the
+  gamification this product's anti-references rule out.
 
 ## Positioning
 
 The AI career product that makes you interview-ready by showing you exactly what to
-fix and proving why — coaching and a roadmap, not just a resume. Every screen
-reinforces measurable, evidence-driven progress: the score, the reasoning, the next
-step — never vague encouragement.
+fix and proving why — coaching, not just a CV generator. Every screen reinforces
+evidence-driven progress: the gap, the reasoning, the next step — never vague
+encouragement.
 
 ## Brand Personality
 

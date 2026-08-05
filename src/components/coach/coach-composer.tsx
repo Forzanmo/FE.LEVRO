@@ -74,6 +74,7 @@ export function CoachComposer({
           multiple={question.type === 'multi'}
           value={selected}
           onChange={setSelected}
+          legend={question.prompt}
         />
       ) : (
         <div className="relative">
@@ -126,13 +127,23 @@ export function CoachComposer({
         </div>
 
         {isChoice ? (
-          <Button
-            onClick={submit}
-            disabled={!canSubmit}
-            rightIcon={<Icon name="arrow-right" size="sm" />}
-          >
-            Continue
-          </Button>
+          <div className="flex items-center gap-3">
+            {/* Say what is missing. A disabled control communicates "not yet"
+                but never "why not", and this is the one screen where the user is
+                least certain they are doing it right. */}
+            {!canSubmit ? (
+              <span className="text-muted-foreground text-xs">
+                {question.type === 'multi' ? 'Pick at least one' : 'Pick one to continue'}
+              </span>
+            ) : null}
+            <Button
+              onClick={submit}
+              disabled={!canSubmit}
+              rightIcon={<Icon name="arrow-right" size="sm" />}
+            >
+              Continue
+            </Button>
+          </div>
         ) : (
           <span className="text-muted-foreground hidden text-xs sm:block">Press Enter to send</span>
         )}

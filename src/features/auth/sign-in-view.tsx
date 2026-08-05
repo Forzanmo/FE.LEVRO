@@ -1,57 +1,73 @@
 'use client'
 
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+import { GoogleButton } from '@/components/auth/google-button'
+import { Reveal } from '@/components/shared/reveal'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Icon, type IconName } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Reveal } from '@/components/shared/reveal'
 import { Heading, Text } from '@/components/ui/typography'
 import { useSession } from '@/providers/session-provider'
 import { ROUTES } from '@/lib/constants/routes'
 import { siteConfig } from '@/config/site'
-import { cn } from '@/lib/utils'
 
+/*
+ * Each of these has to be something the product does today. The first slot used
+ * to promise "A measurable Career Readiness Score in minutes" — a feature that
+ * had been removed, sold on the screen where the user decides to hand over
+ * their employment history. It also introduced an expectation the landing page
+ * never set and the app could not meet.
+ *
+ * "CV", not "resume": `navigation.ts` renamed the artifact deliberately, and two
+ * nouns for one object is what makes an app feel like several apps.
+ */
 const VALUE_PROPS: { icon: IconName; text: string }[] = [
-  { icon: 'target', text: 'A measurable Career Readiness Score in minutes' },
+  { icon: 'target', text: 'See which skills your CV actually proves' },
   { icon: 'coach', text: 'An AI coach that explains every step' },
-  { icon: 'resume', text: 'Recruiter-ready resume & cover letter' },
+  { icon: 'resume', text: 'A recruiter-ready CV and cover letter' },
 ]
-
-type AuthMode = 'sign-in' | 'register'
-
-function messageFrom(error: unknown): string {
-  return error instanceof Error ? error.message : 'We could not complete that request.'
-}
 
 export function SignInView() {
   const { status, hasOnboarded, signIn, register } = useSession()
   const router = useRouter()
-  const [mode, setMode] = useState<AuthMode>('sign-in')
+  const handled = useRef(false)
+  const [open, setOpen] = useState(false)
+  const [registering, setRegistering] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (status === 'loading' || handled.current) return
     if (status === 'authenticated') {
+      handled.current = true
       router.replace(hasOnboarded ? ROUTES.dashboard : ROUTES.onboarding)
     }
   }, [status, hasOnboarded, router])
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setError(null)
     setSubmitting(true)
+    setError(null)
     try {
       const credentials = { email: email.trim(), password }
-      if (mode === 'register') await register(credentials)
+      if (registering) await register(credentials)
       else await signIn(credentials)
     } catch (reason) {
-      setError(messageFrom(reason))
+      setError(reason instanceof Error ? reason.message : 'We could not complete that request.')
     } finally {
       setSubmitting(false)
     }
@@ -64,85 +80,98 @@ export function SignInView() {
           <Heading level={1} size="2xl">
             Welcome to {siteConfig.name}
           </Heading>
-          <Text tone="muted">
-            {mode === 'sign-in'
-              ? 'Sign in to continue building your career readiness.'
-              : 'Create your account — free to start.'}
-          </Text>
+          <Text tone="muted">Sign in to build your career readiness — free to start.</Text>
         </div>
 
-        <div className="bg-muted mt-6 grid grid-cols-2 rounded-lg p-1" aria-label="Authentication mode">
-          {(['sign-in', 'register'] as const).map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => {
-                setMode(value)
-                setError(null)
-              }}
-              className={cn(
-                'rounded-md px-3 py-2 text-sm font-medium transition',
-                mode === value ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground',
-              )}
-            >
-              {value === 'sign-in' ? 'Sign in' : 'Create account'}
-            </button>
-          ))}
+        <div className="mt-6">
+          <GoogleButton onClick={() => setOpen(true)} />
         </div>
 
-        <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <Label htmlFor="auth-email">Email</Label>
-            <Input
-              id="auth-email"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              autoComplete="email"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="auth-password">Password</Label>
-            <Input
-              id="auth-password"
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
-              minLength={mode === 'register' ? 10 : 1}
-              required
-            />
-            {mode === 'register' ? (
-              <p className="text-muted-foreground text-xs">Use at least 10 characters.</p>
-            ) : null}
-          </div>
-
-          {error ? (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          ) : null}
-
-          <Button type="submit" variant="gradient" size="xl" fullWidth isLoading={submitting}>
-            {mode === 'sign-in' ? 'Sign in' : 'Create account'}
-          </Button>
-        </form>
-
-        <p className="text-muted-foreground mt-4 text-center text-xs">
-          By continuing you agree to our Terms and Privacy Policy.
+        {/*
+         * Real links, and a plain statement about the data. This is the point
+         * where someone hands over their entire employment history to an AI,
+         * and it was the lowest-trust surface in the product: the Terms and
+         * Privacy Policy were unclickable plain text, and the only privacy
+         * assurance anywhere appeared on question 7 of the assessment — long
+         * after commitment.
+         */}
+        <p className="text-muted-foreground mt-4 text-center text-xs text-balance">
+          Your answers stay private and are only used to build your plan. By continuing you agree to
+          our{' '}
+          <Link href={ROUTES.terms} className="text-foreground underline underline-offset-2">
+            Terms
+          </Link>{' '}
+          and{' '}
+          <Link href={ROUTES.privacy} className="text-foreground underline underline-offset-2">
+            Privacy Policy
+          </Link>
+          .
         </p>
 
         <ul className="mt-6 space-y-2.5 border-t pt-6">
-          {VALUE_PROPS.map((item) => (
-            <li key={item.text} className="flex items-center gap-2.5 text-sm">
-              <Icon name={item.icon} size="sm" tone="brand" />
-              <span className="text-foreground/90">{item.text}</span>
+          {VALUE_PROPS.map((vp) => (
+            <li key={vp.text} className="flex items-center gap-2.5 text-sm">
+              <Icon name={vp.icon} size="sm" tone="brand" />
+              <span className="text-foreground/90">{vp.text}</span>
             </li>
           ))}
         </ul>
       </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{registering ? 'Create your account' : 'Sign in to Levvro'}</DialogTitle>
+            <DialogDescription>
+              Use your email and password for this demo. Google authentication can be enabled later.
+            </DialogDescription>
+          </DialogHeader>
+          <form className="space-y-4" onSubmit={submit}>
+            <div className="space-y-2">
+              <Label htmlFor="auth-email">Email</Label>
+              <Input
+                id="auth-email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="auth-password">Password</Label>
+              <Input
+                id="auth-password"
+                type="password"
+                autoComplete={registering ? 'new-password' : 'current-password'}
+                minLength={registering ? 10 : 1}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+              />
+            </div>
+            {error ? (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            ) : null}
+            <Button type="submit" fullWidth isLoading={submitting}>
+              {registering ? 'Create account' : 'Sign in'}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              fullWidth
+              onClick={() => {
+                setRegistering((value) => !value)
+                setError(null)
+              }}
+            >
+              {registering ? 'Already have an account? Sign in' : 'New to Levvro? Create account'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </Reveal>
   )
 }

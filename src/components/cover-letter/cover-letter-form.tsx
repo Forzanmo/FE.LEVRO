@@ -15,7 +15,10 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { COVER_LETTER_TONES } from '@/features/cover-letter/types'
-import type { CoverLetterFormValues } from '@/lib/validators/cover-letter-schema'
+import {
+  COVER_LETTER_LIMITS,
+  type CoverLetterFormValues,
+} from '@/lib/validators/cover-letter-schema'
 
 export function CoverLetterForm({
   form,
@@ -33,12 +36,32 @@ export function CoverLetterForm({
   } = form
 
   return (
-    <form onSubmit={onGenerate} className="bg-card ring-foreground/10 space-y-4 rounded-xl p-5 ring-1">
+    <form
+      onSubmit={onGenerate}
+      className="bg-card ring-foreground/10 space-y-4 rounded-xl p-5 ring-1"
+    >
       <div className="grid gap-4 sm:grid-cols-2">
-        <TextField label="Company" required error={errors.company?.message} {...register('company')} />
-        <TextField label="Role" required error={errors.role?.message} {...register('role')} />
+        <TextField
+          label="Company"
+          required
+          maxLength={COVER_LETTER_LIMITS.company}
+          error={errors.company?.message}
+          {...register('company')}
+        />
+        <TextField
+          label="Role"
+          required
+          maxLength={COVER_LETTER_LIMITS.role}
+          error={errors.role?.message}
+          {...register('role')}
+        />
       </div>
-      <TextField label="Hiring manager" placeholder="Optional" {...register('hiringManager')} />
+      <TextField
+        label="Hiring manager"
+        placeholder="Optional"
+        maxLength={COVER_LETTER_LIMITS.hiringManager}
+        {...register('hiringManager')}
+      />
       <div className="space-y-1.5">
         <Label htmlFor="cl-tone">Tone</Label>
         <Controller
@@ -67,6 +90,7 @@ export function CoverLetterForm({
         <Textarea
           id="cl-highlights"
           rows={4}
+          maxLength={COVER_LETTER_LIMITS.highlights}
           placeholder="e.g. Shipped a component library used across 4 products"
           {...register('highlights')}
         />

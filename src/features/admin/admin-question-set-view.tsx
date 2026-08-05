@@ -13,7 +13,6 @@ import type {
   QuestionType,
 } from '@/api/generated'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -81,7 +80,20 @@ function QuestionSetEditor({ version }: { version: QuestionSetVersionResponse })
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      const payload = questions.map(({ localId: _localId, ruleJson, ...question }, index) => {
+      const payload = questions.map((editable, index) => {
+        const { ruleJson } = editable
+        const question: AdminQuestionInput = {
+          display_order: index,
+          help_text: editable.help_text,
+          is_active: editable.is_active,
+          is_required: editable.is_required,
+          key: editable.key,
+          label: editable.label,
+          options: editable.options,
+          profile_section: editable.profile_section,
+          question_type: editable.question_type,
+          rule: editable.rule,
+        }
         let rule: Rule = null
         if (ruleJson.trim()) {
           const parsed = JSON.parse(ruleJson) as unknown

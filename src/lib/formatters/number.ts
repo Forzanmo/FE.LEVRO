@@ -14,5 +14,7 @@ export function formatPercent(value: number, fractionDigits = 0): string {
 
 /** "1.2k" */
 export function formatCompactNumber(value: number): string {
-  return new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(value)
+  return new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(
+    value,
+  )
 }

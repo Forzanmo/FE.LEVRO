@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 
 import { PageHeader } from '@/components/shared/page-header'
 import { Button } from '@/components/ui/button'
+import { ChoiceGroup } from '@/components/ui/choice-group'
 import { TextField } from '@/components/ui/field'
 import { Icon, type IconName } from '@/components/ui/icon'
 import { Label } from '@/components/ui/label'
@@ -43,29 +44,27 @@ function SettingsSection({
   )
 }
 
-function ProfileForm({
-  initialName,
-  email,
-  onSave,
-}: {
-  initialName: string
-  email: string
-  onSave: (name: string) => Promise<void>
-}) {
+function ProfileForm({ initialName, email }: { initialName: string; email: string }) {
+  const { updateProfile } = useSession()
   const [name, setName] = useState(initialName)
-  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(initialName)
 
+  /*
+   * This used to fire `toast.success('Profile saved')` with no persistence
+   * call at all — the name lived in local state and was discarded on
+   * navigation, so the one component whose entire job was to confirm was
+   * lying. It now actually writes, and only reports success if the write
+   * returned one.
+   */
   const save = async () => {
-    setSaving(true)
+    const next = name.trim()
+    if (!next || next === saved) return
     try {
-      await onSave(name.trim())
+      await updateProfile({ full_name: next })
+      setSaved(next)
       toast.success('Profile saved')
-    } catch (error) {
-      toast.error('Could not save profile', {
-        description: error instanceof Error ? error.message : 'Please try again.',
-      })
-    } finally {
-      setSaving(false)
+    } catch {
+      toast.error("Couldn't save your profile — please try again.")
     }
   }
 
@@ -76,7 +75,9 @@ function ProfileForm({
         <TextField label="Email" value={email} readOnly disabled />
       </div>
       <div className="flex justify-end">
-        <Button onClick={save} isLoading={saving}>Save changes</Button>
+        <Button onClick={() => void save()} disabled={!name.trim() || name.trim() === saved}>
+          Save changes
+        </Button>
       </div>
     </div>
   )
@@ -94,64 +95,67 @@ function AppearanceSection() {
   const active = mounted ? theme : undefined
 
   return (
-    <div className="grid grid-cols-3 gap-2 sm:max-w-md">
-      {THEME_OPTIONS.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          onClick={() => setTheme(option.value)}
-          aria-pressed={active === option.value}
+    // Real radios: picking a theme is a one-of-three choice, which
+    // `aria-pressed` buttons announce as three independent toggles.
+    <ChoiceGroup
+      legend="Theme"
+      options={THEME_OPTIONS}
+      value={active ?? null}
+      onChange={setTheme}
+      className="grid grid-cols-3 gap-2 sm:max-w-md"
+    >
+      {(option, { selected }) => (
+        <span
           className={cn(
-            'focus-visible:ring-ring flex flex-col items-center gap-2 rounded-lg border-2 p-3 text-sm font-medium transition outline-none focus-visible:ring-2',
-            active === option.value
-              ? 'border-brand bg-brand-muted/40'
-              : 'border-border hover:bg-muted',
+            'flex h-full flex-col items-center gap-2 rounded-lg border p-3 text-sm font-medium transition',
+            'group-has-[:focus-visible]/choice:ring-ring group-has-[:focus-visible]/choice:ring-2',
+            selected ? 'border-brand bg-brand-muted/40' : 'border-border hover:bg-muted',
           )}
         >
-          <Icon name={option.icon} size="sm" />
+          <Icon name={THEME_OPTIONS.find((t) => t.value === option.value)!.icon} size="sm" />
           {option.label}
-        </button>
-      ))}
-    </div>
+        </span>
+      )}
+    </ChoiceGroup>
   )
 }
 
 const NOTIFICATIONS: { id: string; label: string; description: string; default: boolean }[] = [
-  { id: 'email', label: 'Email updates', description: 'Product news and account activity.', default: true },
-  { id: 'weekly', label: 'Weekly summary', description: 'A recap of your progress every Monday.', default: true },
-  { id: 'reminders', label: 'Roadmap reminders', description: 'Nudges to complete your next quest.', default: false },
+  {
+    id: 'email',
+    label: 'Email updates',
+    description: 'Product news and account activity.',
+    default: true,
+  },
+  {
+    id: 'weekly',
+    label: 'Weekly summary',
+    description: 'A recap of your progress every Monday.',
+    default: true,
+  },
+  {
+    id: 'reminders',
+    label: 'Document reminders',
+    // Was "Nudges to complete your next quest." Quests were the roadmap's
+    // vocabulary; the roadmap is gone and the word appeared nowhere else, so it
+    // read as a setting for a feature the user could not find.
+    description: 'Nudges to finish a CV or cover letter you’ve left as a draft.',
+    default: false,
+  },
 ]
 
-function NotificationsSection({
-  initial,
-  onSave,
-}: {
-  initial: Record<string, boolean>
-  onSave: (preferences: Record<string, boolean>) => Promise<void>
-}) {
+function NotificationsSection() {
   const [prefs, setPrefs] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(NOTIFICATIONS.map((n) => [n.id, initial[n.id] ?? n.default])),
+    Object.fromEntries(NOTIFICATIONS.map((n) => [n.id, n.default])),
   )
-  const [saving, setSaving] = useState(false)
-
-  const save = async () => {
-    setSaving(true)
-    try {
-      await onSave(prefs)
-      toast.success('Notification preferences saved')
-    } catch (error) {
-      toast.error('Could not save preferences', {
-        description: error instanceof Error ? error.message : 'Please try again.',
-      })
-    } finally {
-      setSaving(false)
-    }
-  }
 
   return (
-    <div>
-      <div className="divide-border divide-y">{NOTIFICATIONS.map((item) => (
-        <div key={item.id} className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
+    <div className="divide-border divide-y">
+      {NOTIFICATIONS.map((item) => (
+        <div
+          key={item.id}
+          className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0"
+        >
           <div className="space-y-0.5">
             <Label htmlFor={`notif-${item.id}`}>{item.label}</Label>
             <Text tone="muted" size="sm">
@@ -164,14 +168,13 @@ function NotificationsSection({
             onCheckedChange={(checked) => setPrefs((p) => ({ ...p, [item.id]: checked }))}
           />
         </div>
-      ))}</div>
-      <div className="mt-4 flex justify-end"><Button variant="outline" onClick={save} isLoading={saving}>Save preferences</Button></div>
+      ))}
     </div>
   )
 }
 
 export function SettingsView() {
-  const { user, profileData, signOut, updateProfile } = useSession()
+  const { user, signOut } = useSession()
   const router = useRouter()
 
   const handleSignOut = async () => {
@@ -188,7 +191,6 @@ export function SettingsView() {
           key={user?.id ?? 'loading'}
           initialName={user?.name ?? ''}
           email={user?.email ?? ''}
-          onSave={(fullName) => updateProfile({ full_name: fullName })}
         />
       </SettingsSection>
 
@@ -197,14 +199,7 @@ export function SettingsView() {
       </SettingsSection>
 
       <SettingsSection title="Notifications" description="Decide what we email you about.">
-        <NotificationsSection
-          initial={
-            profileData.notification_preferences && typeof profileData.notification_preferences === 'object'
-              ? profileData.notification_preferences as Record<string, boolean>
-              : {}
-          }
-          onSave={(notificationPreferences) => updateProfile({ notification_preferences: notificationPreferences })}
-        />
+        <NotificationsSection />
       </SettingsSection>
 
       <SettingsSection title="Account">
@@ -212,7 +207,11 @@ export function SettingsView() {
           <Text tone="muted" size="sm">
             Signed in as {user?.email ?? 'your account'}.
           </Text>
-          <Button variant="outline" onClick={handleSignOut} leftIcon={<Icon name="logout" size="sm" />}>
+          <Button
+            variant="outline"
+            onClick={() => void handleSignOut()}
+            leftIcon={<Icon name="logout" size="sm" />}
+          >
             Sign out
           </Button>
         </div>

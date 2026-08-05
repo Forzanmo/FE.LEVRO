@@ -10,7 +10,7 @@ import type { ProfileResponse, UserResponse } from '@/api/generated'
 import { unwrapApiResult } from '@/lib/api/http-client'
 import { refreshAccessToken, setAccessToken } from '@/lib/api/runtime'
 
-export type AuthPlan = 'assets' | 'assets-roadmap'
+export type AuthPlan = 'cv' | 'cv-letters'
 
 export interface SessionUser {
   id: string
@@ -66,7 +66,7 @@ function toSession(user: UserResponse, profile: ProfileResponse): StoredSession 
     },
     hasOnboarded: profile.data.onboarding_completed === true,
     plan:
-      profile.data.plan === 'assets' || profile.data.plan === 'assets-roadmap'
+      profile.data.plan === 'cv' || profile.data.plan === 'cv-letters'
         ? profile.data.plan
         : undefined,
     profile,

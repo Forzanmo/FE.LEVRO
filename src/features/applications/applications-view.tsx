@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback, useMemo, useState } from 'react'
-import Link from 'next/link'
 import {
   getCoreRowModel,
   getFilteredRowModel,
@@ -18,18 +17,16 @@ import { ApplicationsToolbar } from '@/components/applications/applications-tool
 import { PipelineSummary } from '@/components/applications/pipeline-summary'
 import { StatusBadge } from '@/components/applications/status-badge'
 import { PageHeader } from '@/components/shared/page-header'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatRelativeTime } from '@/lib/formatters'
-import { DYNAMIC_ROUTES } from '@/lib/constants/routes'
 
 import type { Application } from './types'
 import { useApplications } from './use-applications'
 
 export function ApplicationsView() {
-  const { applications, isLoading, error, add, remove, restore } = useApplications()
+  const { applications, hydrated, add, remove, restore } = useApplications()
 
   const [sorting, setSorting] = useState<SortingState>([{ id: 'appliedAt', desc: true }])
   const [globalFilter, setGlobalFilter] = useState('')
@@ -78,13 +75,17 @@ export function ApplicationsView() {
         accessorKey: 'location',
         header: 'Location',
         enableSorting: false,
-        cell: ({ getValue }) => <span className="text-muted-foreground">{getValue() as string}</span>,
+        cell: ({ getValue }) => (
+          <span className="text-muted-foreground">{getValue() as string}</span>
+        ),
       },
       {
         accessorKey: 'source',
         header: 'Source',
         enableSorting: false,
-        cell: ({ getValue }) => <span className="text-muted-foreground">{getValue() as string}</span>,
+        cell: ({ getValue }) => (
+          <span className="text-muted-foreground">{getValue() as string}</span>
+        ),
       },
       {
         id: 'actions',
@@ -92,12 +93,7 @@ export function ApplicationsView() {
         enableSorting: false,
         enableGlobalFilter: false,
         cell: ({ row }) => (
-          <div className="flex justify-end gap-1">
-            <Button variant="ghost" size="icon-sm" aria-label={`Open ${row.original.company} application`} asChild>
-              <Link href={DYNAMIC_ROUTES.application(row.original.id)}>
-                <Icon name="arrow-right" size="xs" />
-              </Link>
-            </Button>
+          <div className="flex justify-end">
             <Button
               variant="ghost"
               size="icon-sm"
@@ -140,25 +136,33 @@ export function ApplicationsView() {
         description="Track every application from applied to offer."
       />
 
-      <PipelineSummary applications={applications} />
+      {/* The list is read after mount (the service gate needs localStorage), so
+          the first paint has nothing to show yet. A skeleton in the shape of
+          the loaded page beats an empty table that fills in a frame later. */}
+      {!hydrated ? (
+        <div className="space-y-6">
+          <Skeleton className="h-24 rounded-xl" />
+          <div className="space-y-4">
+            <Skeleton className="h-9 rounded-lg" />
+            <Skeleton className="h-80 rounded-xl" />
+          </div>
+        </div>
+      ) : (
+        <>
+          <PipelineSummary applications={applications} />
 
-      {error ? (
-        <Alert variant="destructive">
-          <AlertTitle>Applications could not be loaded</AlertTitle>
-          <AlertDescription>{error.message}</AlertDescription>
-        </Alert>
-      ) : null}
-
-      <div className="space-y-4">
-        <ApplicationsToolbar
-          search={globalFilter}
-          onSearch={setGlobalFilter}
-          status={statusFilter}
-          onStatus={setStatusFilter}
-          onAdd={add}
-        />
-        {isLoading ? <Skeleton className="h-64 w-full rounded-xl" /> : <ApplicationsTable table={table} onDelete={handleDelete} />}
-      </div>
+          <div className="space-y-4">
+            <ApplicationsToolbar
+              search={globalFilter}
+              onSearch={setGlobalFilter}
+              status={statusFilter}
+              onStatus={setStatusFilter}
+              onAdd={add}
+            />
+            <ApplicationsTable table={table} onDelete={handleDelete} />
+          </div>
+        </>
+      )}
     </div>
   )
 }

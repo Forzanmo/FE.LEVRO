@@ -1,25 +1,27 @@
 'use client'
 
+import { useState } from 'react'
+
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { PRIMARY_NAV, SECONDARY_NAV } from '@/lib/constants/navigation'
-import { toggleSidebar, useAppDispatch, useAppSelector } from '@/stores'
 import { cn } from '@/lib/utils'
-import { useSession } from '@/providers/session-provider'
-import { ROUTES } from '@/lib/constants/routes'
 
 import { Logo } from './logo'
 import { NavItem } from './nav-item'
 
-/** Expandable desktop sidebar (spec §4). Collapsed state lives in the UI store. */
+/**
+ * Expandable desktop sidebar (spec §4).
+ *
+ * `collapsed` is local state, not global. It was a Redux slice, which meant
+ * every visitor downloaded Redux Toolkit and react-redux so that this one
+ * component could remember one boolean that nothing else reads — the store's
+ * other two fields had no consumers at all. This lives in the `(app)` layout, so
+ * React keeps the state across route changes exactly as the store did.
+ */
 export function Sidebar({ className }: { className?: string }) {
-  const collapsed = useAppSelector((state) => state.ui.sidebarCollapsed)
-  const dispatch = useAppDispatch()
-  const { user } = useSession()
-  const secondaryNavigation = user?.isAdmin
-    ? [...SECONDARY_NAV, { label: 'Admin', href: ROUTES.admin, icon: 'lock' as const }]
-    : SECONDARY_NAV
+  const [collapsed, setCollapsed] = useState(false)
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -35,14 +37,17 @@ export function Sidebar({ className }: { className?: string }) {
           <Logo collapsed={collapsed} />
         </div>
 
-        <nav className="flex-1 space-y-1 overflow-x-hidden overflow-y-auto px-3 py-2" aria-label="Primary">
+        <nav
+          className="flex-1 space-y-1 overflow-x-hidden overflow-y-auto px-3 py-2"
+          aria-label="Primary"
+        >
           {PRIMARY_NAV.map((item) => (
             <NavItem key={item.href} item={item} collapsed={collapsed} />
           ))}
         </nav>
 
         <div className="space-y-1 px-3 py-2">
-          {secondaryNavigation.map((item) => (
+          {SECONDARY_NAV.map((item) => (
             <NavItem key={item.href} item={item} collapsed={collapsed} />
           ))}
         </div>
@@ -58,7 +63,7 @@ export function Sidebar({ className }: { className?: string }) {
             size="icon-sm"
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             aria-pressed={collapsed}
-            onClick={() => dispatch(toggleSidebar())}
+            onClick={() => setCollapsed((c) => !c)}
           >
             <Icon name="panel-left" size="sm" />
           </Button>

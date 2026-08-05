@@ -1,7 +1,12 @@
 import { expect, test } from './fixtures'
 
+import { seedAssessed } from './support/journey'
+
 test.describe('Cover Letter generator', () => {
   test('generates a letter from the form', async ({ page }) => {
+    // The generator is gated on having taken the assessment: it argues from the
+    // evidence the coach collected, so there is nothing honest to write without it.
+    await seedAssessed(page)
     await page.goto('/cover-letter')
 
     await expect(page.getByText('Your letter will appear here')).toBeVisible({ timeout: 15_000 })

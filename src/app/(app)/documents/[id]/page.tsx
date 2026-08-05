@@ -1,6 +1,16 @@
-import { DocumentEditorView } from '@/features/documents/document-editor-view'
+import type { Metadata } from 'next'
 
-export default async function DocumentEditorPage({ params }: { params: Promise<{ id: string }> }) {
+import { DocumentDetailView } from '@/features/documents/document-detail-view'
+
+export const metadata: Metadata = {
+  title: 'Document',
+}
+
+export default async function DocumentDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
   const { id } = await params
-  return <DocumentEditorView documentId={id} />
+  return <DocumentDetailView id={id} />
 }

@@ -1,10 +1,15 @@
+import { SHEET_SURFACE } from '@/components/documents/document-sheet'
 import { Icon } from '@/components/ui/icon'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Text } from '@/components/ui/typography'
 import type { CoverLetter } from '@/features/cover-letter/types'
+import { cn } from '@/lib/utils'
 
-const SHEET_CLASS =
-  'print-sheet mx-auto w-full max-w-[46rem] rounded-lg bg-white p-8 text-[var(--neutral-900)] shadow-lg ring-1 ring-[var(--neutral-200)] sm:p-10'
+// Surface colours from the one shared definition; geometry and padding local.
+const SHEET_CLASS = cn(
+  'print-sheet mx-auto w-full max-w-[46rem] rounded-lg p-8 shadow-lg sm:p-10',
+  SHEET_SURFACE,
+)
 
 export function CoverLetterPreview({
   letter,
@@ -28,7 +33,11 @@ export function CoverLetterPreview({
 
   if (!letter) {
     return (
-      <div className="flex min-h-[24rem] flex-col items-center justify-center gap-3 rounded-lg border border-dashed p-8 text-center">
+      // Taller on desktop so the placeholder occupies roughly the space the
+      // letter will. At 24rem the page ended around y=565 on a 1440×900
+      // viewport and about 65% of the screen was blank, which read as broken
+      // rather than as waiting.
+      <div className="flex min-h-[24rem] flex-col items-center justify-center gap-3 rounded-lg border border-dashed p-8 text-center lg:min-h-[34rem]">
         <span className="bg-brand-muted text-brand grid size-12 place-items-center rounded-full">
           <Icon name="cover-letter" size="lg" />
         </span>

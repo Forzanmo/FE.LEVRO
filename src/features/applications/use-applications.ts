@@ -13,6 +13,7 @@ const applicationsKey = ['applications'] as const
 export interface UseApplications {
   applications: Application[]
   isLoading: boolean
+  hydrated: boolean
   error: Error | null
   add: (values: ApplicationFormValues) => void
   remove: (id: string) => void
@@ -55,6 +56,7 @@ export function useApplications(): UseApplications {
   return {
     applications: query.data ?? [],
     isLoading: query.isLoading,
+    hydrated: !query.isLoading,
     error: query.error,
     add: (values) => createMutation.mutate(values),
     remove: (id) => deleteMutation.mutate(id),

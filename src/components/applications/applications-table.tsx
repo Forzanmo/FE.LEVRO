@@ -36,9 +36,31 @@ export function ApplicationsTable({
 
   return (
     <>
-      {/* Desktop table */}
-      <div className="ring-foreground/10 hidden overflow-hidden rounded-xl ring-1 md:block">
-        <table className="w-full text-sm">
+      {/*
+       * Desktop table.
+       *
+       * `overflow-x-auto` and `min-w-0`, not `overflow-hidden`. Between 768 and
+       * ~900px the desktop sidebar has already appeared (256px) while the
+       * viewport has not caught up, leaving the table about 512px for six
+       * columns that need ~600. `overflow-hidden` did not contain that: the
+       * wrapper is a grid child, so its automatic minimum was the table's
+       * min-content width and the wrapper itself grew — pushing the whole PAGE
+       * to scroll sideways by 65px at exactly 768px, in both themes.
+       *
+       * Six columns of a data table are worth scrolling; the page is not. The
+       * `min-w-0` is what actually lets the track shrink, and `overflow-x-auto`
+       * is what makes the overflow reachable instead of clipped.
+       *
+       * `relative` is the non-obvious part, and without it the page still
+       * scrolled. The actions column carries an `sr-only` header, and `sr-only`
+       * is `position: absolute`. With no positioned ancestor its containing
+       * block is the initial one — the viewport — so that 1px label sat at
+       * x=839 *outside* the scroll container and extended the document's scroll
+       * width by 72px on its own. Making the wrapper a containing block puts it
+       * back inside the region that scrolls.
+       */}
+      <div className="ring-foreground/10 relative hidden min-w-0 overflow-x-auto rounded-xl ring-1 md:block">
+        <table className="w-full min-w-[38rem] text-sm">
           <thead className="bg-muted/50">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
@@ -48,13 +70,23 @@ export function ApplicationsTable({
                   return (
                     <th
                       key={header.id}
+                      // The actions column renders an empty <th>; give it a
+                      // screen-reader name rather than an unlabelled header.
+                      scope="col"
                       className="text-muted-foreground px-4 py-2.5 text-left font-medium"
                     >
-                      {header.isPlaceholder ? null : canSort ? (
+                      {/* The row-actions column has no visible header. An empty
+                          <th> is an unlabelled column for screen readers, so it
+                          gets a name that simply isn't painted. */}
+                      {!header.column.columnDef.header ? (
+                        <span className="sr-only">Actions</span>
+                      ) : header.isPlaceholder ? null : canSort ? (
                         <button
                           type="button"
                           onClick={header.column.getToggleSortingHandler()}
-                          className="hover:text-foreground inline-flex items-center gap-1 outline-none"
+                          // `outline-none` with no replacement made this sort
+                          // control invisible to keyboard focus.
+                          className="hover:text-foreground focus-visible:ring-ring inline-flex items-center gap-1 rounded outline-none focus-visible:ring-2"
                         >
                           {flexRender(header.column.columnDef.header, header.getContext())}
                           <Icon

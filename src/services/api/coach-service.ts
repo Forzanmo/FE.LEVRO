@@ -14,6 +14,8 @@ export interface CoachSession extends Assessment {
   completedAt: string | null
 }
 
+export const COACH_QUESTION_COUNT = 7
+
 function mapSession(data: CoachAssessmentResponse): CoachSession {
   return {
     intro: data.intro,

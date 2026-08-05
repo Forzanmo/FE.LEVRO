@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 import { resumeSchema, type ResumeData } from '@/lib/validators/resume-schema'
 import { resumeService, type ResumeSession } from '@/services/api/resume-service'
 
-export type SaveStatus = 'idle' | 'saving' | 'saved'
+export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
 const AUTOSAVE_DELAY = 700
 const resumeKey = ['resume-draft'] as const
@@ -60,7 +60,7 @@ export function useResume() {
           queryClient.setQueryData<ResumeSession>(resumeKey, next)
           setStatus('saved')
         } catch {
-          setStatus('idle')
+          setStatus('error')
           toast.error('Could not save your resume')
         }
       }, AUTOSAVE_DELAY)
@@ -75,6 +75,7 @@ export function useResume() {
     form,
     status,
     isLoading: query.isPending,
+    hydrated: !query.isPending,
     isError: query.isError,
     retry: () => void query.refetch(),
   }
