@@ -64,6 +64,20 @@ const nextConfig: NextConfig = {
   /** Don't advertise the framework. */
   poweredByHeader: false,
 
+  // WSL/Windows browsers often reach the dev server through the VM address
+  // instead of localhost. Without this, Next blocks HMR chunks even though
+  // the page itself loads successfully.
+  ...(isDev
+    ? {
+        allowedDevOrigins: [
+          'localhost',
+          '127.0.0.1',
+          '172.25.101.81',
+          ...(process.env.LEVRRO_DEV_ORIGIN ? [process.env.LEVRRO_DEV_ORIGIN] : []),
+        ],
+      }
+    : {}),
+
   async rewrites() {
     return [
       {

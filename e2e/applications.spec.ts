@@ -35,11 +35,22 @@ test.describe('Applications table', () => {
 
     await page.getByRole('button', { name: 'Add application' }).click()
     const dialog = page.getByRole('dialog')
-    await dialog.getByLabel('Company').fill('Aperture')
-    await dialog.getByLabel('Role').fill('Frontend Engineer')
+    await dialog.getByLabel('Application type').click()
+    await page.getByRole('option', { name: 'Internship' }).click()
+    await dialog.getByLabel('Organization').fill('Aperture')
+    await dialog.getByLabel('Role or scholarship').fill('Frontend Engineer Intern')
     await dialog.getByRole('button', { name: 'Add application' }).click()
 
     await expect(page.locator('table').getByText('Aperture')).toBeVisible()
+  })
+
+  test('can reopen and duplicate an application', async ({ page }) => {
+    await page.goto('/applications')
+    await page.getByRole('button', { name: 'Duplicate Vercel application' }).click()
+    await expect(page.locator('table').getByText('Frontend Engineer copy')).toBeVisible()
+
+    await page.locator('a[href="/applications/a1"]:visible').click()
+    await expect(page).toHaveURL(/\/applications\/a1$/, { timeout: 15_000 })
   })
 
   test('delete shows an undo toast that restores the row', async ({ page }) => {

@@ -33,6 +33,7 @@ import {
 } from '@/lib/validators/application-schema'
 
 const DEFAULTS: ApplicationFormValues = {
+  applicationType: 'job',
   company: '',
   role: '',
   status: 'applied',
@@ -80,16 +81,35 @@ export function AddApplicationDialog({
           <DialogDescription>Track a new role you&rsquo;ve applied to.</DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="application-type">Application type</Label>
+            <Controller
+              control={control}
+              name="applicationType"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id="application-type" className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="job">Job</SelectItem>
+                    <SelectItem value="internship">Internship</SelectItem>
+                    <SelectItem value="scholarship">Scholarship</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <TextField
-              label="Company"
+              label="Organization"
               required
               maxLength={APPLICATION_LIMITS.company}
               error={errors.company?.message}
               {...register('company')}
             />
             <TextField
-              label="Role"
+              label="Role or scholarship"
               required
               maxLength={APPLICATION_LIMITS.role}
               error={errors.role?.message}

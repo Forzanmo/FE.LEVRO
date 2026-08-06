@@ -8,6 +8,7 @@ import {
   getOpportunityApiV1ApplicationsApplicationIdOpportunityGet,
   listDocumentsApiV1ApplicationsApplicationIdDocumentsGet,
   putOpportunityApiV1ApplicationsApplicationIdOpportunityPut,
+  retryExtractionApiV1ApplicationsApplicationIdExtractionRetryPost,
   saveAnswerApiV1ApplicationsApplicationIdAnswersQuestionIdPut,
   uploadCvApiV1ApplicationsApplicationIdCvUploadPost,
 } from '@/api/generated'
@@ -74,14 +75,32 @@ export const applicationWorkflowService = {
     )
   },
 
-  async confirmExtraction(applicationId: string, extraction: CvExtractionResponse) {
+  async confirmExtraction(
+    applicationId: string,
+    extraction: CvExtractionResponse,
+    data: Record<string, unknown>,
+  ) {
     return unwrapApiResult(
       await confirmExtractionApiV1ApplicationsApplicationIdExtractionConfirmPost({
         path: { application_id: applicationId },
         body: {
-          data: extraction.candidate_data,
+          data,
           expected_revision: extraction.revision,
         },
+      }),
+    )
+  },
+
+  async retryExtraction(applicationId: string): Promise<CvExtractionResponse> {
+    unwrapApiResult(
+      await retryExtractionApiV1ApplicationsApplicationIdExtractionRetryPost({
+        path: { application_id: applicationId },
+        headers: { 'Idempotency-Key': crypto.randomUUID() },
+      }),
+    )
+    return unwrapApiResult(
+      await getExtractionApiV1ApplicationsApplicationIdExtractionGet({
+        path: { application_id: applicationId },
       }),
     )
   },

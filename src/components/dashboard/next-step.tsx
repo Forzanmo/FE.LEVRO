@@ -55,8 +55,8 @@ export function NextStep({ skills }: { skills: SkillsSummary }) {
       </div>
 
       <Button asChild className="shrink-0 max-sm:w-full">
-        <Link href={ROUTES.resume}>
-          Add evidence
+        <Link href={ROUTES.applications}>
+          Open applications
           <Icon name="arrow-right" size="sm" />
         </Link>
       </Button>

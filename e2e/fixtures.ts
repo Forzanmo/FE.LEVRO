@@ -10,17 +10,22 @@ function application(id: string, organization: string, title: string, state = 'd
     state,
     application_type: 'job',
     opportunity_text: null,
-    source_application_id: null,
+    source_application_id: null as string | null,
     revision: 0,
     created_at: now,
     updated_at: now,
   }
 }
 
-export async function installApi(page: Page) {
-  let authenticated = true
+export async function installApi(page: Page, initiallyAuthenticated = true) {
+  let authenticated = initiallyAuthenticated
   let onboarded = true
   let profileRevision = 0
+  let profileData: Record<string, unknown> = {
+    full_name: 'Alex Rivera',
+    onboarding_completed: onboarded,
+    plan: 'assets-roadmap',
+  }
   let coachRevision = 0
   let coachAnswers: Record<string, { question_id: string; value: string | string[]; skipped: boolean }> = {}
   let roadmapRevision = 1
@@ -56,26 +61,43 @@ export async function installApi(page: Page) {
     if (path === '/api/v1/auth/token' && method === 'POST') {
       authenticated = true
       onboarded = false
+      profileData = { ...profileData, onboarding_completed: false }
       return respond(route, { access_token: 'e2e-token', expires_in: 900, token_type: 'bearer' })
     }
     if (path === '/api/v1/auth/register' && method === 'POST') {
       return respond(route, { id: 'user-1', email: 'admin@example.com', email_verified: true, is_admin: true, created_at: now }, 201)
+    }
+    if (path === '/api/v1/auth/password-reset/request' && method === 'POST') {
+      return respond(route, { message: 'If an account exists, a reset link has been sent.' }, 202)
+    }
+    if (path === '/api/v1/auth/password-reset/confirm' && method === 'POST') {
+      authenticated = false
+      return route.fulfill({ status: 204 })
     }
     if (path === '/api/v1/auth/logout' && method === 'POST') {
       authenticated = false
       return route.fulfill({ status: 204 })
     }
     if (!authenticated) return unauthorized(route)
+    if (path === '/api/v1/auth/me' && method === 'DELETE') {
+      authenticated = false
+      return route.fulfill({ status: 204 })
+    }
     if (path === '/api/v1/auth/me') {
       return respond(route, { id: 'user-1', email: 'admin@example.com', email_verified: true, is_admin: true, created_at: now })
     }
     if (path === '/api/v1/profile' && method === 'GET') {
-      return respond(route, { id: 'profile-1', revision: profileRevision, data: { full_name: 'Alex Rivera', onboarding_completed: onboarded, plan: 'assets-roadmap' }, updated_at: now })
+      return respond(route, { id: 'profile-1', revision: profileRevision, data: profileData, updated_at: now })
     }
     if (path === '/api/v1/profile' && method === 'PATCH') {
+      const body = request.postDataJSON() as { data: Record<string, unknown> }
       profileRevision += 1
       onboarded = true
-      return respond(route, { id: 'profile-1', revision: profileRevision, data: { full_name: 'Alex Rivera', onboarding_completed: true, plan: 'assets-roadmap' }, updated_at: now })
+      profileData = { ...body.data, onboarding_completed: true }
+      return respond(route, { id: 'profile-1', revision: profileRevision, data: profileData, updated_at: now })
+    }
+    if (path === '/api/v1/analytics/events' && method === 'POST') {
+      return route.fulfill({ status: 204 })
     }
 
     const coachQuestions = [
@@ -142,8 +164,24 @@ export async function installApi(page: Page) {
 
     if (path === '/api/v1/applications' && method === 'GET') return respond(route, applications)
     if (path === '/api/v1/applications' && method === 'POST') {
-      const body = request.postDataJSON() as { organization: string; title: string }
-      const created = application(`a${applications.length + 10}`, body.organization, body.title)
+      const body = request.postDataJSON() as { organization: string; title: string; application_type: string }
+      const created = {
+        ...application(`a${applications.length + 10}`, body.organization, body.title),
+        application_type: body.application_type,
+      }
+      applications = [created, ...applications]
+      return respond(route, created, 201)
+    }
+    const duplicateMatch = path.match(/^\/api\/v1\/applications\/([^/]+)\/duplicate$/)
+    if (duplicateMatch && method === 'POST') {
+      const source = applications.find((item) => item.id === duplicateMatch[1]) ?? applications[0]
+      const body = request.postDataJSON() as { title?: string }
+      const created = {
+        ...source,
+        id: `a${applications.length + 10}`,
+        title: body.title ?? `${source.title} copy`,
+        source_application_id: source.id,
+      }
       applications = [created, ...applications]
       return respond(route, created, 201)
     }
@@ -166,7 +204,8 @@ export async function installApi(page: Page) {
       return respond(route, { application_id: 'a1', question_set_version: 1, current_question: null, answered_questions: [], answered_count: 4, eligible_count: 4, progress_percent: 100, is_complete: true })
     }
     if (path.endsWith('/documents') && method === 'GET') {
-      return respond(route, [{ id: 'doc-1', application_id: 'a1', document_type: 'cv', current_revision: 1, title: 'Tailored CV', updated_at: now }])
+      const applicationId = path.match(/^\/api\/v1\/applications\/([^/]+)\/documents$/)?.[1] ?? 'a1'
+      return respond(route, [{ id: applicationId === 'a1' ? 'doc-1' : `${applicationId}-doc`, application_id: applicationId, document_type: 'cv', current_revision: 1, updated_at: now }])
     }
     if (path === '/api/v1/documents/doc-1' && method === 'GET') {
       return respond(route, {
@@ -180,6 +219,20 @@ export async function installApi(page: Page) {
           ],
         },
       })
+    }
+    if (path === '/api/v1/documents/doc-1/preview' && method === 'GET') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'text/html',
+        body: '<!doctype html><html><body><h1>Alex Rivera</h1><p>Frontend Engineer</p></body></html>',
+      })
+    }
+    const regenerateMatch = path.match(/^\/api\/v1\/documents\/doc-1\/sections\/([^/]+)\/regenerate$/)
+    if (regenerateMatch && method === 'POST') {
+      return respond(route, { id: 'regen-job-1', application_id: 'a1', job_type: 'section_regeneration', target_id: regenerateMatch[1], resource_id: 'doc-1', resource_revision: 1, result_id: null, status: 'queued', attempt_count: 0, max_attempts: 3, error_code: null, created_at: now, completed_at: null }, 202)
+    }
+    if (path === '/api/v1/jobs/regen-job-1' && method === 'GET') {
+      return respond(route, { id: 'regen-job-1', application_id: 'a1', job_type: 'section_regeneration', target_id: 'summary', resource_id: 'doc-1', resource_revision: 2, result_id: 'doc-1', status: 'completed', attempt_count: 1, max_attempts: 3, error_code: null, created_at: now, completed_at: now })
     }
 
     if (path === '/api/v1/admin/question-set-versions' && method === 'GET') {
@@ -199,9 +252,10 @@ export async function installApi(page: Page) {
   })
 }
 
-export const test = base.extend<{ api: void }>({
-  api: [async ({ page }, use) => {
-    await installApi(page)
+export const test = base.extend<{ api: void; signedIn: boolean }>({
+  signedIn: [true, { option: true }],
+  api: [async ({ page, signedIn }, use) => {
+    await installApi(page, signedIn)
     await use()
   }, { auto: true }],
 })

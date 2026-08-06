@@ -3,8 +3,10 @@ import {
   getAiUsageSummaryApiV1AdminOperationsAiUsageGet,
   getEmailDeliverySummaryApiV1AdminOperationsEmailDeliveryGet,
   getProductFunnelSummaryApiV1AdminOperationsProductFunnelGet,
+  getUserJourneyApiV1AdminOperationsUsersUserIdJourneyGet,
   getVersionApiV1AdminQuestionSetVersionsVersionIdGet,
   listVersionsApiV1AdminQuestionSetVersionsGet,
+  listUsersApiV1AdminOperationsUsersGet,
   publishVersionApiV1AdminQuestionSetVersionsVersionIdPublishPost,
   replaceQuestionsApiV1AdminQuestionSetVersionsVersionIdQuestionsPut,
 } from '@/api/generated'
@@ -26,6 +28,16 @@ export const adminService = {
       emailDelivery: unwrapApiResult(emailDelivery),
       productFunnel: unwrapApiResult(productFunnel),
     }
+  },
+
+  async listUsers() {
+    return unwrapApiResult(await listUsersApiV1AdminOperationsUsersGet({ query: { limit: 100 } }))
+  },
+
+  async getUserJourney(userId: string) {
+    return unwrapApiResult(
+      await getUserJourneyApiV1AdminOperationsUsersUserIdJourneyGet({ path: { user_id: userId } }),
+    )
   },
 
   async createVersion(body: QuestionSetCreate) {

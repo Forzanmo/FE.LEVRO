@@ -30,6 +30,7 @@ const APPLICATIONS: Application[] = [
     appliedAt: daysAgo(3),
     location: 'Remote',
     source: 'Referral',
+    applicationType: 'job',
   },
   {
     id: 'a2',
@@ -39,6 +40,7 @@ const APPLICATIONS: Application[] = [
     appliedAt: daysAgo(5),
     location: 'Remote (EU)',
     source: 'Careers page',
+    applicationType: 'job',
   },
   {
     id: 'a3',
@@ -48,6 +50,7 @@ const APPLICATIONS: Application[] = [
     appliedAt: daysAgo(6),
     location: 'Berlin, DE',
     source: 'LinkedIn',
+    applicationType: 'job',
   },
   {
     id: 'a4',
@@ -57,6 +60,7 @@ const APPLICATIONS: Application[] = [
     appliedAt: daysAgo(18),
     location: 'Remote',
     source: 'Referral',
+    applicationType: 'job',
   },
   {
     id: 'a5',
@@ -66,6 +70,7 @@ const APPLICATIONS: Application[] = [
     appliedAt: daysAgo(24),
     location: 'London, UK',
     source: 'Careers page',
+    applicationType: 'job',
   },
 ]
 

@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { QuestionResponse } from '@/api/generated'
+import type { AnswerUpdate, OpportunityRequirementResponse, QuestionResponse } from '@/api/generated'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -19,17 +20,32 @@ import { Icon } from '@/components/ui/icon'
 import { PageHeader } from '@/components/shared/page-header'
 import { DYNAMIC_ROUTES, ROUTES } from '@/lib/constants/routes'
 import { applicationWorkflowService } from '@/services/api/application-workflow-service'
+import { analyticsService } from '@/services/api/analytics-service'
+
+type AnswerValue = AnswerUpdate['value']
+
+const REQUIREMENT_LABELS: Record<string, string> = {
+  responsibility: 'Responsibilities',
+  required_qualification: 'Required qualifications',
+  preferred_qualification: 'Preferred qualifications',
+  selection_criterion: 'Selection criteria',
+  keyword: 'Keywords',
+}
 
 function QuestionAnswer({
   question,
   onSubmit,
   pending,
+  initialValue,
 }: {
   question: QuestionResponse
-  onSubmit: (value: string | number | boolean | string[]) => void
+  onSubmit: (value: AnswerValue) => void
   pending: boolean
+  initialValue?: unknown
 }) {
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState(() =>
+    Array.isArray(initialValue) ? initialValue.join(', ') : String(initialValue ?? ''),
+  )
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -45,7 +61,10 @@ function QuestionAnswer({
   return (
     <form className="space-y-4" onSubmit={submit}>
       <div>
-        <Label htmlFor={`answer-${question.id}`}>{question.label}</Label>
+        <div className="flex flex-wrap items-center gap-2">
+          <Label htmlFor={`answer-${question.id}`}>{question.label}</Label>
+          <Badge variant="outline">{question.is_required ? 'Required' : 'Optional'}</Badge>
+        </div>
         {question.help_text ? <p className="text-muted-foreground mt-1 text-sm">{question.help_text}</p> : null}
       </div>
       {options ? (
@@ -54,8 +73,20 @@ function QuestionAnswer({
             <Button
               key={option}
               type="button"
-              variant={value === option ? 'default' : 'outline'}
-              onClick={() => setValue(option)}
+              variant={value.split(',').map((item) => item.trim()).includes(option) ? 'default' : 'outline'}
+              onClick={() => {
+                if (question.question_type !== 'multiple_choice') {
+                  setValue(option)
+                  return
+                }
+                const selected = value.split(',').map((item) => item.trim()).filter(Boolean)
+                setValue(
+                  (selected.includes(option)
+                    ? selected.filter((item) => item !== option)
+                    : [...selected, option]
+                  ).join(', '),
+                )
+              }}
             >
               {option}
             </Button>
@@ -68,6 +99,7 @@ function QuestionAnswer({
           onChange={(event) => setValue(event.target.value)}
           placeholder={question.question_type === 'multiple_choice' ? 'Separate answers with commas' : undefined}
           required={question.is_required}
+          dir="auto"
         />
       ) : (
         <Input
@@ -76,12 +108,120 @@ function QuestionAnswer({
           value={value}
           onChange={(event) => setValue(event.target.value)}
           required={question.is_required}
+          dir="auto"
         />
       )}
-      <Button type="submit" isLoading={pending} disabled={!value && question.is_required}>
-        Save and continue
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button type="submit" isLoading={pending} disabled={!value && question.is_required}>
+          Save and continue
+        </Button>
+        {!question.is_required ? (
+          <Button type="button" variant="ghost" disabled={pending} onClick={() => onSubmit(null)}>
+            Skip for now
+          </Button>
+        ) : null}
+      </div>
     </form>
+  )
+}
+
+function ExtractionReview({
+  extraction,
+  pending,
+  onConfirm,
+}: {
+  extraction: NonNullable<Awaited<ReturnType<typeof applicationWorkflowService.getWorkspace>>['extraction']>
+  pending: boolean
+  onConfirm: (data: Record<string, unknown>) => void
+}) {
+  const entries = Object.entries(extraction.candidate_data)
+  const [draft, setDraft] = useState<Record<string, string>>(() =>
+    Object.fromEntries(
+      entries.map(([key, value]) => [
+        key,
+        typeof value === 'string' ? value : JSON.stringify(value, null, 2),
+      ]),
+    ),
+  )
+  const parsed: Record<string, unknown> = {}
+  const errors: Record<string, string> = {}
+
+  for (const [key, original] of entries) {
+    const value = draft[key] ?? ''
+    if (original !== null && typeof original === 'object') {
+      try {
+        parsed[key] = JSON.parse(value) as unknown
+      } catch {
+        errors[key] = 'Correct this field’s JSON formatting.'
+      }
+    } else if (typeof original === 'number') {
+      const number = Number(value)
+      if (Number.isFinite(number)) parsed[key] = number
+      else errors[key] = 'Enter a valid number.'
+    } else if (typeof original === 'boolean') {
+      if (value === 'true' || value === 'false') parsed[key] = value === 'true'
+      else errors[key] = 'Enter true or false.'
+    } else {
+      parsed[key] = value
+    }
+  }
+
+  const hasErrors = Object.keys(errors).length > 0
+
+  return (
+    <div className="space-y-3">
+      <p className="text-muted-foreground text-sm">
+        Review every field before confirming. Only confirmed details become reusable source evidence.
+      </p>
+      {entries.length ? (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {entries.map(([key, original]) => {
+            const label = key.replaceAll('_', ' ').replace(/^./, (letter) => letter.toUpperCase())
+            const structured = original !== null && typeof original === 'object'
+            return (
+              <div key={key} className={structured ? 'space-y-2 sm:col-span-2' : 'space-y-2'}>
+                <Label htmlFor={`extraction-${extraction.id}-${key}`}>{label}</Label>
+                {structured ? (
+                  <Textarea
+                    id={`extraction-${extraction.id}-${key}`}
+                    value={draft[key] ?? ''}
+                    onChange={(event) =>
+                      setDraft((current) => ({ ...current, [key]: event.target.value }))
+                    }
+                    rows={6}
+                    spellCheck={false}
+                    dir="auto"
+                    aria-invalid={Boolean(errors[key])}
+                  />
+                ) : (
+                  <Input
+                    id={`extraction-${extraction.id}-${key}`}
+                    value={draft[key] ?? ''}
+                    onChange={(event) =>
+                      setDraft((current) => ({ ...current, [key]: event.target.value }))
+                    }
+                    dir="auto"
+                    aria-invalid={Boolean(errors[key])}
+                  />
+                )}
+                {errors[key] ? <p className="text-destructive text-sm">{errors[key]}</p> : null}
+              </div>
+            )
+          })}
+        </div>
+      ) : (
+        <Alert>
+          <AlertDescription>No profile fields were found. Continue with the guided interview.</AlertDescription>
+        </Alert>
+      )}
+      <Button
+        onClick={() => onConfirm(parsed)}
+        isLoading={pending}
+        disabled={hasErrors || !entries.length}
+      >
+        Confirm corrected details
+      </Button>
+    </div>
   )
 }
 
@@ -118,7 +258,12 @@ export function ApplicationWorkspaceView({ applicationId }: { applicationId: str
   })
 
   const confirmMutation = useMutation({
-    mutationFn: () => applicationWorkflowService.confirmExtraction(applicationId, workspace.data!.extraction!),
+    mutationFn: (data: Record<string, unknown>) =>
+      applicationWorkflowService.confirmExtraction(
+        applicationId,
+        workspace.data!.extraction!,
+        data,
+      ),
     onSuccess: () => {
       void refresh()
       toast.success('CV details confirmed')
@@ -126,8 +271,18 @@ export function ApplicationWorkspaceView({ applicationId }: { applicationId: str
     onError: (error: Error) => toast.error('Could not confirm extraction', { description: error.message }),
   })
 
+  const retryExtractionMutation = useMutation({
+    mutationFn: () => applicationWorkflowService.retryExtraction(applicationId),
+    onSuccess: () => {
+      void refresh()
+      toast.success('CV extraction queued again')
+    },
+    onError: (error: Error) =>
+      toast.error('Could not retry CV extraction', { description: error.message }),
+  })
+
   const answerMutation = useMutation({
-    mutationFn: ({ question, value }: { question: QuestionResponse; value: string | number | boolean | string[] }) =>
+    mutationFn: ({ question, value }: { question: QuestionResponse; value: AnswerValue }) =>
       applicationWorkflowService.saveAnswer(applicationId, question.id, {
         value,
         expected_revision: question.answer_revision,
@@ -139,7 +294,16 @@ export function ApplicationWorkspaceView({ applicationId }: { applicationId: str
   const generationMutation = useMutation({
     mutationFn: () => applicationWorkflowService.startGeneration(applicationId),
     onSuccess: (job) => setJobId(job.id),
-    onError: (error: Error) => toast.error('Could not start generation', { description: error.message }),
+    onError: (error: Error) => {
+      // Older API proxies sometimes replace a structured 409 response with a
+      // generic 500 message. Keep the recovery action useful in that case;
+      // generation is only allowed after the guided interview is complete.
+      const description =
+        error.message === 'Internal Server Error'
+          ? 'Complete the opportunity and every required guided question, then try again.'
+          : error.message
+      toast.error('Could not start generation', { description })
+    },
   })
 
   const job = useQuery({
@@ -151,6 +315,12 @@ export function ApplicationWorkspaceView({ applicationId }: { applicationId: str
       return status === 'queued' || status === 'processing' ? 1500 : false
     },
   })
+
+  useEffect(() => {
+    if (job.data?.status === 'completed') {
+      void queryClient.invalidateQueries({ queryKey: ['application-workspace', applicationId] })
+    }
+  }, [applicationId, job.data?.status, queryClient])
 
   if (workspace.isLoading) return <Skeleton className="h-[36rem] w-full rounded-xl" />
   if (workspace.error || !workspace.data) {
@@ -167,6 +337,22 @@ export function ApplicationWorkspaceView({ applicationId }: { applicationId: str
   const conversation = data.conversation
   const opportunity = data.opportunity
   const jobComplete = job.data?.status === 'completed'
+  const abandonmentStep = !opportunity
+    ? 'opportunity'
+    : !conversation.is_complete
+      ? 'questions'
+      : data.documents.length === 0
+        ? 'generation'
+        : 'export'
+  const requirementsByType = (opportunity?.requirements ?? []).reduce<
+    Record<string, OpportunityRequirementResponse[]>
+  >((grouped, requirement) => {
+    grouped[requirement.requirement_type] = [
+      ...(grouped[requirement.requirement_type] ?? []),
+      requirement,
+    ]
+    return grouped
+  }, {})
 
   return (
     <div className="space-y-6">
@@ -174,9 +360,26 @@ export function ApplicationWorkspaceView({ applicationId }: { applicationId: str
         title={data.application.title}
         description={`${data.application.organization ?? 'Personal application'} · ${data.application.state.replaceAll('_', ' ')}`}
         actions={
-          <Button variant="outline" asChild>
-            <Link href={ROUTES.applications}>Back to applications</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="capitalize">
+              {data.application.application_type}
+            </Badge>
+            <Button variant="outline" asChild>
+              <Link
+                href={ROUTES.applications}
+                onClick={() => {
+                  if (data.application.state !== 'exported') {
+                    void analyticsService.applicationAbandoned(
+                      data.application.id,
+                      abandonmentStep,
+                    )
+                  }
+                }}
+              >
+                Back to applications
+              </Link>
+            </Button>
+          </div>
         }
       />
 
@@ -218,9 +421,18 @@ export function ApplicationWorkspaceView({ applicationId }: { applicationId: str
               <Button type="submit" isLoading={opportunityMutation.isPending}>Analyze opportunity</Button>
             </form>
             {opportunity?.requirements.length ? (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {opportunity.requirements.slice(0, 8).map((requirement) => (
-                  <Badge key={requirement.id} variant="secondary">{requirement.text}</Badge>
+              <div className="mt-5 space-y-4">
+                {Object.entries(requirementsByType).map(([type, requirements]) => (
+                  <div key={type}>
+                    <p className="mb-2 text-sm font-medium">
+                      {REQUIREMENT_LABELS[type] ?? type.replaceAll('_', ' ')}
+                    </p>
+                    <ul className="text-muted-foreground list-disc space-y-1 pl-5 text-sm">
+                      {requirements.map((requirement) => (
+                        <li key={requirement.id}>{requirement.text}</li>
+                      ))}
+                    </ul>
+                  </div>
                 ))}
               </div>
             ) : null}
@@ -230,7 +442,7 @@ export function ApplicationWorkspaceView({ applicationId }: { applicationId: str
         <Card>
           <CardHeader>
             <CardTitle>2. CV extraction</CardTitle>
-            <CardDescription>Upload a PDF, review the extracted candidate profile, then confirm it.</CardDescription>
+            <CardDescription>Upload one PDF and confirm its details, or continue from scratch.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="rounded-lg border border-dashed p-4">
@@ -245,14 +457,41 @@ export function ApplicationWorkspaceView({ applicationId }: { applicationId: str
                   <span className="font-medium">{extraction.upload.original_filename}</span>
                   <Badge variant="outline">{extraction.status}</Badge>
                 </div>
-                {Object.keys(extraction.candidate_data).length ? (
-                  <pre className="bg-muted max-h-48 overflow-auto rounded-md p-3 text-xs">{JSON.stringify(extraction.candidate_data, null, 2)}</pre>
-                ) : null}
                 {extraction.status === 'completed' ? (
-                  <Button onClick={() => confirmMutation.mutate()} isLoading={confirmMutation.isPending}>Confirm extracted details</Button>
+                  <ExtractionReview
+                    key={`${extraction.id}-${extraction.revision}`}
+                    extraction={extraction}
+                    pending={confirmMutation.isPending}
+                    onConfirm={(data) => confirmMutation.mutate(data)}
+                  />
+                ) : null}
+                {extraction.status === 'failed' ? (
+                  <div className="space-y-3">
+                    <Alert variant="destructive">
+                      <AlertTitle>CV extraction failed</AlertTitle>
+                      <AlertDescription>
+                        {extraction.error_code ?? 'Your PDF is still safe. Retry or continue from scratch.'}
+                      </AlertDescription>
+                    </Alert>
+                    <Button
+                      variant="outline"
+                      onClick={() => retryExtractionMutation.mutate()}
+                      isLoading={retryExtractionMutation.isPending}
+                      leftIcon={<Icon name="refresh" size="sm" />}
+                    >
+                      Retry extraction
+                    </Button>
+                  </div>
                 ) : null}
               </div>
-            ) : null}
+            ) : (
+              <Alert>
+                <AlertTitle>Starting from scratch?</AlertTitle>
+                <AlertDescription>
+                  CV upload is optional. Save the opportunity and answer the guided questions below.
+                </AlertDescription>
+              </Alert>
+            )}
           </CardContent>
         </Card>
 
@@ -263,6 +502,27 @@ export function ApplicationWorkspaceView({ applicationId }: { applicationId: str
           </CardHeader>
           <CardContent className="space-y-5">
             <Progress value={conversation.progress_percent} />
+            {conversation.answered_questions.length ? (
+              <Accordion type="single" collapsible>
+                {conversation.answered_questions.map((question, index) => (
+                  <AccordionItem key={question.id} value={question.id}>
+                    <AccordionTrigger>
+                      <span className="text-left">
+                        {index + 1}. {question.label}
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <QuestionAnswer
+                        question={question}
+                        initialValue={question.answer}
+                        pending={answerMutation.isPending}
+                        onSubmit={(value) => answerMutation.mutate({ question, value })}
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            ) : null}
             {conversation.is_complete ? (
               <Alert>
                 <Icon name="check" size="sm" />
@@ -292,22 +552,31 @@ export function ApplicationWorkspaceView({ applicationId }: { applicationId: str
               variant="gradient"
               onClick={() => generationMutation.mutate()}
               isLoading={generationMutation.isPending || job.data?.status === 'queued' || job.data?.status === 'processing'}
+              disabled={!opportunity || !conversation.is_complete}
             >
               Generate documents
             </Button>
+            {!opportunity || !conversation.is_complete ? (
+              <p className="text-muted-foreground text-sm">
+                Save the opportunity and complete all required guided questions before generation.
+              </p>
+            ) : null}
             {job.data ? (
               <Alert variant={job.data.status === 'failed' ? 'destructive' : 'default'}>
                 <AlertTitle>Generation {job.data.status}</AlertTitle>
-                <AlertDescription>{job.data.error_code ?? (jobComplete ? 'Your documents are ready.' : 'Gemini is preparing your documents.')}</AlertDescription>
+                <AlertDescription>
+                  {job.data.error_code === 'application_not_ready'
+                    ? 'Complete every required guided question before generating documents.'
+                    : job.data.error_code === 'generation_failed'
+                      ? 'Gemini could not complete this attempt. Retry generation after checking the provider status.'
+                      : job.data.error_code ?? (jobComplete ? 'Your documents are ready.' : 'Gemini is preparing your documents.')}
+                </AlertDescription>
               </Alert>
-            ) : null}
-            {jobComplete ? (
-              <Button variant="outline" onClick={() => void refresh()}>Load documents</Button>
             ) : null}
             <div className="grid gap-3 sm:grid-cols-2">
               {data.documents.map((document) => (
                 <Button key={document.id} variant="outline" asChild className="h-auto justify-start p-4">
-                  <Link href={DYNAMIC_ROUTES.document(document.id)}>
+                  <Link href={DYNAMIC_ROUTES.generatedDocument(document.id)}>
                     <Icon name={document.document_type === 'cv' ? 'resume' : 'cover-letter'} size="sm" />
                     <span className="capitalize">{document.document_type.replace('_', ' ')}</span>
                   </Link>

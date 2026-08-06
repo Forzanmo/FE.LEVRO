@@ -31,7 +31,7 @@
 # 3. MVP Scope
 
 ## Included
-- Authentication (Google)
+- Authentication (email and password)
 - AI onboarding conversation
 - Career Readiness Score
 - Interactive Quest Roadmap
@@ -287,4 +287,3 @@ Dashboard preview
 Users should say:
 
 > "This is the first AI career product that actually made me confident to go through a real interview."
-

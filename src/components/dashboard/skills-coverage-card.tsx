@@ -161,8 +161,8 @@ export function SkillsCoverageCard({ skills }: { skills: SkillsSummary }) {
                    */}
                   {GAP_STRENGTHS.includes(skill.strength) ? (
                     <Button asChild variant="outline" size="sm" className="mt-3">
-                      <Link href={ROUTES.resume}>
-                        Add evidence to your CV
+                      <Link href={ROUTES.applications}>
+                        Add evidence in an application
                         <Icon name="arrow-right" size="xs" />
                       </Link>
                     </Button>

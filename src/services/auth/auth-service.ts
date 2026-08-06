@@ -34,6 +34,11 @@ export interface Credentials {
   password: string
 }
 
+export interface RegistrationCredentials extends Credentials {
+  first_name: string
+  last_name: string
+}
+
 export const signedOutSession: StoredSession = {
   authenticated: false,
   user: null,
@@ -102,7 +107,7 @@ export const authService = {
     return fetchSession()
   },
 
-  async register(credentials: Credentials): Promise<StoredSession> {
+  async register(credentials: RegistrationCredentials): Promise<StoredSession> {
     unwrapApiResult(await registerApiV1AuthRegisterPost({ body: credentials }))
     return this.signIn(credentials)
   },

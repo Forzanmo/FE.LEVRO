@@ -37,8 +37,16 @@ export function AdminOverviewView() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const [days, setDays] = useState('30')
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const overviewKey = ['admin-overview', Number(days)] as const
   const overview = useQuery({ queryKey: overviewKey, queryFn: () => adminService.getOverview(Number(days)) })
+  const users = useQuery({ queryKey: ['admin-users'], queryFn: () => adminService.listUsers() })
+  const activeUserId = selectedUserId ?? users.data?.users[0]?.id ?? null
+  const journey = useQuery({
+    queryKey: ['admin-user-journey', activeUserId],
+    queryFn: () => adminService.getUserJourney(activeUserId as string),
+    enabled: activeUserId !== null,
+  })
 
   const createMutation = useMutation({
     mutationFn: ({ name, cloneFrom }: { name: string; cloneFrom?: string }) =>
@@ -186,6 +194,72 @@ export function AdminOverviewView() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>User journey preview</CardTitle>
+          <CardDescription>
+            Select a user to inspect safe progress milestones without exposing CV text, answers, or
+            private files.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          {users.isLoading ? <Skeleton className="h-20 w-full" /> : null}
+          {users.error ? (
+            <Alert variant="destructive">
+              <AlertDescription>{users.error.message}</AlertDescription>
+            </Alert>
+          ) : null}
+          {users.data?.users.length ? (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {users.data.users.map((user) => (
+                <button
+                  key={user.id}
+                  type="button"
+                  onClick={() => setSelectedUserId(user.id)}
+                  className={`rounded-lg border p-3 text-left transition hover:border-brand ${activeUserId === user.id ? 'border-brand bg-brand/5' : ''}`}
+                >
+                  <div className="font-medium">{user.full_name ?? user.email}</div>
+                  <div className="text-muted-foreground text-xs">{user.email}</div>
+                  <div className="text-muted-foreground mt-2 text-xs">
+                    {user.application_count} applications · {user.document_count} documents
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : null}
+          {journey.isLoading ? <Skeleton className="h-32 w-full" /> : null}
+          {journey.data ? (
+            <div className="space-y-4 rounded-lg border p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <div className="font-semibold">{journey.data.user.full_name ?? journey.data.user.email}</div>
+                  <div className="text-muted-foreground text-xs">{journey.data.user.email}</div>
+                </div>
+                <Badge>{journey.data.profile_fields} profile fields</Badge>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {journey.data.events.map((event) => <Badge key={event} variant="outline">{event.replaceAll('_', ' ')}</Badge>)}
+              </div>
+              {journey.data.applications.length ? (
+                <div className="space-y-2">
+                  {journey.data.applications.map((application) => (
+                    <div key={application.id} className="rounded-md bg-muted/50 p-3 text-sm">
+                      <div className="flex flex-wrap justify-between gap-2 font-medium">
+                        <span>{application.title}</span>
+                        <Badge variant="outline">{application.state}</Badge>
+                      </div>
+                      <div className="text-muted-foreground mt-1 text-xs">
+                        {application.has_opportunity ? 'Opportunity saved' : 'Opportunity missing'} · {application.answered_questions}/{application.question_count} questions · {application.document_types.length} documents · {application.export_count} exports
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : <div className="text-muted-foreground text-sm">No applications yet.</div>}
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
     </div>
   )
 }

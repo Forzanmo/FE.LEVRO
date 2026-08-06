@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Icon, type IconName } from '@/components/ui/icon'
 import { Heading, Text } from '@/components/ui/typography'
-import { COACH_QUESTION_COUNT } from '@/services/api/coach-service'
 import { ROUTES } from '@/lib/constants/routes'
 
 /**
@@ -48,27 +47,21 @@ export function FirstRunPanel() {
           </span>
 
           <Heading level={2} size="2xl" className="mt-4">
-            Start with a short conversation
+            Start with an opportunity
           </Heading>
 
-          {/* The count is derived, never written down — see COACH_QUESTION_COUNT. */}
           <Text tone="muted" measure="lead" className="mt-2 text-pretty">
-            {COACH_QUESTION_COUNT} questions, one at a time — about the role you want and what
-            you’ve actually done. The coach explains why it’s asking each one, and you can skip
-            anything or stop and come back.
+            Create a job, internship, or scholarship application. Add the opportunity, then answer
+            only the questions needed to build an evidence-grounded CV and cover letter.
           </Text>
 
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">
             <Button asChild size="lg">
-              <Link href={ROUTES.coach}>
-                Start my assessment
+              <Link href={ROUTES.applications}>
+                Start an application
                 <Icon name="arrow-right" size="sm" />
               </Link>
             </Button>
-            <span className="text-muted-foreground inline-flex items-center gap-1.5 text-sm">
-              <Icon name="clock" size="xs" />
-              About 5 minutes
-            </span>
           </div>
         </div>
 

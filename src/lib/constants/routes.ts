@@ -1,16 +1,15 @@
 /**
  * Centralised route table. Never hardcode a path string at a call site.
  *
- * Two entries are deliberate stubs for planned features (see PRODUCT.md,
- * "Planned"): `signUp` has no page yet, and the roadmap will reappear here when
- * it is built. Kept rather than deleted so the eventual route lands in one
- * place — but nothing may link to a stub, because a nav item pointing at a 404
- * is worse than a missing feature.
+ * The sign-up form is intentionally part of the email/password sign-in screen;
+ * there is no separate sign-up route or social-auth route at this time.
  */
 export const ROUTES = {
   home: '/',
   signIn: '/sign-in',
-  /** STUB — no page. Google sign-in currently covers registration too. */
+  forgotPassword: '/forgot-password',
+  resetPassword: '/reset-password',
+  /** Reserved for a future dedicated sign-up page. */
   signUp: '/sign-up',
   onboarding: '/onboarding',
   dashboard: '/dashboard',
@@ -33,5 +32,6 @@ export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES]
 export const DYNAMIC_ROUTES = {
   application: (id: string) => `${ROUTES.applications}/${id}`,
   document: (id: string) => `${ROUTES.documents}/${id}`,
+  generatedDocument: (id: string) => `/generated-documents/${id}`,
   adminQuestionSet: (id: string) => `${ROUTES.admin}/question-sets/${id}`,
 } as const

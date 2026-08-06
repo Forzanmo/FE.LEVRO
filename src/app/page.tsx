@@ -43,7 +43,7 @@ const NAV_LINKS: readonly MarketingNavLink[] = [
  * asserts this number against `COACH_QUESTION_COUNT` and fails the moment a
  * question is added or removed.
  */
-const QUESTION_COUNT = 7
+const QUESTION_COUNT = 13
 
 const HOW_IT_WORKS: { title: string; body: string }[] = [
   {

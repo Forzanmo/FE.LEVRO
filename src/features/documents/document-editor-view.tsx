@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { PageHeader } from '@/components/shared/page-header'
 import { DYNAMIC_ROUTES } from '@/lib/constants/routes'
 import { documentsService } from '@/services/api/documents-service'
+import { analyticsService } from '@/services/api/analytics-service'
 
 const ACCENTS = ['#315c5b', '#1f4b99', '#7a3e9d', '#8a3b3b', '#263238'] as const
 type Accent = (typeof ACCENTS)[number]
@@ -39,16 +40,30 @@ function statementsFromText(text: string, previous: DocumentStatement[]): Docume
 function SectionEditor({
   section,
   onSave,
+  onRegenerate,
   pending,
+  regenerating,
 }: {
   section: DocumentSection
   onSave: (statements: DocumentStatement[]) => void
+  onRegenerate: () => void
   pending: boolean
+  regenerating: boolean
 }) {
+  const [value, setValue] = useState(() =>
+    section.statements.map((statement) => statement.text).join('\n'),
+  )
+  const [savedValue, setSavedValue] = useState(value)
+
+  const save = () => {
+    if (value === savedValue || pending) return
+    onSave(statementsFromText(value, section.statements))
+    setSavedValue(value)
+  }
+
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const form = new FormData(event.currentTarget)
-    onSave(statementsFromText(String(form.get('statements') ?? ''), section.statements))
+    save()
   }
 
   return (
@@ -64,12 +79,29 @@ function SectionEditor({
           <Textarea
             name="statements"
             rows={Math.max(4, section.statements.length + 2)}
-            defaultValue={section.statements.map((statement) => statement.text).join('\n')}
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            onBlur={save}
             aria-label={`${section.title} statements`}
           />
           <div className="flex items-center justify-between gap-3">
-            <p className="text-muted-foreground text-xs">One statement per line. Evidence links are preserved for unchanged lines.</p>
-            <Button type="submit" size="sm" isLoading={pending}>Save section</Button>
+            <p className="text-muted-foreground text-xs">
+              One statement per line. Changes autosave when you leave this field.
+            </p>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={onRegenerate}
+                isLoading={regenerating}
+              >
+                Regenerate section
+              </Button>
+              <Button type="submit" size="sm" isLoading={pending} disabled={value === savedValue}>
+                Save now
+              </Button>
+            </div>
           </div>
         </form>
       </CardContent>
@@ -80,9 +112,13 @@ function SectionEditor({
 export function DocumentEditorView({ documentId }: { documentId: string }) {
   const queryClient = useQueryClient()
   const documentKey = ['document', documentId] as const
-  const [template, setTemplate] = useState<'classic' | 'modern'>('classic')
-  const [accent, setAccent] = useState<Accent>('#315c5b')
+  const [template, setTemplate] = useState<'classic' | 'modern' | null>(null)
+  const [accent, setAccent] = useState<Accent | null>(null)
   const [exportJobId, setExportJobId] = useState<string | null>(null)
+  const [regenerationJobId, setRegenerationJobId] = useState<string | null>(null)
+  const [regeneratingSectionId, setRegeneratingSectionId] = useState<string | null>(null)
+  const editorEventRecorded = useRef(false)
+  const regenerationHandled = useRef<string | null>(null)
 
   const document = useQuery({
     queryKey: documentKey,
@@ -90,24 +126,45 @@ export function DocumentEditorView({ documentId }: { documentId: string }) {
   })
   const setDocument = (data: NonNullable<typeof document.data>) => queryClient.setQueryData(documentKey, data)
 
+  useEffect(() => {
+    if (!document.data || editorEventRecorded.current) return
+    editorEventRecorded.current = true
+    void analyticsService.editorOpened(document.data.application_id, document.data.id)
+  }, [document.data])
+
+  const preview = useQuery({
+    queryKey: ['document-preview', documentId, document.data?.current_revision],
+    queryFn: () => documentsService.preview(documentId),
+    enabled: Boolean(document.data),
+  })
+
   const sectionMutation = useMutation({
     mutationFn: ({ sectionId, statements }: { sectionId: string; statements: DocumentStatement[] }) =>
       documentsService.updateSection(documentId, sectionId, document.data!.current_revision, statements),
     onSuccess: (data) => {
       setDocument(data)
+      void queryClient.invalidateQueries({ queryKey: ['document-preview', documentId] })
       toast.success('Section saved')
     },
     onError: (error: Error) => toast.error('Could not save section', { description: error.message }),
   })
 
   const presentationMutation = useMutation({
-    mutationFn: () => documentsService.updatePresentation(documentId, {
-      expected_revision: document.data!.current_revision,
-      template_id: template,
-      accent_color: accent,
-    }),
+    mutationFn: () =>
+      documentsService.updatePresentation(documentId, {
+        expected_revision: document.data!.current_revision,
+        template_id:
+          template ??
+          (document.data!.content.presentation?.template_id === 'modern' ? 'modern' : 'classic'),
+        accent_color:
+          accent ??
+          (ACCENTS.includes(document.data!.content.presentation?.accent_color as Accent)
+            ? (document.data!.content.presentation!.accent_color as Accent)
+            : '#315c5b'),
+      }),
     onSuccess: (data) => {
       setDocument(data)
+      void queryClient.invalidateQueries({ queryKey: ['document-preview', documentId] })
       toast.success('Presentation updated')
     },
     onError: (error: Error) => toast.error('Could not update presentation', { description: error.message }),
@@ -118,6 +175,45 @@ export function DocumentEditorView({ documentId }: { documentId: string }) {
     onSuccess: (job) => setExportJobId(job.id),
     onError: (error: Error) => toast.error('Could not start export', { description: error.message }),
   })
+
+  const regenerationMutation = useMutation({
+    mutationFn: (sectionId: string) =>
+      documentsService.regenerateSection(
+        documentId,
+        sectionId,
+        document.data!.current_revision,
+      ),
+    onSuccess: (job) => setRegenerationJobId(job.id),
+    onError: (error: Error) => {
+      setRegeneratingSectionId(null)
+      toast.error('Could not regenerate section', { description: error.message })
+    },
+  })
+
+  const regenerationJob = useQuery({
+    queryKey: ['regeneration-job', regenerationJobId],
+    queryFn: () => documentsService.getJob(regenerationJobId!),
+    enabled: Boolean(regenerationJobId),
+    refetchInterval: (query) => {
+      const status = query.state.data?.status
+      return status === 'queued' || status === 'processing' ? 1500 : false
+    },
+  })
+
+  useEffect(() => {
+    if (!regenerationJobId || regenerationHandled.current === regenerationJobId) return
+    if (regenerationJob.data?.status === 'completed') {
+      regenerationHandled.current = regenerationJobId
+      void document.refetch()
+      void queryClient.invalidateQueries({ queryKey: ['document-preview', documentId] })
+      toast.success('Section regenerated')
+    } else if (regenerationJob.data?.status === 'failed') {
+      regenerationHandled.current = regenerationJobId
+      toast.error('Section regeneration failed', {
+        description: regenerationJob.data.error_code ?? 'Please try again.',
+      })
+    }
+  }, [document, documentId, queryClient, regenerationJob.data, regenerationJobId])
 
   const exportJob = useQuery({
     queryKey: ['export-job', exportJobId],
@@ -154,6 +250,13 @@ export function DocumentEditorView({ documentId }: { documentId: string }) {
 
   const data = document.data
   const exportReady = exportJob.data?.status === 'completed' && exportJob.data.result_id
+  const selectedTemplate =
+    template ?? (data.content.presentation?.template_id === 'modern' ? 'modern' : 'classic')
+  const selectedAccent =
+    accent ??
+    (ACCENTS.includes(data.content.presentation?.accent_color as Accent)
+      ? (data.content.presentation!.accent_color as Accent)
+      : '#315c5b')
 
   return (
     <div className="space-y-6">
@@ -175,7 +278,7 @@ export function DocumentEditorView({ documentId }: { documentId: string }) {
         <CardContent className="flex flex-col gap-4 lg:flex-row lg:items-end">
           <div className="space-y-2 lg:w-52">
             <Label>Template</Label>
-            <Select value={template} onValueChange={(value) => setTemplate(value as 'classic' | 'modern')}>
+            <Select value={selectedTemplate} onValueChange={(value) => setTemplate(value as 'classic' | 'modern')}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="classic">Classic</SelectItem>
@@ -191,7 +294,7 @@ export function DocumentEditorView({ documentId }: { documentId: string }) {
                   key={color}
                   type="button"
                   aria-label={`Use ${color} accent`}
-                  aria-pressed={accent === color}
+                  aria-pressed={selectedAccent === color}
                   onClick={() => setAccent(color)}
                   className="size-9 rounded-full border-2 border-background ring-1 ring-foreground/20 aria-pressed:ring-2 aria-pressed:ring-primary"
                   style={{ backgroundColor: color }}
@@ -216,13 +319,45 @@ export function DocumentEditorView({ documentId }: { documentId: string }) {
         </Alert>
       ) : null}
 
+      <Card>
+        <CardHeader>
+          <CardTitle>Live preview</CardTitle>
+          <CardDescription>This is the same layout used for the exported PDF.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {preview.isLoading ? (
+            <Skeleton className="h-[40rem] w-full rounded-lg" />
+          ) : preview.data ? (
+            <iframe
+              title="Document preview"
+              srcDoc={preview.data}
+              sandbox=""
+              className="h-[40rem] w-full rounded-lg border bg-white"
+            />
+          ) : (
+            <Alert variant="destructive">
+              <AlertDescription>The preview could not be loaded.</AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+
       <div className="grid gap-5 xl:grid-cols-2">
         {data.content.sections.map((section) => (
           <SectionEditor
-            key={`${section.id}-${data.current_revision}`}
+            key={`${section.id}-${section.statements.map((statement) => statement.text).join('\n')}`}
             section={section}
             pending={sectionMutation.isPending && sectionMutation.variables?.sectionId === section.id}
+            regenerating={
+              regeneratingSectionId === section.id &&
+              regenerationJob.data?.status !== 'completed' &&
+              regenerationJob.data?.status !== 'failed'
+            }
             onSave={(statements) => sectionMutation.mutate({ sectionId: section.id, statements })}
+            onRegenerate={() => {
+              setRegeneratingSectionId(section.id)
+              regenerationMutation.mutate(section.id)
+            }}
           />
         ))}
       </div>

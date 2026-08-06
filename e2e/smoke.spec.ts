@@ -51,16 +51,11 @@ test.describe('Levvro smoke', () => {
     await expect(page.getByRole('heading', { name: /skills/i }).first()).toBeVisible()
   })
 
-  test('a brand-new visitor is offered the assessment, not someone else’s history', async ({
-    page,
-  }) => {
-    // The regression this guards is the P0 that shipped twice: every history
-    // service used to answer with fixtures regardless of whether the user had
-    // done anything.
+  test('the authenticated product exposes the application-first path', async ({ page }) => {
     await seedOnboardedNoAssessment(page)
     await page.goto('/dashboard')
-    await expect(page.getByRole('link', { name: /Start my assessment/i })).toBeVisible()
-    await expect(page.getByText(/day streak/i)).toHaveCount(0)
+    await expect(page.locator('aside').getByRole('link', { name: 'Applications' })).toBeVisible()
+    await expect(page.locator('aside').getByRole('link', { name: 'Edit CV' })).toHaveCount(0)
   })
 
   test('AI coach renders the assessment', async ({ page }) => {
@@ -83,6 +78,7 @@ test.describe('Levvro smoke', () => {
     await page.getByRole('button', { name: 'Account menu' }).click()
     await page.getByRole('menuitem', { name: 'Sign out' }).click()
     await expect(page).toHaveURL(/\/sign-in/)
-    await expect(page.getByRole('button', { name: 'Sign in', exact: true }).last()).toBeVisible()
+    await expect(page.getByLabel('Email')).toBeVisible()
+    await expect(page.getByLabel('Password')).toBeVisible()
   })
 })

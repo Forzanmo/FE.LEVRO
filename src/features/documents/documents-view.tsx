@@ -9,9 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Text } from '@/components/ui/typography'
-import { useHasAssessment } from '@/hooks/use-has-assessment'
 import { formatRelativeTime } from '@/lib/formatters'
-import { ROUTES } from '@/lib/constants/routes'
+import { DYNAMIC_ROUTES, ROUTES } from '@/lib/constants/routes'
 
 import { KIND_META } from './status'
 import type { DocumentSummary } from './types'
@@ -30,7 +29,7 @@ function DocumentRow({ doc }: { doc: DocumentSummary }) {
   return (
     <li>
       <Link
-        href={`${ROUTES.documents}/${doc.id}`}
+        href={doc.generated ? DYNAMIC_ROUTES.generatedDocument(doc.id) : DYNAMIC_ROUTES.document(doc.id)}
         className="hover:bg-muted/60 focus-visible:ring-ring group flex items-center gap-4 rounded-xl px-3 py-3.5 outline-none transition-colors focus-visible:ring-2 sm:px-4"
       >
         <span className="bg-muted text-muted-foreground grid size-10 shrink-0 place-items-center rounded-lg">
@@ -61,7 +60,6 @@ function DocumentRow({ doc }: { doc: DocumentSummary }) {
 
 export function DocumentsView() {
   const { data, isPending, isError, refetch } = useDocuments()
-  const hasAssessment = useHasAssessment()
 
   const cvs = data?.filter((d) => d.kind === 'cv') ?? []
   const letters = data?.filter((d) => d.kind === 'cover-letter') ?? []
@@ -70,11 +68,7 @@ export function DocumentsView() {
     <div className="space-y-6">
       <PageHeader
         title="Documents"
-        description={
-          hasAssessment === false
-            ? 'Your CVs and cover letters will collect here, each kept with the role it was written for.'
-            : 'Every CV and cover letter you’ve made, and the roles they were written for.'
-        }
+        description="Every CV and cover letter you’ve made, and the opportunities they were written for."
         /*
          * No "New CV" before the assessment. It points at an editor that has
          * nothing to seed from, and it competed as a second primary button
@@ -91,22 +85,12 @@ export function DocumentsView() {
          * what the landing page promises.
          */
         actions={
-          hasAssessment === false ? null : (
-            <div className="flex flex-wrap items-center gap-2">
-              <Button asChild>
-                <Link href={ROUTES.resume}>
-                  <Icon name="add" size="sm" />
-                  New CV
-                </Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href={ROUTES.coverLetter}>
-                  <Icon name="add" size="sm" />
-                  New cover letter
-                </Link>
-              </Button>
-            </div>
-          )
+          <Button asChild>
+            <Link href={ROUTES.applications}>
+              <Icon name="add" size="sm" />
+              New application
+            </Link>
+          </Button>
         }
       />
 
@@ -128,38 +112,16 @@ export function DocumentsView() {
           <Skeleton className="h-16 rounded-xl" />
         </div>
       ) : !data.length ? (
-        /*
-         * Two different empty states wearing one shape. Before the assessment
-         * there is nothing to build a document from, so pointing at the editor
-         * would send the user to a blank page; after it, the editor is exactly
-         * where they should go.
-         */
-        hasAssessment === false ? (
-          <EmptyState
-            icon="coach"
-            title="Your documents start with a conversation"
-            description="Levvro drafts your CV and cover letters from what you tell the coach, so each one argues from real evidence rather than a template."
-            action={
-              <Button asChild size="lg">
-                <Link href={ROUTES.coach}>
-                  Start my assessment
-                  <Icon name="arrow-right" size="sm" />
-                </Link>
-              </Button>
-            }
-          />
-        ) : (
-          <EmptyState
-            icon="resume"
-            title="No documents yet"
-            description="Your CVs and cover letters will collect here as you tailor them for each role, so you can reuse the one that fits."
-            action={
-              <Button asChild>
-                <Link href={ROUTES.resume}>Build your first CV</Link>
-              </Button>
-            }
-          />
-        )
+        <EmptyState
+          icon="resume"
+          title="No documents yet"
+          description="Start an application, add the opportunity and your evidence, then Levvro will save the tailored CV and cover letter here."
+          action={
+            <Button asChild>
+              <Link href={ROUTES.applications}>Start your first application</Link>
+            </Button>
+          }
+        />
       ) : (
         <div className="space-y-8">
           <section>
@@ -204,8 +166,8 @@ export function DocumentsView() {
                   your CV, tailored to one role.
                 </Text>
                 <Button asChild variant="outline" size="sm" className="mt-3">
-                  <Link href={ROUTES.coverLetter}>
-                    Write a cover letter
+                  <Link href={ROUTES.applications}>
+                    Start an application
                     <Icon name="arrow-right" size="xs" />
                   </Link>
                 </Button>

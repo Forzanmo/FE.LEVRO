@@ -7,6 +7,7 @@ import {
   signedOutSession,
   type AuthPlan,
   type Credentials,
+  type RegistrationCredentials,
   type SessionUser,
   type StoredSession,
 } from '@/services/auth/auth-service'
@@ -21,7 +22,7 @@ interface SessionContextValue {
   plan?: AuthPlan
   profileData: Record<string, unknown>
   signIn: (credentials: Credentials) => Promise<void>
-  register: (credentials: Credentials) => Promise<void>
+  register: (credentials: RegistrationCredentials) => Promise<void>
   signOut: () => Promise<void>
   completeOnboarding: (plan: AuthPlan) => Promise<void>
   updateProfile: (patch: Record<string, unknown>) => Promise<void>
@@ -48,7 +49,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     setSession(await authService.signIn(credentials))
   }, [])
 
-  const register = useCallback(async (credentials: Credentials) => {
+  const register = useCallback(async (credentials: RegistrationCredentials) => {
     setSession(await authService.register(credentials))
   }, [])
 

@@ -66,7 +66,7 @@ export function OnboardingView() {
 
   const handleContinue = async () => {
     await completeOnboarding(plan)
-    router.push(ROUTES.coach)
+    router.push(ROUTES.applications)
   }
 
   return (
@@ -139,7 +139,7 @@ export function OnboardingView() {
           onClick={handleContinue}
           rightIcon={<Icon name="arrow-right" size="sm" />}
         >
-          Continue to your coach
+          Start your first application
         </Button>
       </Reveal>
     </div>

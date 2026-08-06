@@ -58,6 +58,8 @@ export interface DocumentSummary {
   updatedAt: string
   /** CVs only: the template this version was last rendered with. */
   template?: CvTemplateId
+  /** Generated, application-specific documents open in the production editor. */
+  generated?: boolean
 }
 
 /** A summary plus the content needed to render the document. */

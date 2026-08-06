@@ -4,17 +4,9 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-import { GoogleButton } from '@/components/auth/google-button'
 import { Reveal } from '@/components/shared/reveal'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { Icon, type IconName } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -40,11 +32,12 @@ const VALUE_PROPS: { icon: IconName; text: string }[] = [
 ]
 
 export function SignInView() {
-  const { status, hasOnboarded, signIn, register } = useSession()
+  const { status, user, hasOnboarded, signIn, register } = useSession()
   const router = useRouter()
   const handled = useRef(false)
-  const [open, setOpen] = useState(false)
   const [registering, setRegistering] = useState(false)
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -54,18 +47,25 @@ export function SignInView() {
     if (status === 'loading' || handled.current) return
     if (status === 'authenticated') {
       handled.current = true
-      router.replace(hasOnboarded ? ROUTES.dashboard : ROUTES.onboarding)
+      router.replace(user?.isAdmin ? ROUTES.admin : hasOnboarded ? ROUTES.dashboard : ROUTES.onboarding)
     }
-  }, [status, hasOnboarded, router])
+  }, [status, user?.isAdmin, hasOnboarded, router])
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setSubmitting(true)
     setError(null)
     try {
-      const credentials = { email: email.trim(), password }
-      if (registering) await register(credentials)
-      else await signIn(credentials)
+      if (registering) {
+        await register({
+          email: email.trim(),
+          password,
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+        })
+      } else {
+        await signIn({ email: email.trim(), password })
+      }
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'We could not complete that request.')
     } finally {
@@ -81,10 +81,6 @@ export function SignInView() {
             Welcome to {siteConfig.name}
           </Heading>
           <Text tone="muted">Sign in to build your career readiness — free to start.</Text>
-        </div>
-
-        <div className="mt-6">
-          <GoogleButton onClick={() => setOpen(true)} />
         </div>
 
         {/*
@@ -108,6 +104,87 @@ export function SignInView() {
           .
         </p>
 
+        <form className="mt-6 space-y-4" onSubmit={submit}>
+          {registering ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="auth-first-name">First name</Label>
+                <Input
+                  id="auth-first-name"
+                  type="text"
+                  autoComplete="given-name"
+                  value={firstName}
+                  onChange={(event) => setFirstName(event.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="auth-last-name">Last name</Label>
+                <Input
+                  id="auth-last-name"
+                  type="text"
+                  autoComplete="family-name"
+                  value={lastName}
+                  onChange={(event) => setLastName(event.target.value)}
+                  required
+                />
+              </div>
+            </div>
+          ) : null}
+          <div className="space-y-2">
+            <Label htmlFor="auth-email">Email</Label>
+            <Input
+              id="auth-email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-3">
+              <Label htmlFor="auth-password">Password</Label>
+              {!registering ? (
+                <Link
+                  href={ROUTES.forgotPassword}
+                  className="text-brand text-xs font-medium hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              ) : null}
+            </div>
+            <Input
+              id="auth-password"
+              type="password"
+              autoComplete={registering ? 'new-password' : 'current-password'}
+              minLength={registering ? 10 : 1}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+          </div>
+          {error ? (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          ) : null}
+          <Button type="submit" fullWidth isLoading={submitting}>
+            {registering ? 'Create account' : 'Sign in'}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            fullWidth
+            onClick={() => {
+              setRegistering((value) => !value)
+              setError(null)
+            }}
+          >
+            {registering ? 'Already have an account? Sign in' : 'New to Levvro? Create account'}
+          </Button>
+        </form>
+
         <ul className="mt-6 space-y-2.5 border-t pt-6">
           {VALUE_PROPS.map((vp) => (
             <li key={vp.text} className="flex items-center gap-2.5 text-sm">
@@ -117,61 +194,6 @@ export function SignInView() {
           ))}
         </ul>
       </div>
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{registering ? 'Create your account' : 'Sign in to Levvro'}</DialogTitle>
-            <DialogDescription>
-              Use your email and password for this demo. Google authentication can be enabled later.
-            </DialogDescription>
-          </DialogHeader>
-          <form className="space-y-4" onSubmit={submit}>
-            <div className="space-y-2">
-              <Label htmlFor="auth-email">Email</Label>
-              <Input
-                id="auth-email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="auth-password">Password</Label>
-              <Input
-                id="auth-password"
-                type="password"
-                autoComplete={registering ? 'new-password' : 'current-password'}
-                minLength={registering ? 10 : 1}
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-              />
-            </div>
-            {error ? (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            ) : null}
-            <Button type="submit" fullWidth isLoading={submitting}>
-              {registering ? 'Create account' : 'Sign in'}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              fullWidth
-              onClick={() => {
-                setRegistering((value) => !value)
-                setError(null)
-              }}
-            >
-              {registering ? 'Already have an account? Sign in' : 'New to Levvro? Create account'}
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
     </Reveal>
   )
 }

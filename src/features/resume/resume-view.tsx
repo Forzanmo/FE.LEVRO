@@ -17,6 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useHasAssessment } from '@/hooks/use-has-assessment'
 import { ROUTES } from '@/lib/constants/routes'
 import { cn } from '@/lib/utils'
+import type { CvTemplateId } from '@/features/documents/types'
 
 import { useResume } from './use-resume'
 
@@ -25,12 +26,15 @@ export function ResumeView() {
   const hasAssessment = useHasAssessment()
   const data = form.watch()
   const [tab, setTab] = useState<'edit' | 'preview'>('edit')
+  const [template, setTemplate] = useState<CvTemplateId>('minimalist')
   // The coach is the intended path to a CV, but it is a recommendation, not a
   // gate: someone who already knows what they want to write can say so.
   const [startedBlank, setStartedBlank] = useState(false)
 
   const downloadPdf = () => {
-    if (typeof window !== 'undefined') window.print()
+    if (typeof window !== 'undefined') {
+      window.open('/api/v1/product/resume/export.pdf', '_self')
+    }
   }
 
   const loading = !hydrated || hasAssessment === null
@@ -123,7 +127,22 @@ export function ResumeView() {
             </div>
             <div className={cn(tab !== 'preview' && 'hidden lg:block')}>
               <div className="lg:sticky lg:top-[calc(var(--header-height)+1.5rem)]">
-                <CvTemplate template="minimalist" data={data} />
+                <div className="mb-3 flex items-center justify-end gap-2">
+                  <label htmlFor="cv-template" className="text-muted-foreground text-sm">
+                    Template
+                  </label>
+                  <select
+                    id="cv-template"
+                    value={template}
+                    onChange={(event) => setTemplate(event.target.value as CvTemplateId)}
+                    className="border-input bg-background h-9 rounded-lg border px-3 text-sm"
+                  >
+                    <option value="minimalist">Minimalist</option>
+                    <option value="designer">Designer</option>
+                    <option value="ats">ATS-friendly</option>
+                  </select>
+                </div>
+                <CvTemplate template={template} data={data} />
               </div>
             </div>
           </div>

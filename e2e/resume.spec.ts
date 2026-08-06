@@ -31,19 +31,11 @@ test.describe('Resume editor', () => {
   })
 })
 
-test('without an assessment the editor offers the coach instead of a stranger’s CV', async ({
+test('the legacy standalone editor is not exposed in primary navigation', async ({
   page,
 }) => {
-  // Signed in and onboarded, but the assessment has never been taken. That
-  // has to be stated now that a first visit is signed out — otherwise this
-  // lands on /sign-in and the pre-assessment design goes untested.
   await seedOnboardedNoAssessment(page)
-  await page.goto('/resume')
-
-  await expect(page.getByText('Alex Rivera')).toHaveCount(0)
-  await expect(page.getByRole('link', { name: /Start my assessment/i })).toBeVisible()
-
-  // The coach is the recommended path, not a gate.
-  await page.getByRole('button', { name: /Start from a blank CV/i }).click()
-  await expect(page.getByLabel('Full name')).toHaveValue('')
+  await page.goto('/dashboard')
+  await expect(page.locator('aside').getByRole('link', { name: 'Edit CV' })).toHaveCount(0)
+  await expect(page.locator('aside').getByRole('link', { name: 'Applications' })).toBeVisible()
 })

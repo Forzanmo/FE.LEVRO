@@ -54,6 +54,14 @@ function UserMenu() {
             Settings
           </Link>
         </DropdownMenuItem>
+        {user?.isAdmin ? (
+          <DropdownMenuItem asChild className="gap-2">
+            <Link href={ROUTES.admin}>
+              <Icon name="settings" size="sm" />
+              Admin panel
+            </Link>
+          </DropdownMenuItem>
+        ) : null}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut} className="text-destructive gap-2">
           <Icon name="logout" size="sm" />

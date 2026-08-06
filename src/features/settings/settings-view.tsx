@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
@@ -8,15 +8,26 @@ import { toast } from 'sonner'
 import { PageHeader } from '@/components/shared/page-header'
 import { Button } from '@/components/ui/button'
 import { ChoiceGroup } from '@/components/ui/choice-group'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { TextField } from '@/components/ui/field'
 import { Icon, type IconName } from '@/components/ui/icon'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { Textarea } from '@/components/ui/textarea'
 import { Heading, Text } from '@/components/ui/typography'
 import { useMounted } from '@/hooks/use-mounted'
 import { useSession } from '@/providers/session-provider'
 import { ROUTES } from '@/lib/constants/routes'
 import { cn } from '@/lib/utils'
+import { accountService } from '@/services/auth/account-service'
 
 function SettingsSection({
   title,
@@ -44,10 +55,68 @@ function SettingsSection({
   )
 }
 
-function ProfileForm({ initialName, email }: { initialName: string; email: string }) {
+const PROFILE_SECTIONS = [
+  ['education', 'Education'],
+  ['experience', 'Experience'],
+  ['projects', 'Projects'],
+  ['skills', 'Skills'],
+  ['certifications', 'Certifications'],
+  ['activities', 'Activities'],
+  ['languages', 'Languages'],
+  ['links', 'Links'],
+] as const
+
+type ProfileDraft = Record<string, string>
+
+function editableValue(value: unknown): string {
+  if (value === null || value === undefined) return ''
+  if (typeof value === 'string') return value
+  return JSON.stringify(value, null, 2)
+}
+
+function structuredValue(value: string): unknown {
+  const trimmed = value.trim()
+  if (!trimmed) return []
+  if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+    try {
+      return JSON.parse(trimmed) as unknown
+    } catch {
+      // User-entered prose is stored as one item per non-empty line.
+    }
+  }
+  return trimmed
+    .split('\n')
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+function makeProfileDraft(data: Record<string, unknown>, fallbackName: string): ProfileDraft {
+  return Object.fromEntries([
+    ['full_name', editableValue(data.full_name) || fallbackName],
+    ['phone', editableValue(data.phone)],
+    ['location', editableValue(data.location)],
+    ...PROFILE_SECTIONS.map(([key]) => [key, editableValue(data[key])]),
+  ])
+}
+
+function ProfileForm({
+  initialName,
+  email,
+  profileData,
+}: {
+  initialName: string
+  email: string
+  profileData: Record<string, unknown>
+}) {
   const { updateProfile } = useSession()
-  const [name, setName] = useState(initialName)
-  const [saved, setSaved] = useState(initialName)
+  const initialDraft = useMemo(
+    () => makeProfileDraft(profileData, initialName),
+    [initialName, profileData],
+  )
+  const [draft, setDraft] = useState<ProfileDraft>(initialDraft)
+  const [saved, setSaved] = useState<ProfileDraft>(initialDraft)
+  const [saving, setSaving] = useState(false)
+  const dirty = JSON.stringify(draft) !== JSON.stringify(saved)
 
   /*
    * This used to fire `toast.success('Profile saved')` with no persistence
@@ -57,25 +126,75 @@ function ProfileForm({ initialName, email }: { initialName: string; email: strin
    * returned one.
    */
   const save = async () => {
-    const next = name.trim()
-    if (!next || next === saved) return
+    const fullName = draft.full_name.trim()
+    if (!fullName || !dirty) return
+    setSaving(true)
     try {
-      await updateProfile({ full_name: next })
-      setSaved(next)
+      await updateProfile({
+        full_name: fullName,
+        phone: draft.phone.trim(),
+        location: draft.location.trim(),
+        ...Object.fromEntries(
+          PROFILE_SECTIONS.map(([key]) => [key, structuredValue(draft[key])]),
+        ),
+      })
+      setSaved(draft)
       toast.success('Profile saved')
     } catch {
       toast.error("Couldn't save your profile — please try again.")
+    } finally {
+      setSaving(false)
     }
   }
 
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <TextField label="Full name" value={name} onChange={(e) => setName(e.target.value)} />
+        <TextField
+          label="Full name"
+          value={draft.full_name}
+          onChange={(event) => setDraft((current) => ({ ...current, full_name: event.target.value }))}
+        />
         <TextField label="Email" value={email} readOnly disabled />
+        <TextField
+          label="Phone"
+          value={draft.phone}
+          onChange={(event) => setDraft((current) => ({ ...current, phone: event.target.value }))}
+        />
+        <TextField
+          label="Location"
+          value={draft.location}
+          onChange={(event) => setDraft((current) => ({ ...current, location: event.target.value }))}
+        />
+      </div>
+      <Text tone="muted" size="sm">
+        This is your shared evidence store. The coach, CV upload, and applications add facts here;
+        use this section to correct or replace them. Keep one item per line. Structured details
+        extracted from a CV remain editable as JSON.
+      </Text>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {PROFILE_SECTIONS.map(([key, label]) => (
+          <div key={key} className="space-y-2">
+            <Label htmlFor={`profile-${key}`}>{label}</Label>
+            <Textarea
+              id={`profile-${key}`}
+              value={draft[key]}
+              onChange={(event) =>
+                setDraft((current) => ({ ...current, [key]: event.target.value }))
+              }
+              rows={4}
+              dir="auto"
+              placeholder={`Add ${label.toLowerCase()}, one item per line`}
+            />
+          </div>
+        ))}
       </div>
       <div className="flex justify-end">
-        <Button onClick={() => void save()} disabled={!name.trim() || name.trim() === saved}>
+        <Button
+          onClick={() => void save()}
+          disabled={!draft.full_name.trim() || !dirty}
+          isLoading={saving}
+        >
           Save changes
         </Button>
       </div>
@@ -174,23 +293,44 @@ function NotificationsSection() {
 }
 
 export function SettingsView() {
-  const { user, signOut } = useSession()
+  const { user, profileData, signOut } = useSession()
   const router = useRouter()
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deletePassword, setDeletePassword] = useState('')
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const handleSignOut = async () => {
     await signOut()
     router.push(ROUTES.signIn)
   }
 
+  const handleDeleteAccount = async () => {
+    if (!deletePassword) return
+    setDeleting(true)
+    setDeleteError(null)
+    try {
+      await accountService.deleteAccount(deletePassword)
+      await signOut()
+      router.replace(ROUTES.home)
+    } catch (reason) {
+      setDeleteError(reason instanceof Error ? reason.message : 'Your account could not be deleted.')
+      setDeleting(false)
+    }
+  }
+
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <PageHeader title="Settings" description="Manage your account, appearance and preferences." />
 
-      <SettingsSection title="Profile">
+      <SettingsSection
+        title="Profile evidence"
+        description="Edit facts collected by the coach, CV uploads, and applications. Career intake happens in the AI coach."
+      >
         <ProfileForm
-          key={user?.id ?? 'loading'}
           initialName={user?.name ?? ''}
           email={user?.email ?? ''}
+          profileData={profileData}
         />
       </SettingsSection>
 
@@ -202,20 +342,69 @@ export function SettingsView() {
         <NotificationsSection />
       </SettingsSection>
 
-      <SettingsSection title="Account">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <Text tone="muted" size="sm">
-            Signed in as {user?.email ?? 'your account'}.
-          </Text>
-          <Button
-            variant="outline"
-            onClick={() => void handleSignOut()}
-            leftIcon={<Icon name="logout" size="sm" />}
-          >
-            Sign out
-          </Button>
+      <SettingsSection title="Account" description="Control your session and personal data.">
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Text tone="muted" size="sm">
+              Signed in as {user?.email ?? 'your account'}.
+            </Text>
+            <Button
+              variant="outline"
+              onClick={() => void handleSignOut()}
+              leftIcon={<Icon name="logout" size="sm" />}
+            >
+              Sign out
+            </Button>
+          </div>
+          <div className="border-destructive/30 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
+            <div>
+              <Text weight="medium">Delete account</Text>
+              <Text tone="muted" size="sm">
+                Permanently remove your profile, applications, answers, and documents.
+              </Text>
+            </div>
+            <Button variant="destructive" onClick={() => setDeleteOpen(true)}>
+              Delete account
+            </Button>
+          </div>
         </div>
       </SettingsSection>
+
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete your account permanently?</DialogTitle>
+            <DialogDescription>
+              This cannot be undone. Enter your password to confirm deletion of all account data.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="delete-account-password">Password</Label>
+            <Input
+              id="delete-account-password"
+              type="password"
+              autoComplete="current-password"
+              value={deletePassword}
+              onChange={(event) => setDeletePassword(event.target.value)}
+              aria-invalid={Boolean(deleteError)}
+            />
+            {deleteError ? <Text className="text-destructive" size="sm">{deleteError}</Text> : null}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteOpen(false)} disabled={deleting}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => void handleDeleteAccount()}
+              disabled={!deletePassword}
+              isLoading={deleting}
+            >
+              Delete permanently
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

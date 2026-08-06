@@ -18,6 +18,7 @@ export interface UseApplications {
   add: (values: ApplicationFormValues) => void
   remove: (id: string) => void
   restore: (application: Application) => void
+  duplicate: (application: Application) => void
 }
 
 export function useApplications(): UseApplications {
@@ -53,6 +54,16 @@ export function useApplications(): UseApplications {
     onError: (error: Error) => toast.error('Could not restore application', { description: error.message }),
   })
 
+  const duplicateMutation = useMutation({
+    mutationFn: applicationsService.duplicate,
+    onSuccess: () => {
+      void refresh()
+      toast.success('Application duplicated')
+    },
+    onError: (error: Error) =>
+      toast.error('Could not duplicate application', { description: error.message }),
+  })
+
   return {
     applications: query.data ?? [],
     isLoading: query.isLoading,
@@ -61,5 +72,6 @@ export function useApplications(): UseApplications {
     add: (values) => createMutation.mutate(values),
     remove: (id) => deleteMutation.mutate(id),
     restore: (application) => restoreMutation.mutate(application),
+    duplicate: (application) => duplicateMutation.mutate(application),
   }
 }

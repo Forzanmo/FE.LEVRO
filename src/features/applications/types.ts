@@ -1,4 +1,5 @@
 import type { AppStatus } from './status'
+import type { ApplicationType } from '@/api/generated'
 
 export interface Application {
   id: string
@@ -9,4 +10,5 @@ export interface Application {
   appliedAt: string
   location: string
   source: string
+  applicationType: ApplicationType
 }

@@ -81,7 +81,16 @@ export function CoachView() {
      * the dashboard already renders "Your plan is ready, {name}" with the
      * skills read-out as its hero for exactly this arrival.
      */
-    return <ProcessingScreen onComplete={() => router.push(ROUTES.dashboard)} />
+    return (
+      <div className="space-y-4">
+        <ProcessingScreen onComplete={() => router.push(ROUTES.dashboard)} />
+        <div className="flex justify-center">
+          <Button variant="ghost" onClick={coach.restart} disabled={coach.isSaving}>
+            Start a fresh coaching chat
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   // Wait for persisted state before painting, so a returning user never sees
@@ -135,9 +144,16 @@ export function CoachView() {
             or blocked, "Save & exit" would send the user away from work that is
             about to vanish, so it stops offering the exit and says why. */}
         {coach.persisted ? (
-          <Button asChild variant="ghost" size="sm">
-            <Link href={ROUTES.dashboard}>Save &amp; exit</Link>
-          </Button>
+          <div className="flex items-center gap-1">
+            {coach.answeredCount > 0 ? (
+              <Button variant="ghost" size="sm" onClick={coach.restart} disabled={coach.isSaving}>
+                Start fresh
+              </Button>
+            ) : null}
+            <Button asChild variant="ghost" size="sm">
+              <Link href={ROUTES.dashboard}>Save &amp; exit</Link>
+            </Button>
+          </div>
         ) : (
           <Button asChild variant="ghost" size="sm">
             <Link href={ROUTES.dashboard}>Exit without saving</Link>
@@ -162,6 +178,14 @@ export function CoachView() {
 
       <div className="space-y-6" role="log" aria-live="polite" aria-label="Coaching conversation">
         <CoachMessage prompt={coach.intro} />
+        <Alert>
+          <AlertTitle>What I will build from this conversation</AlertTitle>
+          <AlertDescription>
+            Your answers become editable profile evidence. Levvro can reuse them in your CV,
+            cover letter, and tailored applications. You can still edit or replace every field
+            later, and you can skip anything that does not apply.
+          </AlertDescription>
+        </Alert>
 
         {history.map(({ question, index }) => {
           const answer = coach.answers[question.id]

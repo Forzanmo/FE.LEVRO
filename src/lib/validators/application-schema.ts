@@ -13,6 +13,7 @@ export const APPLICATION_LIMITS = {
 const capped = (max: number) => z.string().max(max, `Keep this under ${max} characters`)
 
 export const applicationFormSchema = z.object({
+  applicationType: z.enum(['job', 'internship', 'scholarship']),
   company: capped(APPLICATION_LIMITS.company).min(1, 'Company is required'),
   role: capped(APPLICATION_LIMITS.role).min(1, 'Role is required'),
   status: z.enum(APPLICATION_STATUSES),

@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useMemo, useState } from 'react'
+import Link from 'next/link'
 import {
   getCoreRowModel,
   getFilteredRowModel,
@@ -21,12 +22,13 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatRelativeTime } from '@/lib/formatters'
+import { DYNAMIC_ROUTES } from '@/lib/constants/routes'
 
 import type { Application } from './types'
 import { useApplications } from './use-applications'
 
 export function ApplicationsView() {
-  const { applications, hydrated, add, remove, restore } = useApplications()
+  const { applications, hydrated, add, remove, restore, duplicate } = useApplications()
 
   const [sorting, setSorting] = useState<SortingState>([{ id: 'appliedAt', desc: true }])
   const [globalFilter, setGlobalFilter] = useState('')
@@ -93,7 +95,20 @@ export function ApplicationsView() {
         enableSorting: false,
         enableGlobalFilter: false,
         cell: ({ row }) => (
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-1">
+            <Button variant="ghost" size="icon-sm" aria-label={`Open ${row.original.company} application`} asChild>
+              <Link href={DYNAMIC_ROUTES.application(row.original.id)}>
+                <Icon name="arrow-right" size="xs" />
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={`Duplicate ${row.original.company} application`}
+              onClick={() => duplicate(row.original)}
+            >
+              <Icon name="copy" size="xs" />
+            </Button>
             <Button
               variant="ghost"
               size="icon-sm"
@@ -107,7 +122,7 @@ export function ApplicationsView() {
         ),
       },
     ],
-    [handleDelete],
+    [duplicate, handleDelete],
   )
 
   const columnFilters = useMemo<ColumnFiltersState>(
@@ -159,7 +174,7 @@ export function ApplicationsView() {
               onStatus={setStatusFilter}
               onAdd={add}
             />
-            <ApplicationsTable table={table} onDelete={handleDelete} />
+            <ApplicationsTable table={table} onDelete={handleDelete} onDuplicate={duplicate} />
           </div>
         </>
       )}

@@ -1,8 +1,12 @@
 import {
+  createSectionRegenerationJobApiV1DocumentsDocumentIdSectionsSectionIdRegeneratePost,
   createExportJobApiV1DocumentsDocumentIdExportJobsPost,
   downloadExportApiV1ExportsExportIdDownloadGet,
   getDocumentApiV1DocumentsDocumentIdGet,
   getJobApiV1JobsJobIdGet,
+  listApplicationsApiV1ApplicationsGet,
+  listDocumentsApiV1ApplicationsApplicationIdDocumentsGet,
+  previewDocumentApiV1DocumentsDocumentIdPreviewGet,
   updatePresentationApiV1DocumentsDocumentIdPresentationPatch,
   updateSectionApiV1DocumentsDocumentIdSectionsSectionIdPatch,
 } from '@/api/generated'
@@ -87,22 +91,30 @@ function buildDemoDocuments(): DocumentRecord[] {
 }
 
 export const documentsService = {
-  list(): Promise<DocumentSummary[]> {
-    if (!journeyStorage.hasAssessment()) return delay([])
-    return delay(
-      buildDemoDocuments().map(
-        ({ id, kind, title, role, company, status, updatedAt, template }): DocumentSummary => ({
-          id,
-          kind,
-          title,
-          role,
-          company,
-          status,
-          updatedAt,
-          template,
-        }),
-      ),
+  async list(): Promise<DocumentSummary[]> {
+    const applications = unwrapApiResult(await listApplicationsApiV1ApplicationsGet())
+    const grouped = await Promise.all(
+      applications.map(async (application) => {
+        const documents = unwrapApiResult(
+          await listDocumentsApiV1ApplicationsApplicationIdDocumentsGet({
+            path: { application_id: application.id },
+          }),
+        )
+        return documents.map(
+          (document): DocumentSummary => ({
+            id: document.id,
+            kind: document.document_type === 'cover_letter' ? 'cover-letter' : 'cv',
+            title: `${document.document_type === 'cover_letter' ? 'Cover letter' : 'CV'} — ${application.title}`,
+            role: application.title,
+            company: application.organization ?? undefined,
+            status: application.state === 'exported' ? 'sent' : 'ready',
+            updatedAt: document.updated_at,
+            generated: true,
+          }),
+        )
+      }),
     )
+    return grouped.flat().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
   },
 
   get(id: string): Promise<DocumentRecord | null> {
@@ -138,6 +150,24 @@ export const documentsService = {
       await updatePresentationApiV1DocumentsDocumentIdPresentationPatch({
         path: { document_id: documentId },
         body,
+      }),
+    )
+  },
+
+  async preview(documentId: string): Promise<string> {
+    return unwrapApiResult(
+      await previewDocumentApiV1DocumentsDocumentIdPreviewGet({
+        path: { document_id: documentId },
+      }),
+    )
+  },
+
+  async regenerateSection(documentId: string, sectionId: string, expectedRevision: number) {
+    return unwrapApiResult(
+      await createSectionRegenerationJobApiV1DocumentsDocumentIdSectionsSectionIdRegeneratePost({
+        path: { document_id: documentId, section_id: sectionId },
+        body: { expected_revision: expectedRevision },
+        headers: { 'Idempotency-Key': crypto.randomUUID() },
       }),
     )
   },

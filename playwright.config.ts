@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
 const PORT = 3000
-const BASE_URL = `http://localhost:${PORT}`
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${PORT}`
 
 /**
  * Playwright E2E configuration. The package pretest hook builds first, then
@@ -24,7 +24,7 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    command: 'npm run start',
+    command: process.env.PLAYWRIGHT_WEB_SERVER_COMMAND ?? 'npm run start',
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

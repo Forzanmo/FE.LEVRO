@@ -162,6 +162,57 @@ export type ActivityItem = {
 };
 
 /**
+ * AdminApplicationJourney
+ */
+export type AdminApplicationJourney = {
+    /**
+     * Answered Questions
+     */
+    answered_questions: number;
+    application_type: ApplicationType;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Document Types
+     */
+    document_types: Array<DocumentType>;
+    /**
+     * Export Count
+     */
+    export_count: number;
+    /**
+     * Has Opportunity
+     */
+    has_opportunity: boolean;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Job Statuses
+     */
+    job_statuses: Array<string>;
+    /**
+     * Question Count
+     */
+    question_count: number;
+    /**
+     * State
+     */
+    state: string;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Updated At
+     */
+    updated_at: string;
+};
+
+/**
  * AdminQuestionInput
  */
 export type AdminQuestionInput = {
@@ -252,6 +303,77 @@ export type AdminQuestionResponse = {
 };
 
 /**
+ * AdminUserJourneyResponse
+ */
+export type AdminUserJourneyResponse = {
+    /**
+     * Applications
+     */
+    applications: Array<AdminApplicationJourney>;
+    /**
+     * Events
+     */
+    events: Array<string>;
+    /**
+     * Profile Fields
+     */
+    profile_fields: number;
+    user: AdminUserSummary;
+};
+
+/**
+ * AdminUserListResponse
+ */
+export type AdminUserListResponse = {
+    /**
+     * Total
+     */
+    total: number;
+    /**
+     * Users
+     */
+    users: Array<AdminUserSummary>;
+};
+
+/**
+ * AdminUserSummary
+ */
+export type AdminUserSummary = {
+    /**
+     * Application Count
+     */
+    application_count: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Document Count
+     */
+    document_count: number;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Email Verified
+     */
+    email_verified: boolean;
+    /**
+     * Full Name
+     */
+    full_name: string | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Is Admin
+     */
+    is_admin: boolean;
+};
+
+/**
  * AnswerSavedResponse
  */
 export type AnswerSavedResponse = {
@@ -277,7 +399,7 @@ export type AnswerUpdate = {
     /**
      * Value
      */
-    value: string | number | number | boolean | string | Array<string>;
+    value: string | number | number | boolean | string | Array<string> | null;
 };
 
 /**
@@ -1240,6 +1362,14 @@ export type LoginRequest = {
      */
     email: string;
     /**
+     * First Name
+     */
+    first_name?: string | null;
+    /**
+     * Last Name
+     */
+    last_name?: string | null;
+    /**
      * Password
      */
     password: string;
@@ -1666,6 +1796,14 @@ export type RegisterRequest = {
      * Email
      */
     email: string;
+    /**
+     * First Name
+     */
+    first_name?: string | null;
+    /**
+     * Last Name
+     */
+    last_name?: string | null;
     /**
      * Password
      */
@@ -2459,6 +2597,134 @@ export type GetProductFunnelSummaryApiV1AdminOperationsProductFunnelGetResponses
 };
 
 export type GetProductFunnelSummaryApiV1AdminOperationsProductFunnelGetResponse = GetProductFunnelSummaryApiV1AdminOperationsProductFunnelGetResponses[keyof GetProductFunnelSummaryApiV1AdminOperationsProductFunnelGetResponses];
+
+export type ListUsersApiV1AdminOperationsUsersGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Offset
+         */
+        offset?: number;
+    };
+    url: '/api/v1/admin/operations/users';
+};
+
+export type ListUsersApiV1AdminOperationsUsersGetErrors = {
+    /**
+     * Invalid request
+     */
+    400: ErrorResponse;
+    /**
+     * Authentication required
+     */
+    401: ErrorResponse;
+    /**
+     * Permission denied
+     */
+    403: ErrorResponse;
+    /**
+     * Resource not found
+     */
+    404: ErrorResponse;
+    /**
+     * State or revision conflict
+     */
+    409: ErrorResponse;
+    /**
+     * Validation failed
+     */
+    422: ErrorResponse;
+    /**
+     * Rate limit exceeded
+     */
+    429: ErrorResponse;
+    /**
+     * Internal error
+     */
+    500: ErrorResponse;
+    /**
+     * Dependency unavailable
+     */
+    503: ErrorResponse;
+};
+
+export type ListUsersApiV1AdminOperationsUsersGetError = ListUsersApiV1AdminOperationsUsersGetErrors[keyof ListUsersApiV1AdminOperationsUsersGetErrors];
+
+export type ListUsersApiV1AdminOperationsUsersGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminUserListResponse;
+};
+
+export type ListUsersApiV1AdminOperationsUsersGetResponse = ListUsersApiV1AdminOperationsUsersGetResponses[keyof ListUsersApiV1AdminOperationsUsersGetResponses];
+
+export type GetUserJourneyApiV1AdminOperationsUsersUserIdJourneyGetData = {
+    body?: never;
+    path: {
+        /**
+         * User Id
+         */
+        user_id: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/operations/users/{user_id}/journey';
+};
+
+export type GetUserJourneyApiV1AdminOperationsUsersUserIdJourneyGetErrors = {
+    /**
+     * Invalid request
+     */
+    400: ErrorResponse;
+    /**
+     * Authentication required
+     */
+    401: ErrorResponse;
+    /**
+     * Permission denied
+     */
+    403: ErrorResponse;
+    /**
+     * Resource not found
+     */
+    404: ErrorResponse;
+    /**
+     * State or revision conflict
+     */
+    409: ErrorResponse;
+    /**
+     * Validation failed
+     */
+    422: ErrorResponse;
+    /**
+     * Rate limit exceeded
+     */
+    429: ErrorResponse;
+    /**
+     * Internal error
+     */
+    500: ErrorResponse;
+    /**
+     * Dependency unavailable
+     */
+    503: ErrorResponse;
+};
+
+export type GetUserJourneyApiV1AdminOperationsUsersUserIdJourneyGetError = GetUserJourneyApiV1AdminOperationsUsersUserIdJourneyGetErrors[keyof GetUserJourneyApiV1AdminOperationsUsersUserIdJourneyGetErrors];
+
+export type GetUserJourneyApiV1AdminOperationsUsersUserIdJourneyGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminUserJourneyResponse;
+};
+
+export type GetUserJourneyApiV1AdminOperationsUsersUserIdJourneyGetResponse = GetUserJourneyApiV1AdminOperationsUsersUserIdJourneyGetResponses[keyof GetUserJourneyApiV1AdminOperationsUsersUserIdJourneyGetResponses];
 
 export type ListVersionsApiV1AdminQuestionSetVersionsGetData = {
     body?: never;

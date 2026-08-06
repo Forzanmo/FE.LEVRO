@@ -1,6 +1,7 @@
 import {
   createApplicationApiV1ApplicationsPost,
   deleteApplicationApiV1ApplicationsApplicationIdDelete,
+  duplicateApplicationApiV1ApplicationsApplicationIdDuplicatePost,
   listApplicationsApiV1ApplicationsGet,
 } from '@/api/generated'
 import type { ApplicationResponse } from '@/api/generated'
@@ -27,6 +28,7 @@ function toApplication(application: ApplicationResponse): Application {
     appliedAt: application.created_at,
     location: application.application_type,
     source: application.state.replaceAll('_', ' '),
+    applicationType: application.application_type,
   }
 }
 
@@ -40,7 +42,7 @@ export const applicationsService = {
     const result = unwrapApiResult(
       await createApplicationApiV1ApplicationsPost({
         body: {
-          application_type: 'job',
+          application_type: values.applicationType,
           organization: values.company,
           title: values.role,
         },
@@ -59,11 +61,23 @@ export const applicationsService = {
 
   async restore(application: Application): Promise<Application> {
     return applicationsService.create({
+      applicationType: application.applicationType,
       company: application.company,
       role: application.role,
       status: application.status,
       location: application.location,
       source: application.source,
     })
+  },
+
+  async duplicate(application: Application): Promise<Application> {
+    const result = unwrapApiResult(
+      await duplicateApplicationApiV1ApplicationsApplicationIdDuplicatePost({
+        path: { application_id: application.id },
+        body: { title: `${application.role} copy` },
+        headers: { 'Idempotency-Key': crypto.randomUUID() },
+      }),
+    )
+    return toApplication(result)
   },
 }

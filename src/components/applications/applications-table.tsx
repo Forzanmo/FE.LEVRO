@@ -1,6 +1,7 @@
 'use client'
 
 import { flexRender, type Table as TableInstance } from '@tanstack/react-table'
+import Link from 'next/link'
 
 import { EmptyState } from '@/components/shared/empty-state'
 import { Button } from '@/components/ui/button'
@@ -8,6 +9,7 @@ import { Icon } from '@/components/ui/icon'
 import type { Application } from '@/features/applications/types'
 import { formatRelativeTime } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
+import { DYNAMIC_ROUTES } from '@/lib/constants/routes'
 
 import { StatusBadge } from './status-badge'
 
@@ -18,9 +20,11 @@ import { StatusBadge } from './status-badge'
 export function ApplicationsTable({
   table,
   onDelete,
+  onDuplicate,
 }: {
   table: TableInstance<Application>
   onDelete: (application: Application) => void
+  onDuplicate: (application: Application) => void
 }) {
   const rows = table.getRowModel().rows
 
@@ -140,7 +144,21 @@ export function ApplicationsTable({
                 </span>
                 <span className="whitespace-nowrap">{formatRelativeTime(app.appliedAt)}</span>
               </div>
-              <div className="mt-2 flex justify-end">
+              <div className="mt-2 flex justify-end gap-1">
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href={DYNAMIC_ROUTES.application(app.id)}>
+                    Open
+                    <Icon name="arrow-right" size="xs" />
+                  </Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onDuplicate(app)}
+                  leftIcon={<Icon name="copy" size="xs" />}
+                >
+                  Duplicate
+                </Button>
                 <Button
                   variant="ghost"
                   size="sm"
