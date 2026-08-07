@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
@@ -30,6 +30,21 @@ export function CoverLetterView() {
   })
   const [letter, setLetter] = useState<CoverLetter | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    void coverLetterService
+      .getDraftInput()
+      .then((input) => {
+        if (active) form.reset(input)
+      })
+      .catch(() => {
+        // The builder remains fully usable without chat evidence.
+      })
+    return () => {
+      active = false
+    }
+  }, [form])
 
   const onGenerate = form.handleSubmit(async (values) => {
     setIsGenerating(true)

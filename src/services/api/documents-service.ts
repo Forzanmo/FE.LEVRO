@@ -50,6 +50,9 @@ const BASE_RESUME = {
     },
   ],
   skills: ['React', 'TypeScript', 'Testing Library', 'Accessibility', 'Node.js', 'Figma'],
+  education: [],
+  projects: [],
+  achievements: [],
 }
 
 function buildDemoDocuments(): DocumentRecord[] {

@@ -534,6 +534,197 @@ export type CareerScore = {
 };
 
 /**
+ * ChatCoverLetterInput
+ */
+export type ChatCoverLetterInput = {
+    /**
+     * Company
+     */
+    company?: string;
+    /**
+     * Highlights
+     */
+    highlights?: string;
+    /**
+     * Hiring Manager
+     */
+    hiring_manager?: string;
+    /**
+     * Role
+     */
+    role?: string;
+    /**
+     * Tone
+     */
+    tone?: 'professional' | 'warm' | 'confident' | 'concise';
+};
+
+/**
+ * ChatDocumentCreate
+ */
+export type ChatDocumentCreate = {
+    application_type?: ApplicationType;
+    /**
+     * Document Types
+     */
+    document_types: Array<DocumentType>;
+    /**
+     * Opportunity Text
+     */
+    opportunity_text: string;
+    /**
+     * Organization
+     */
+    organization?: string | null;
+    /**
+     * Role Name
+     */
+    role_name: string;
+};
+
+/**
+ * ChatDocumentJobResponse
+ */
+export type ChatDocumentJobResponse = {
+    application: ApplicationResponse;
+    /**
+     * Document Types
+     */
+    document_types: Array<DocumentType>;
+    job: JobResponse;
+};
+
+/**
+ * ChatMessageCreate
+ */
+export type ChatMessageCreate = {
+    /**
+     * Content
+     */
+    content: string;
+};
+
+/**
+ * ChatMessageResponse
+ */
+export type ChatMessageResponse = {
+    /**
+     * Content
+     */
+    content: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Role
+     */
+    role: 'user' | 'assistant' | 'system';
+};
+
+/**
+ * ChatSessionCreate
+ */
+export type ChatSessionCreate = {
+    /**
+     * Title
+     */
+    title?: string;
+    /**
+     * Use Shared Memory
+     */
+    use_shared_memory?: boolean;
+};
+
+/**
+ * ChatSessionResponse
+ */
+export type ChatSessionResponse = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Has More Messages
+     */
+    has_more_messages: boolean;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Memory
+     */
+    memory: {
+        [key: string]: unknown;
+    };
+    /**
+     * Message Count
+     */
+    message_count: number;
+    /**
+     * Messages
+     */
+    messages: Array<ChatMessageResponse>;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Updated At
+     */
+    updated_at: string;
+    /**
+     * Use Shared Memory
+     */
+    use_shared_memory: boolean;
+};
+
+/**
+ * ChatSessionSummary
+ */
+export type ChatSessionSummary = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Updated At
+     */
+    updated_at: string;
+    /**
+     * Use Shared Memory
+     */
+    use_shared_memory: boolean;
+};
+
+/**
+ * ChatSessionUpdate
+ */
+export type ChatSessionUpdate = {
+    /**
+     * Title
+     */
+    title?: string | null;
+    /**
+     * Use Shared Memory
+     */
+    use_shared_memory?: boolean | null;
+};
+
+/**
  * ClientProductEventCreate
  */
 export type ClientProductEventCreate = {
@@ -1820,6 +2011,14 @@ export type RequirementType = 'responsibility' | 'required_qualification' | 'pre
  */
 export type ResumeData = {
     /**
+     * Achievements
+     */
+    achievements?: Array<string>;
+    /**
+     * Education
+     */
+    education?: Array<string>;
+    /**
      * Email
      */
     email: string;
@@ -1843,6 +2042,10 @@ export type ResumeData = {
      * Phone
      */
     phone: string;
+    /**
+     * Projects
+     */
+    projects?: Array<string>;
     /**
      * Skills
      */
@@ -4672,6 +4875,711 @@ export type LoginApiV1AuthTokenPostResponses = {
 
 export type LoginApiV1AuthTokenPostResponse = LoginApiV1AuthTokenPostResponses[keyof LoginApiV1AuthTokenPostResponses];
 
+export type GetCoverLetterInputApiV1ChatCoverLetterInputGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/chat/cover-letter-input';
+};
+
+export type GetCoverLetterInputApiV1ChatCoverLetterInputGetErrors = {
+    /**
+     * Invalid request
+     */
+    400: ErrorResponse;
+    /**
+     * Authentication required
+     */
+    401: ErrorResponse;
+    /**
+     * Permission denied
+     */
+    403: ErrorResponse;
+    /**
+     * Resource not found
+     */
+    404: ErrorResponse;
+    /**
+     * State or revision conflict
+     */
+    409: ErrorResponse;
+    /**
+     * Validation failed
+     */
+    422: ErrorResponse;
+    /**
+     * Rate limit exceeded
+     */
+    429: ErrorResponse;
+    /**
+     * Internal error
+     */
+    500: ErrorResponse;
+    /**
+     * Dependency unavailable
+     */
+    503: ErrorResponse;
+};
+
+export type GetCoverLetterInputApiV1ChatCoverLetterInputGetError = GetCoverLetterInputApiV1ChatCoverLetterInputGetErrors[keyof GetCoverLetterInputApiV1ChatCoverLetterInputGetErrors];
+
+export type GetCoverLetterInputApiV1ChatCoverLetterInputGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: ChatCoverLetterInput;
+};
+
+export type GetCoverLetterInputApiV1ChatCoverLetterInputGetResponse = GetCoverLetterInputApiV1ChatCoverLetterInputGetResponses[keyof GetCoverLetterInputApiV1ChatCoverLetterInputGetResponses];
+
+export type ListSessionsApiV1ChatSessionsGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Offset
+         */
+        offset?: number;
+    };
+    url: '/api/v1/chat/sessions';
+};
+
+export type ListSessionsApiV1ChatSessionsGetErrors = {
+    /**
+     * Invalid request
+     */
+    400: ErrorResponse;
+    /**
+     * Authentication required
+     */
+    401: ErrorResponse;
+    /**
+     * Permission denied
+     */
+    403: ErrorResponse;
+    /**
+     * Resource not found
+     */
+    404: ErrorResponse;
+    /**
+     * State or revision conflict
+     */
+    409: ErrorResponse;
+    /**
+     * Validation failed
+     */
+    422: ErrorResponse;
+    /**
+     * Rate limit exceeded
+     */
+    429: ErrorResponse;
+    /**
+     * Internal error
+     */
+    500: ErrorResponse;
+    /**
+     * Dependency unavailable
+     */
+    503: ErrorResponse;
+};
+
+export type ListSessionsApiV1ChatSessionsGetError = ListSessionsApiV1ChatSessionsGetErrors[keyof ListSessionsApiV1ChatSessionsGetErrors];
+
+export type ListSessionsApiV1ChatSessionsGetResponses = {
+    /**
+     * Response List Sessions Api V1 Chat Sessions Get
+     *
+     * Successful Response
+     */
+    200: Array<ChatSessionSummary>;
+};
+
+export type ListSessionsApiV1ChatSessionsGetResponse = ListSessionsApiV1ChatSessionsGetResponses[keyof ListSessionsApiV1ChatSessionsGetResponses];
+
+export type CreateSessionApiV1ChatSessionsPostData = {
+    body: ChatSessionCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/chat/sessions';
+};
+
+export type CreateSessionApiV1ChatSessionsPostErrors = {
+    /**
+     * Invalid request
+     */
+    400: ErrorResponse;
+    /**
+     * Authentication required
+     */
+    401: ErrorResponse;
+    /**
+     * Permission denied
+     */
+    403: ErrorResponse;
+    /**
+     * Resource not found
+     */
+    404: ErrorResponse;
+    /**
+     * State or revision conflict
+     */
+    409: ErrorResponse;
+    /**
+     * Validation failed
+     */
+    422: ErrorResponse;
+    /**
+     * Rate limit exceeded
+     */
+    429: ErrorResponse;
+    /**
+     * Internal error
+     */
+    500: ErrorResponse;
+    /**
+     * Dependency unavailable
+     */
+    503: ErrorResponse;
+};
+
+export type CreateSessionApiV1ChatSessionsPostError = CreateSessionApiV1ChatSessionsPostErrors[keyof CreateSessionApiV1ChatSessionsPostErrors];
+
+export type CreateSessionApiV1ChatSessionsPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: ChatSessionResponse;
+};
+
+export type CreateSessionApiV1ChatSessionsPostResponse = CreateSessionApiV1ChatSessionsPostResponses[keyof CreateSessionApiV1ChatSessionsPostResponses];
+
+export type DeleteSessionApiV1ChatSessionsSessionIdDeleteData = {
+    body?: never;
+    path: {
+        /**
+         * Session Id
+         */
+        session_id: string;
+    };
+    query?: never;
+    url: '/api/v1/chat/sessions/{session_id}';
+};
+
+export type DeleteSessionApiV1ChatSessionsSessionIdDeleteErrors = {
+    /**
+     * Invalid request
+     */
+    400: ErrorResponse;
+    /**
+     * Authentication required
+     */
+    401: ErrorResponse;
+    /**
+     * Permission denied
+     */
+    403: ErrorResponse;
+    /**
+     * Resource not found
+     */
+    404: ErrorResponse;
+    /**
+     * State or revision conflict
+     */
+    409: ErrorResponse;
+    /**
+     * Validation failed
+     */
+    422: ErrorResponse;
+    /**
+     * Rate limit exceeded
+     */
+    429: ErrorResponse;
+    /**
+     * Internal error
+     */
+    500: ErrorResponse;
+    /**
+     * Dependency unavailable
+     */
+    503: ErrorResponse;
+};
+
+export type DeleteSessionApiV1ChatSessionsSessionIdDeleteError = DeleteSessionApiV1ChatSessionsSessionIdDeleteErrors[keyof DeleteSessionApiV1ChatSessionsSessionIdDeleteErrors];
+
+export type DeleteSessionApiV1ChatSessionsSessionIdDeleteResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteSessionApiV1ChatSessionsSessionIdDeleteResponse = DeleteSessionApiV1ChatSessionsSessionIdDeleteResponses[keyof DeleteSessionApiV1ChatSessionsSessionIdDeleteResponses];
+
+export type GetSessionApiV1ChatSessionsSessionIdGetData = {
+    body?: never;
+    path: {
+        /**
+         * Session Id
+         */
+        session_id: string;
+    };
+    query?: never;
+    url: '/api/v1/chat/sessions/{session_id}';
+};
+
+export type GetSessionApiV1ChatSessionsSessionIdGetErrors = {
+    /**
+     * Invalid request
+     */
+    400: ErrorResponse;
+    /**
+     * Authentication required
+     */
+    401: ErrorResponse;
+    /**
+     * Permission denied
+     */
+    403: ErrorResponse;
+    /**
+     * Resource not found
+     */
+    404: ErrorResponse;
+    /**
+     * State or revision conflict
+     */
+    409: ErrorResponse;
+    /**
+     * Validation failed
+     */
+    422: ErrorResponse;
+    /**
+     * Rate limit exceeded
+     */
+    429: ErrorResponse;
+    /**
+     * Internal error
+     */
+    500: ErrorResponse;
+    /**
+     * Dependency unavailable
+     */
+    503: ErrorResponse;
+};
+
+export type GetSessionApiV1ChatSessionsSessionIdGetError = GetSessionApiV1ChatSessionsSessionIdGetErrors[keyof GetSessionApiV1ChatSessionsSessionIdGetErrors];
+
+export type GetSessionApiV1ChatSessionsSessionIdGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: ChatSessionResponse;
+};
+
+export type GetSessionApiV1ChatSessionsSessionIdGetResponse = GetSessionApiV1ChatSessionsSessionIdGetResponses[keyof GetSessionApiV1ChatSessionsSessionIdGetResponses];
+
+export type UpdateSessionApiV1ChatSessionsSessionIdPatchData = {
+    body: ChatSessionUpdate;
+    path: {
+        /**
+         * Session Id
+         */
+        session_id: string;
+    };
+    query?: never;
+    url: '/api/v1/chat/sessions/{session_id}';
+};
+
+export type UpdateSessionApiV1ChatSessionsSessionIdPatchErrors = {
+    /**
+     * Invalid request
+     */
+    400: ErrorResponse;
+    /**
+     * Authentication required
+     */
+    401: ErrorResponse;
+    /**
+     * Permission denied
+     */
+    403: ErrorResponse;
+    /**
+     * Resource not found
+     */
+    404: ErrorResponse;
+    /**
+     * State or revision conflict
+     */
+    409: ErrorResponse;
+    /**
+     * Validation failed
+     */
+    422: ErrorResponse;
+    /**
+     * Rate limit exceeded
+     */
+    429: ErrorResponse;
+    /**
+     * Internal error
+     */
+    500: ErrorResponse;
+    /**
+     * Dependency unavailable
+     */
+    503: ErrorResponse;
+};
+
+export type UpdateSessionApiV1ChatSessionsSessionIdPatchError = UpdateSessionApiV1ChatSessionsSessionIdPatchErrors[keyof UpdateSessionApiV1ChatSessionsSessionIdPatchErrors];
+
+export type UpdateSessionApiV1ChatSessionsSessionIdPatchResponses = {
+    /**
+     * Successful Response
+     */
+    200: ChatSessionResponse;
+};
+
+export type UpdateSessionApiV1ChatSessionsSessionIdPatchResponse = UpdateSessionApiV1ChatSessionsSessionIdPatchResponses[keyof UpdateSessionApiV1ChatSessionsSessionIdPatchResponses];
+
+export type CreateChatDocumentJobApiV1ChatSessionsSessionIdDocumentJobsPostData = {
+    body: ChatDocumentCreate;
+    headers: {
+        /**
+         * Idempotency-Key
+         */
+        'Idempotency-Key': string;
+    };
+    path: {
+        /**
+         * Session Id
+         */
+        session_id: string;
+    };
+    query?: never;
+    url: '/api/v1/chat/sessions/{session_id}/document-jobs';
+};
+
+export type CreateChatDocumentJobApiV1ChatSessionsSessionIdDocumentJobsPostErrors = {
+    /**
+     * Invalid request
+     */
+    400: ErrorResponse;
+    /**
+     * Authentication required
+     */
+    401: ErrorResponse;
+    /**
+     * Permission denied
+     */
+    403: ErrorResponse;
+    /**
+     * Resource not found
+     */
+    404: ErrorResponse;
+    /**
+     * State or revision conflict
+     */
+    409: ErrorResponse;
+    /**
+     * Validation failed
+     */
+    422: ErrorResponse;
+    /**
+     * Rate limit exceeded
+     */
+    429: ErrorResponse;
+    /**
+     * Internal error
+     */
+    500: ErrorResponse;
+    /**
+     * Dependency unavailable
+     */
+    503: ErrorResponse;
+};
+
+export type CreateChatDocumentJobApiV1ChatSessionsSessionIdDocumentJobsPostError = CreateChatDocumentJobApiV1ChatSessionsSessionIdDocumentJobsPostErrors[keyof CreateChatDocumentJobApiV1ChatSessionsSessionIdDocumentJobsPostErrors];
+
+export type CreateChatDocumentJobApiV1ChatSessionsSessionIdDocumentJobsPostResponses = {
+    /**
+     * Successful Response
+     */
+    202: ChatDocumentJobResponse;
+};
+
+export type CreateChatDocumentJobApiV1ChatSessionsSessionIdDocumentJobsPostResponse = CreateChatDocumentJobApiV1ChatSessionsSessionIdDocumentJobsPostResponses[keyof CreateChatDocumentJobApiV1ChatSessionsSessionIdDocumentJobsPostResponses];
+
+export type ListMessagesApiV1ChatSessionsSessionIdMessagesGetData = {
+    body?: never;
+    path: {
+        /**
+         * Session Id
+         */
+        session_id: string;
+    };
+    query?: {
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Offset
+         */
+        offset?: number;
+    };
+    url: '/api/v1/chat/sessions/{session_id}/messages';
+};
+
+export type ListMessagesApiV1ChatSessionsSessionIdMessagesGetErrors = {
+    /**
+     * Invalid request
+     */
+    400: ErrorResponse;
+    /**
+     * Authentication required
+     */
+    401: ErrorResponse;
+    /**
+     * Permission denied
+     */
+    403: ErrorResponse;
+    /**
+     * Resource not found
+     */
+    404: ErrorResponse;
+    /**
+     * State or revision conflict
+     */
+    409: ErrorResponse;
+    /**
+     * Validation failed
+     */
+    422: ErrorResponse;
+    /**
+     * Rate limit exceeded
+     */
+    429: ErrorResponse;
+    /**
+     * Internal error
+     */
+    500: ErrorResponse;
+    /**
+     * Dependency unavailable
+     */
+    503: ErrorResponse;
+};
+
+export type ListMessagesApiV1ChatSessionsSessionIdMessagesGetError = ListMessagesApiV1ChatSessionsSessionIdMessagesGetErrors[keyof ListMessagesApiV1ChatSessionsSessionIdMessagesGetErrors];
+
+export type ListMessagesApiV1ChatSessionsSessionIdMessagesGetResponses = {
+    /**
+     * Response List Messages Api V1 Chat Sessions  Session Id  Messages Get
+     *
+     * Successful Response
+     */
+    200: Array<ChatMessageResponse>;
+};
+
+export type ListMessagesApiV1ChatSessionsSessionIdMessagesGetResponse = ListMessagesApiV1ChatSessionsSessionIdMessagesGetResponses[keyof ListMessagesApiV1ChatSessionsSessionIdMessagesGetResponses];
+
+export type AddMessageApiV1ChatSessionsSessionIdMessagesPostData = {
+    body: ChatMessageCreate;
+    headers: {
+        /**
+         * Idempotency-Key
+         */
+        'Idempotency-Key': string;
+    };
+    path: {
+        /**
+         * Session Id
+         */
+        session_id: string;
+    };
+    query?: never;
+    url: '/api/v1/chat/sessions/{session_id}/messages';
+};
+
+export type AddMessageApiV1ChatSessionsSessionIdMessagesPostErrors = {
+    /**
+     * Invalid request
+     */
+    400: ErrorResponse;
+    /**
+     * Authentication required
+     */
+    401: ErrorResponse;
+    /**
+     * Permission denied
+     */
+    403: ErrorResponse;
+    /**
+     * Resource not found
+     */
+    404: ErrorResponse;
+    /**
+     * State or revision conflict
+     */
+    409: ErrorResponse;
+    /**
+     * Validation failed
+     */
+    422: ErrorResponse;
+    /**
+     * Rate limit exceeded
+     */
+    429: ErrorResponse;
+    /**
+     * Internal error
+     */
+    500: ErrorResponse;
+    /**
+     * Dependency unavailable
+     */
+    503: ErrorResponse;
+};
+
+export type AddMessageApiV1ChatSessionsSessionIdMessagesPostError = AddMessageApiV1ChatSessionsSessionIdMessagesPostErrors[keyof AddMessageApiV1ChatSessionsSessionIdMessagesPostErrors];
+
+export type AddMessageApiV1ChatSessionsSessionIdMessagesPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: ChatSessionResponse;
+};
+
+export type AddMessageApiV1ChatSessionsSessionIdMessagesPostResponse = AddMessageApiV1ChatSessionsSessionIdMessagesPostResponses[keyof AddMessageApiV1ChatSessionsSessionIdMessagesPostResponses];
+
+export type StreamMessageApiV1ChatSessionsSessionIdMessagesStreamPostData = {
+    body: ChatMessageCreate;
+    headers: {
+        /**
+         * Idempotency-Key
+         */
+        'Idempotency-Key': string;
+    };
+    path: {
+        /**
+         * Session Id
+         */
+        session_id: string;
+    };
+    query?: never;
+    url: '/api/v1/chat/sessions/{session_id}/messages/stream';
+};
+
+export type StreamMessageApiV1ChatSessionsSessionIdMessagesStreamPostErrors = {
+    /**
+     * Invalid request
+     */
+    400: ErrorResponse;
+    /**
+     * Authentication required
+     */
+    401: ErrorResponse;
+    /**
+     * Permission denied
+     */
+    403: ErrorResponse;
+    /**
+     * Resource not found
+     */
+    404: ErrorResponse;
+    /**
+     * State or revision conflict
+     */
+    409: ErrorResponse;
+    /**
+     * Validation failed
+     */
+    422: ErrorResponse;
+    /**
+     * Rate limit exceeded
+     */
+    429: ErrorResponse;
+    /**
+     * Internal error
+     */
+    500: ErrorResponse;
+    /**
+     * Dependency unavailable
+     */
+    503: ErrorResponse;
+};
+
+export type StreamMessageApiV1ChatSessionsSessionIdMessagesStreamPostError = StreamMessageApiV1ChatSessionsSessionIdMessagesStreamPostErrors[keyof StreamMessageApiV1ChatSessionsSessionIdMessagesStreamPostErrors];
+
+export type StreamMessageApiV1ChatSessionsSessionIdMessagesStreamPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type ContinueToResumeBuilderApiV1ChatSessionsSessionIdResumeDraftPostData = {
+    body?: never;
+    path: {
+        /**
+         * Session Id
+         */
+        session_id: string;
+    };
+    query?: never;
+    url: '/api/v1/chat/sessions/{session_id}/resume-draft';
+};
+
+export type ContinueToResumeBuilderApiV1ChatSessionsSessionIdResumeDraftPostErrors = {
+    /**
+     * Invalid request
+     */
+    400: ErrorResponse;
+    /**
+     * Authentication required
+     */
+    401: ErrorResponse;
+    /**
+     * Permission denied
+     */
+    403: ErrorResponse;
+    /**
+     * Resource not found
+     */
+    404: ErrorResponse;
+    /**
+     * State or revision conflict
+     */
+    409: ErrorResponse;
+    /**
+     * Validation failed
+     */
+    422: ErrorResponse;
+    /**
+     * Rate limit exceeded
+     */
+    429: ErrorResponse;
+    /**
+     * Internal error
+     */
+    500: ErrorResponse;
+    /**
+     * Dependency unavailable
+     */
+    503: ErrorResponse;
+};
+
+export type ContinueToResumeBuilderApiV1ChatSessionsSessionIdResumeDraftPostError = ContinueToResumeBuilderApiV1ChatSessionsSessionIdResumeDraftPostErrors[keyof ContinueToResumeBuilderApiV1ChatSessionsSessionIdResumeDraftPostErrors];
+
+export type ContinueToResumeBuilderApiV1ChatSessionsSessionIdResumeDraftPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: ResumeResponse;
+};
+
+export type ContinueToResumeBuilderApiV1ChatSessionsSessionIdResumeDraftPostResponse = ContinueToResumeBuilderApiV1ChatSessionsSessionIdResumeDraftPostResponses[keyof ContinueToResumeBuilderApiV1ChatSessionsSessionIdResumeDraftPostResponses];
+
 export type GetDocumentApiV1DocumentsDocumentIdGetData = {
     body?: never;
     path: {
@@ -5765,6 +6673,61 @@ export type SaveResumeApiV1ProductResumePutResponses = {
 };
 
 export type SaveResumeApiV1ProductResumePutResponse = SaveResumeApiV1ProductResumePutResponses[keyof SaveResumeApiV1ProductResumePutResponses];
+
+export type ExportResumePdfApiV1ProductResumeExportPdfGetData = {
+    body: Settings;
+    path?: never;
+    query?: never;
+    url: '/api/v1/product/resume/export.pdf';
+};
+
+export type ExportResumePdfApiV1ProductResumeExportPdfGetErrors = {
+    /**
+     * Invalid request
+     */
+    400: ErrorResponse;
+    /**
+     * Authentication required
+     */
+    401: ErrorResponse;
+    /**
+     * Permission denied
+     */
+    403: ErrorResponse;
+    /**
+     * Resource not found
+     */
+    404: ErrorResponse;
+    /**
+     * State or revision conflict
+     */
+    409: ErrorResponse;
+    /**
+     * Validation failed
+     */
+    422: ErrorResponse;
+    /**
+     * Rate limit exceeded
+     */
+    429: ErrorResponse;
+    /**
+     * Internal error
+     */
+    500: ErrorResponse;
+    /**
+     * Dependency unavailable
+     */
+    503: ErrorResponse;
+};
+
+export type ExportResumePdfApiV1ProductResumeExportPdfGetError = ExportResumePdfApiV1ProductResumeExportPdfGetErrors[keyof ExportResumePdfApiV1ProductResumeExportPdfGetErrors];
+
+export type ExportResumePdfApiV1ProductResumeExportPdfGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
 
 export type GetRoadmapApiV1ProductRoadmapGetData = {
     body?: never;

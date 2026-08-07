@@ -30,6 +30,8 @@ export const RESUME_LIMITS = {
   highlights: 2000,
   skill: 60,
   skills: 60,
+  evidence: 20000,
+  evidenceItems: 100,
   experience: 25,
 } as const
 
@@ -55,6 +57,9 @@ export const resumeSchema = z.object({
   summary: capped(RESUME_LIMITS.summary),
   experience: z.array(experienceSchema).max(RESUME_LIMITS.experience),
   skills: z.array(capped(RESUME_LIMITS.skill)).max(RESUME_LIMITS.skills),
+  education: z.array(capped(RESUME_LIMITS.evidence)).max(RESUME_LIMITS.evidenceItems),
+  projects: z.array(capped(RESUME_LIMITS.evidence)).max(RESUME_LIMITS.evidenceItems),
+  achievements: z.array(capped(RESUME_LIMITS.evidence)).max(RESUME_LIMITS.evidenceItems),
 })
 
 export type ResumeData = z.infer<typeof resumeSchema>
@@ -100,5 +105,14 @@ export function clampResume(input: unknown): unknown {
     skills: Array.isArray(raw.skills)
       ? raw.skills.slice(0, RESUME_LIMITS.skills).map((s) => str(s, RESUME_LIMITS.skill))
       : raw.skills,
+    education: Array.isArray(raw.education)
+      ? raw.education.slice(0, RESUME_LIMITS.evidenceItems).map((item) => str(item, RESUME_LIMITS.evidence))
+      : [],
+    projects: Array.isArray(raw.projects)
+      ? raw.projects.slice(0, RESUME_LIMITS.evidenceItems).map((item) => str(item, RESUME_LIMITS.evidence))
+      : [],
+    achievements: Array.isArray(raw.achievements)
+      ? raw.achievements.slice(0, RESUME_LIMITS.evidenceItems).map((item) => str(item, RESUME_LIMITS.evidence))
+      : [],
   }
 }

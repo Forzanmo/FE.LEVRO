@@ -39,6 +39,39 @@ function SectionCard({
   )
 }
 
+function EvidenceListEditor({
+  id,
+  label,
+  value,
+  onChange,
+}: {
+  id: string
+  label: string
+  value: string[]
+  onChange: (value: string[]) => void
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label htmlFor={id}>{label}</Label>
+      <Textarea
+        id={id}
+        rows={4}
+        value={value.join('\n')}
+        onChange={(event) =>
+          onChange(
+            event.target.value
+              .split('\n')
+              .map((item) => item.trim())
+              .filter(Boolean),
+          )
+        }
+        placeholder="One item per line"
+      />
+      <p className="text-muted-foreground text-xs">One item per line. You can edit anything gathered by the AI coach.</p>
+    </div>
+  )
+}
+
 export function ResumeEditor({ form }: { form: UseFormReturn<ResumeData> }) {
   const {
     register,
@@ -50,6 +83,9 @@ export function ResumeEditor({ form }: { form: UseFormReturn<ResumeData> }) {
   } = form
   const { fields, append, remove, insert } = useFieldArray({ control, name: 'experience' })
   const skills = watch('skills')
+  const education = watch('education')
+  const projects = watch('projects')
+  const achievements = watch('achievements')
 
   /*
    * Undo, matching the applications table exactly.
@@ -108,6 +144,10 @@ export function ResumeEditor({ form }: { form: UseFormReturn<ResumeData> }) {
           />
           <TextField label="Website" maxLength={RESUME_LIMITS.website} {...register('website')} />
         </div>
+      </SectionCard>
+
+      <SectionCard title="Education" description="Degrees, institutions, coursework, and dates gathered from your chat.">
+        <EvidenceListEditor id="resume-education" label="Education entries" value={education} onChange={(value) => setValue('education', value, { shouldDirty: true })} />
       </SectionCard>
 
       <SectionCard
@@ -207,6 +247,14 @@ export function ResumeEditor({ form }: { form: UseFormReturn<ResumeData> }) {
             ? `That’s the maximum of ${RESUME_LIMITS.experience} roles`
             : 'Add role'}
         </Button>
+      </SectionCard>
+
+      <SectionCard title="Projects" description="Academic, personal, freelance, and volunteer work relevant to your target.">
+        <EvidenceListEditor id="resume-projects" label="Project evidence" value={projects} onChange={(value) => setValue('projects', value, { shouldDirty: true })} />
+      </SectionCard>
+
+      <SectionCard title="Achievements" description="Measured outcomes, awards, and evidence of impact.">
+        <EvidenceListEditor id="resume-achievements" label="Achievement evidence" value={achievements} onChange={(value) => setValue('achievements', value, { shouldDirty: true })} />
       </SectionCard>
 
       <SectionCard title="Skills" description="Press Enter after each skill.">

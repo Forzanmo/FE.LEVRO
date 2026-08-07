@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 
-import { CoachView } from '@/features/coach/coach-view'
+import { ChatWorkspaceView } from '@/features/chat/chat-workspace-view'
 
 export const metadata: Metadata = {
-  title: 'AI Coach',
+  title: 'AI workspace',
 }
 
 export default function CoachPage() {
-  return <CoachView />
+  return <ChatWorkspaceView />
 }

@@ -2,7 +2,7 @@ import { getResumeApiV1ProductResumeGet, saveResumeApiV1ProductResumePut } from 
 import type { ResumeData as ApiResumeData, ResumeResponse } from '@/api/generated'
 import type { ResumeData } from '@/lib/validators/resume-schema'
 import { unwrapApiResult } from '@/lib/api/http-client'
-import '@/lib/api/runtime'
+import { authenticatedFetch } from '@/lib/api/runtime'
 
 export interface ResumeSession {
   data: ResumeData
@@ -22,6 +22,9 @@ function fromApi(response: ResumeResponse): ResumeSession {
       summary: response.data.summary,
       experience: response.data.experience,
       skills: response.data.skills,
+      education: response.data.education ?? [],
+      projects: response.data.projects ?? [],
+      achievements: response.data.achievements ?? [],
     },
   }
 }
@@ -37,11 +40,17 @@ function toApi(data: ResumeData): ApiResumeData {
     summary: data.summary,
     experience: data.experience,
     skills: data.skills,
+    education: data.education,
+    projects: data.projects,
+    achievements: data.achievements,
   }
 }
 
 export const resumeService = {
   async get(): Promise<ResumeSession> {
+    // Backfill facts from the latest chat before loading the editable draft.
+    // A user without a chat simply receives the normal blank/profile draft.
+    await authenticatedFetch('/api/v1/chat/resume-draft', { method: 'POST' }).catch(() => null)
     return fromApi(unwrapApiResult(await getResumeApiV1ProductResumeGet()))
   },
 

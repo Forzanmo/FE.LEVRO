@@ -16,6 +16,19 @@ export function setAccessToken(token: string | null): void {
   accessToken = token
 }
 
+/** Authenticated fetch for workspace endpoints not yet represented by the generated SDK. */
+export async function authenticatedFetch(input: RequestInfo | URL, init: RequestInit = {}) {
+  const headers = new Headers(init.headers)
+  if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
+  const response = await fetch(input, { ...init, headers, credentials: 'include' })
+  if (response.status !== 401) return response
+  const token = await refreshAccessToken()
+  if (!token) return response
+  headers.set('Authorization', `Bearer ${token}`)
+  headers.set('x-levrro-retry', '1')
+  return fetch(input, { ...init, headers, credentials: 'include' })
+}
+
 export function subscribeToSessionExpiration(listener: () => void): () => void {
   expirationListeners.add(listener)
   return () => expirationListeners.delete(listener)

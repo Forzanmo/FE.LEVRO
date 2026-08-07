@@ -45,6 +45,18 @@ function MinimalistSection({ title, children }: { title: string; children: React
   )
 }
 
+function EvidenceBullets({ items }: { items: string[] }) {
+  return (
+    <ul className="space-y-1">
+      {items.map((item, index) => (
+        <li key={index} className="text-sm leading-relaxed text-[var(--neutral-700)]">
+          {item}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 function MinimalistCv({ data }: { data: ResumeData }) {
   const contact = [data.email, data.phone, data.location, data.website].filter(Boolean)
 
@@ -123,6 +135,10 @@ function MinimalistCv({ data }: { data: ResumeData }) {
           </div>
         </MinimalistSection>
       ) : null}
+
+      {data.education.length > 0 ? <MinimalistSection title="Education"><EvidenceBullets items={data.education} /></MinimalistSection> : null}
+      {data.projects.length > 0 ? <MinimalistSection title="Projects"><EvidenceBullets items={data.projects} /></MinimalistSection> : null}
+      {data.achievements.length > 0 ? <MinimalistSection title="Achievements"><EvidenceBullets items={data.achievements} /></MinimalistSection> : null}
 
       {data.skills.length > 0 ? (
         <MinimalistSection title="Skills">
@@ -243,6 +259,12 @@ function DesignerCv({ data }: { data: ResumeData }) {
               </div>
             </section>
           ) : null}
+          {(['education', 'projects', 'achievements'] as const).map((key) => data[key].length > 0 ? (
+            <section key={key} className="mt-6">
+              <h3 className="font-heading text-sm font-semibold tracking-tight capitalize">{key}</h3>
+              <div className="mt-2"><EvidenceBullets items={data[key]} /></div>
+            </section>
+          ) : null)}
         </div>
       </div>
     </div>
@@ -304,6 +326,13 @@ function AtsCv({ data }: { data: ResumeData }) {
           </div>
         </section>
       ) : null}
+
+      {(['education', 'projects', 'achievements'] as const).map((key) => data[key].length > 0 ? (
+        <section key={key} className="mt-5">
+          <h3 className="text-sm font-bold tracking-caps uppercase">{key}</h3>
+          <ul className="mt-1">{data[key].map((item, index) => <li key={index} className="text-sm leading-relaxed">- {item}</li>)}</ul>
+        </section>
+      ) : null)}
 
       {data.skills.length > 0 ? (
         <section className="mt-5">

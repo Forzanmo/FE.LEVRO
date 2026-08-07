@@ -23,6 +23,9 @@ const EMPTY_RESUME: ResumeData = {
   summary: '',
   experience: [],
   skills: [],
+  education: [],
+  projects: [],
+  achievements: [],
 }
 
 export function useResume() {

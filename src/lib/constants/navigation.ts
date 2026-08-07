@@ -11,11 +11,8 @@ export interface NavItem {
 /** Full sidebar navigation (spec §4). */
 export const PRIMARY_NAV: readonly NavItem[] = [
   { label: 'Dashboard', href: ROUTES.dashboard, icon: 'dashboard' },
-  { label: 'Applications', href: ROUTES.applications, icon: 'applications' },
+  { label: 'AI workspace', href: ROUTES.coach, icon: 'coach' },
   { label: 'Documents', href: ROUTES.documents, icon: 'resume' },
-  { label: 'AI coach', href: ROUTES.coach, icon: 'coach' },
-  { label: 'CV builder', href: ROUTES.resume, icon: 'resume' },
-  { label: 'Cover letter', href: ROUTES.coverLetter, icon: 'cover-letter' },
   // Achievements removed with the roadmap that fed it (PRODUCT.md, "Planned").
   // A badge wall with no progression behind it is the gamification the product's
   // anti-references rule out, and it was the one screen stacking two of the
@@ -29,25 +26,6 @@ export const SECONDARY_NAV: readonly NavItem[] = [
 /** Mobile bottom navigation — a focused five-item subset. */
 export const MOBILE_NAV: readonly NavItem[] = [
   { label: 'Dashboard', href: ROUTES.dashboard, icon: 'dashboard' },
-  /*
-   * "Tracker", not "Apps".
-   *
-   * On a phone, "Apps" reads as software before it reads as job applications —
-   * the one place the word has a dominant competing meaning is the device this
-   * label only ever appears on.
-   *
-   * The full noun is not an option: measured at `text-xs font-medium`,
-   * "Applications" is 71px against a 56–70px column at 320–390px, so `truncate`
-   * would clip it to "Applicat…" on essentially every phone. "Pipeline" is
-   * recruiter jargon and "Jobs" promises a job board this product does not have,
-   * both of which PRODUCT.md's plain-language bar rules out. "Tracker" is the
-   * verb the page itself uses — "Track every application from applied to offer".
-   *
-   * The sidebar keeps "Applications". That is a container/contents pair, not the
-   * Resume-vs-CV problem: those were two names for one artifact, which is what
-   * actually confuses people.
-   */
-  { label: 'Tracker', href: ROUTES.applications, icon: 'applications' },
+  { label: 'Workspace', href: ROUTES.coach, icon: 'coach' },
   { label: 'Docs', href: ROUTES.documents, icon: 'resume' },
-  { label: 'Coach', href: ROUTES.coach, icon: 'coach' },
 ]
