@@ -182,8 +182,78 @@ body {
   animation: chevron-rise 16s linear infinite;
 }
 
+/*
+ * Pricing gets a calmer version of the brand's upward motion. The texture
+ * overhangs the section, so its one-tile compositor shift loops without
+ * exposing an edge. Cards respond only when their actual CTA is targeted.
+ */
+.pricing-chevron-drift {
+  animation: chevron-rise 24s linear infinite;
+}
+
+.pricing-plan {
+  transition:
+    transform var(--duration-base) var(--ease-emphasized),
+    box-shadow var(--duration-base) var(--ease-emphasized);
+}
+
+.pricing-plan:has(a:hover),
+.pricing-plan:focus-within {
+  transform: translate3d(0, -5px, 0);
+  box-shadow: 0 28px 64px -30px rgb(0 0 0 / 0.78);
+}
+
+/*
+ * The hero behaves like a recruiter lens: light follows the point being
+ * inspected while the brand mark and evidence chevrons separate into shallow
+ * depth planes. Defaults match the original static composition before JS runs.
+ */
+.interactive-hero {
+  --pointer-x: 82%;
+  --pointer-y: 2%;
+  --pointer-dx: 0;
+  --pointer-dy: 0;
+}
+
+.hero-pointer-light {
+  background:
+    radial-gradient(
+      34rem 28rem at var(--pointer-x) var(--pointer-y),
+      color-mix(in oklab, var(--accent-400) 26%, transparent),
+      transparent 68%
+    ),
+    radial-gradient(
+      70% 60% at 6% 104%,
+      color-mix(in oklab, var(--brand-950) 85%, transparent),
+      transparent 72%
+    );
+  transition: background 180ms linear;
+}
+
+.hero-reactive-mark,
+.hero-reactive-chevrons {
+  transition: transform 280ms var(--ease-emphasized);
+}
+
+.hero-reactive-mark {
+  transform: translate3d(
+    calc(var(--pointer-dx) * -18px),
+    calc(var(--pointer-dy) * -12px),
+    0
+  );
+}
+
+.hero-reactive-chevrons {
+  transform: translate3d(
+    calc(var(--pointer-dx) * 10px),
+    calc(var(--pointer-dy) * 7px),
+    0
+  );
+}
+
 @media (max-width: 767px) {
-  .chevron-drift {
+  .chevron-drift,
+  .pricing-chevron-drift {
     animation: none;
   }
 }
@@ -389,6 +459,49 @@ body {
 .meter-segment {
   transform-origin: left center;
   animation: meter-fill 1.15s var(--ease-decelerate);
+}
+
+/* Evidence Engine: source lines visibly resolve into recruiter verdicts. */
+@keyframes evidence-trace {
+  0%, 12% { stroke-dashoffset: 1; }
+  68%, 100% { stroke-dashoffset: 0; }
+}
+@keyframes evidence-scan {
+  0%, 10% { transform: translateY(-115%); }
+  72%, 100% { transform: translateY(115%); }
+}
+@keyframes evidence-node-lock {
+  0%, 58% { transform: scale(0.4); opacity: 0; }
+  72%, 100% { transform: scale(1); opacity: 1; }
+}
+.evidence-engine {
+  --engine-line: color-mix(in oklab, var(--accent-700) 30%, transparent);
+}
+.evidence-circuit { opacity: 0.42; }
+.evidence-path {
+  fill: none;
+  stroke: var(--engine-line);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: evidence-trace 3.15s var(--ease-decelerate) both;
+}
+.evidence-path-b { animation-delay: 120ms; }
+.evidence-path-c { animation-delay: 240ms; }
+.evidence-node {
+  fill: var(--accent-600);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: evidence-node-lock 3.15s var(--ease-decelerate) both;
+}
+.evidence-node-b { animation-delay: 180ms; }
+.evidence-node-c { animation-delay: 300ms; }
+.evidence-scan {
+  position: absolute;
+  inset: -18% 0;
+  z-index: 0;
+  background: linear-gradient(to bottom, transparent 44%, color-mix(in oklab, var(--accent-500) 9%, transparent) 49%, color-mix(in oklab, var(--accent-500) 18%, transparent) 50%, transparent 56%);
+  animation: evidence-scan 3.15s var(--ease-decelerate) both;
 }
 
 /* -------------------------------------------------------------------------- */

@@ -28,9 +28,9 @@ export function CoachMessage({
   return (
     <motion.div
       className="flex items-start gap-3"
-      initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
     >
       <CoachAvatar />
       <div className="min-w-0 flex-1 space-y-1.5 pt-0.5">
@@ -43,7 +43,7 @@ export function CoachMessage({
          * surface. History stays a <p>: only one question is ever current.
          */}
         {emphasized ? (
-          <h2 className="font-heading text-xl leading-snug font-semibold tracking-normal text-pretty">
+          <h2 className="font-heading text-lg leading-snug font-semibold tracking-normal text-pretty sm:text-xl">
             {prompt}
           </h2>
         ) : (
@@ -95,7 +95,7 @@ export function CoachMessage({
                  * It is the one block of running text in the assessment, read
                  * by someone deciding whether to trust the question.
                  */}
-                <p className="text-muted-foreground bg-muted/60 mt-1.5 max-w-[45ch] rounded-lg px-3 py-2 text-sm">
+                <p className="text-muted-foreground mt-1.5 max-w-[45ch] text-sm leading-relaxed">
                   {reasoning}
                 </p>
               </div>

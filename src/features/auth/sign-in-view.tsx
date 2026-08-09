@@ -31,11 +31,11 @@ const VALUE_PROPS: { icon: IconName; text: string }[] = [
   { icon: 'resume', text: 'A recruiter-ready CV and cover letter' },
 ]
 
-export function SignInView() {
+export function SignInView({ initialMode = 'sign-in' }: { initialMode?: 'sign-in' | 'register' }) {
   const { status, user, hasOnboarded, signIn, register } = useSession()
   const router = useRouter()
   const handled = useRef(false)
-  const [registering, setRegistering] = useState(false)
+  const [registering, setRegistering] = useState(initialMode === 'register')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -78,9 +78,13 @@ export function SignInView() {
       <div className="bg-card ring-foreground/10 rounded-2xl p-8 shadow-lg ring-1">
         <div className="space-y-2 text-center">
           <Heading level={1} size="2xl">
-            Welcome to {siteConfig.name}
+            {registering ? `Create your ${siteConfig.name} account` : `Welcome back to ${siteConfig.name}`}
           </Heading>
-          <Text tone="muted">Sign in to build your career readiness — free to start.</Text>
+          <Text tone="muted">
+            {registering
+              ? 'Start your career assessment for free. No credit card required.'
+              : 'Sign in to continue your saved assessment and documents.'}
+          </Text>
         </div>
 
         {/*

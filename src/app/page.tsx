@@ -4,7 +4,9 @@ import { Logo } from '@/components/layout'
 import { BrandMark } from '@/components/layout/brand-mark'
 import { AssessmentPanel } from '@/components/marketing/assessment-panel'
 import { GapClosing } from '@/components/marketing/gap-closing'
+import { InteractiveHero } from '@/components/marketing/interactive-hero'
 import { MobileNav, type MarketingNavLink } from '@/components/marketing/mobile-nav'
+import { PricingSection } from '@/features/monetization/pricing-section'
 import { BrandBackdrop } from '@/components/shared/brand-backdrop'
 import { SkipLink } from '@/components/shared/skip-link'
 import { Reveal } from '@/components/shared/reveal'
@@ -28,6 +30,7 @@ import { cn } from '@/lib/utils'
 const NAV_LINKS: readonly MarketingNavLink[] = [
   { label: 'How it works', href: '#how-it-works' },
   { label: 'What you get', href: '#features' },
+  { label: 'Pricing', href: '#pricing' },
 ]
 
 /**
@@ -124,6 +127,7 @@ const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[]
     links: [
       { label: 'How it works', href: '#how-it-works' },
       { label: 'What you get', href: '#features' },
+      { label: 'Pricing', href: '#pricing' },
       { label: 'Sign in', href: ROUTES.signIn },
     ],
   },
@@ -204,7 +208,7 @@ function MarketingHeader() {
             size="sm"
             className="text-brand-900 h-11 bg-white px-4 hover:bg-white/90 sm:h-8"
           >
-            <Link href={ROUTES.signIn}>Get started</Link>
+            <Link href={ROUTES.createAccount}>Create free account</Link>
           </Button>
           <MobileNav links={NAV_LINKS} />
         </div>
@@ -237,19 +241,12 @@ export default function HomePage() {
          * is no blurred blob anywhere on this page, because a blurred blob is
          * the one background every generated landing page already has.
          */}
-        <section className="relative isolate overflow-hidden bg-brand-surface text-white">
+        <InteractiveHero className="relative isolate overflow-hidden bg-brand-surface text-white">
           {/* Layer 2 — one light, from the upper right, and the floor falling
               away into deeper navy at the lower left. One source, one direction. */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 -z-10"
-            style={{
-              background:
-                'radial-gradient(58% 46% at 82% 2%,' +
-                ' color-mix(in oklab, var(--accent-500) 22%, transparent), transparent 72%),' +
-                'radial-gradient(70% 60% at 6% 104%,' +
-                ' color-mix(in oklab, var(--brand-950) 85%, transparent), transparent 72%)',
-            }}
+            className="hero-pointer-light pointer-events-none absolute inset-0 -z-10"
           />
 
           {/* Layer 3a — the mark itself, oversized and cropped by the fold's own
@@ -257,14 +254,13 @@ export default function HomePage() {
               not an abstract shape floating for atmosphere. */}
           <BrandMark
             tone="onBrand"
-            className="pointer-events-none absolute -right-16 -bottom-24 -z-10 w-[26rem] opacity-[0.05] sm:-right-20 sm:w-[34rem] lg:-right-24 lg:w-[44rem]"
+            className="hero-reactive-mark pointer-events-none absolute -right-16 -bottom-24 -z-10 w-[26rem] opacity-[0.05] sm:-right-20 sm:w-[34rem] lg:-right-24 lg:w-[44rem]"
           />
 
           {/* Layer 3b + 4 — the chevron field, rising. */}
-          <div
-            aria-hidden="true"
-            className="chevron-field chevron-drift pointer-events-none absolute inset-x-0 -inset-y-6 -z-10 text-white opacity-[0.055]"
-          />
+          <div aria-hidden="true" className="hero-reactive-chevrons pointer-events-none absolute inset-x-0 -inset-y-6 -z-10">
+            <div className="chevron-field chevron-drift absolute inset-0 text-white opacity-[0.055]" />
+          </div>
 
           <div
             className={cn(
@@ -364,9 +360,9 @@ export default function HomePage() {
                   fullWidth
                   className="text-brand-900 bg-white shadow-lg hover:bg-white/90 sm:w-auto"
                 >
-                  <Link href={ROUTES.signIn}>
+                  <Link href={ROUTES.createAccount}>
                     See what mine proves
-                    <Icon name="arrow-right" size="sm" />
+                    <Icon name="arrow-right" size="sm" className="transition-transform duration-200 group-hover/button:translate-x-1" />
                   </Link>
                 </Button>
                 {/*
@@ -400,7 +396,7 @@ export default function HomePage() {
                 asymmetry is the composition, not an accident of the grid. */}
             <AssessmentPanel className="min-w-0 lg:mt-10" />
           </div>
-        </section>
+        </InteractiveHero>
 
         {/*
          * How it works — a genuine ordered sequence, so it is built as one.
@@ -617,6 +613,8 @@ export default function HomePage() {
 
         {/* CTA band — the second committed brand surface, carrying the same
             layer stack as the hero so the page closes where it opened. */}
+        <PricingSection />
+
         <section className={cn(SHELL, 'pb-16 sm:pb-20')}>
           {/*
            * No `shadow-brand-glow` here. A teal halo around a near-black band
@@ -683,9 +681,9 @@ export default function HomePage() {
               >
                 {/* The same words as the hero's primary. A visitor scrolling
                       5,900px should recognise the door, not count new ones. */}
-                <Link href={ROUTES.signIn}>
+                <Link href={ROUTES.createAccount}>
                   See what mine proves
-                  <Icon name="arrow-right" size="sm" />
+                  <Icon name="arrow-right" size="sm" className="transition-transform duration-200 group-hover/button:translate-x-1" />
                 </Link>
               </Button>
             </div>

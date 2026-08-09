@@ -15,6 +15,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Heading } from '@/components/ui/typography'
 import { ROUTES } from '@/lib/constants/routes'
+import { useSession } from '@/providers/session-provider'
 
 import type { CoachAnswer, CoachQuestion } from './types'
 import { useCoach } from './use-coach'
@@ -60,9 +61,13 @@ function ResumePrompt({ onResume, onRestart }: { onResume: () => void; onRestart
 
 export function CoachView() {
   const coach = useCoach()
+  const { user, profileData } = useSession()
   const router = useRouter()
   const endRef = useRef<HTMLDivElement>(null)
   const reduceMotion = useReducedMotion()
+  const avatarStyle = profileData.avatar_style === 'woman' || profileData.avatar_style === 'man'
+    ? profileData.avatar_style
+    : 'neutral'
 
   // Keep the newest turn in view as the conversation advances — honoring the
   // user's reduced-motion preference like the rest of the app.
@@ -193,7 +198,7 @@ export function CoachView() {
             <div key={question.id} className="space-y-3">
               <CoachMessage prompt={question.prompt} reasoning={question.reasoning} />
               {answer ? (
-                <UserAnswer skipped={answer.skipped} onEdit={() => coach.editAt(index)}>
+                <UserAnswer skipped={answer.skipped} onEdit={() => coach.editAt(index)} avatarStyle={avatarStyle} initials={user?.initials ?? 'You'}>
                   {formatAnswer(question, answer)}
                 </UserAnswer>
               ) : null}

@@ -109,15 +109,29 @@ export function AssessmentPanel({ className }: { className?: string }) {
 
       <div
         className={cn(
-          'relative rounded-2xl p-5 shadow-xl sm:p-6',
+          'evidence-engine relative isolate overflow-hidden rounded-2xl p-5 shadow-xl sm:p-6',
           // The panel is a document, so it uses the shared theme-invariant sheet
           // rather than `card` — it must look the same in both themes, like the
           // CV it describes.
           SHEET_SURFACE,
         )}
       >
+        <div aria-hidden="true" className="evidence-scan" />
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 440 420"
+          preserveAspectRatio="none"
+          className="evidence-circuit pointer-events-none absolute inset-0 z-0 size-full"
+        >
+          <path className="evidence-path evidence-path-a" pathLength="1" d="M38 282 C110 282 120 114 214 114 S320 132 397 132" />
+          <path className="evidence-path evidence-path-b" pathLength="1" d="M38 318 C126 318 140 166 232 166 S330 184 397 184" />
+          <path className="evidence-path evidence-path-c" pathLength="1" d="M38 356 C148 356 150 222 248 222 S334 236 397 236" />
+          <circle className="evidence-node evidence-node-a" cx="38" cy="282" r="3" />
+          <circle className="evidence-node evidence-node-b" cx="397" cy="132" r="3" />
+          <circle className="evidence-node evidence-node-c" cx="397" cy="184" r="3" />
+        </svg>
         {/* Header — what is being assessed, and against what. */}
-        <div className="flex items-start justify-between gap-3">
+        <div className="relative z-10 flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className={cn('text-sm font-semibold', SHEET_INK.heading)}>Skills assessment</p>
             <p className={cn('mt-0.5 truncate text-xs', SHEET_INK.muted)}>
@@ -145,7 +159,7 @@ export function AssessmentPanel({ className }: { className?: string }) {
         </div>
 
         {/* Coverage — the headline number, and a meter that reconciles with it. */}
-        <div className={cn('mt-5 border-t pt-4', SHEET_INK.hairline)}>
+        <div className={cn('relative z-10 mt-5 border-t pt-4', SHEET_INK.hairline)}>
           <div className="flex items-baseline justify-between gap-3">
             <p className={cn('text-xs font-medium', SHEET_INK.body)}>Skills your CV proves</p>
             <p className={cn('text-xs tabular-nums', SHEET_INK.muted)}>
@@ -177,7 +191,7 @@ export function AssessmentPanel({ className }: { className?: string }) {
         </div>
 
         {/* The verdicts. */}
-        <ul className={cn('mt-4 divide-y border-t', SHEET_INK.hairline)}>
+        <ul className={cn('relative z-10 mt-4 divide-y border-t', SHEET_INK.hairline)}>
           {ROWS.map((row) => (
             <li key={row.skill} className={cn('py-2.5', SHEET_INK.hairline)}>
               <div className="flex items-center justify-between gap-3">

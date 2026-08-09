@@ -10,10 +10,14 @@ export function UserAnswer({
   children,
   onEdit,
   skipped = false,
+  avatarStyle = 'neutral',
+  initials = 'You',
 }: {
   children?: React.ReactNode
   onEdit?: () => void
   skipped?: boolean
+  avatarStyle?: 'neutral' | 'woman' | 'man'
+  initials?: string
 }) {
   const reduceMotion = useReducedMotion()
 
@@ -45,6 +49,13 @@ export function UserAnswer({
         >
           {skipped ? 'Skipped' : children}
         </div>
+        <span
+          className="bg-brand-surface text-white grid size-8 shrink-0 place-items-center rounded-full ring-1 ring-white/10"
+          title={`${initials} profile icon`}
+          aria-label={`${initials} profile icon`}
+        >
+          <Icon name={`user-${avatarStyle}`} size="xs" />
+        </span>
       </div>
     </motion.div>
   )

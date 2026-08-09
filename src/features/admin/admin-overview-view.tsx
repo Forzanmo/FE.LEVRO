@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PageHeader } from '@/components/shared/page-header'
-import { DYNAMIC_ROUTES } from '@/lib/constants/routes'
+import { DYNAMIC_ROUTES, ROUTES } from '@/lib/constants/routes'
 import { adminService } from '@/services/api/admin-service'
 
 const number = new Intl.NumberFormat('en-US')
@@ -101,6 +101,8 @@ export function AdminOverviewView() {
         title="Admin panel"
         description="Manage guided questions and monitor production operations."
         actions={
+          <div className="flex flex-wrap items-center gap-2">
+          <Button asChild variant="outline"><Link href={ROUTES.adminMonetization}>Edit pricing</Link></Button>
           <Select value={days} onValueChange={setDays}>
             <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -109,6 +111,7 @@ export function AdminOverviewView() {
               <SelectItem value="90">Last 90 days</SelectItem>
             </SelectContent>
           </Select>
+          </div>
         }
       />
 

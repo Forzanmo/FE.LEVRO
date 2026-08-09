@@ -7,6 +7,7 @@
 export const ROUTES = {
   home: '/',
   signIn: '/sign-in',
+  createAccount: '/sign-in?mode=register',
   forgotPassword: '/forgot-password',
   resetPassword: '/reset-password',
   /** Reserved for a future dedicated sign-up page. */
@@ -20,6 +21,7 @@ export const ROUTES = {
   coverLetter: '/cover-letter',
   applications: '/applications',
   admin: '/admin',
+  adminMonetization: '/admin/monetization',
   /** STUB — removed with the roadmap; rebuild the two together (PRODUCT.md). */
   achievements: '/achievements',
   settings: '/settings',

@@ -115,7 +115,7 @@ export function MobileNav({ links }: { links: readonly MarketingNavLink[] }) {
         <div className="border-border mt-auto flex flex-col gap-3 border-t p-5">
           <SheetClose asChild>
             <Button asChild size="xl" fullWidth>
-              <Link href={ROUTES.signIn}>Get started — it&rsquo;s free</Link>
+              <Link href={ROUTES.createAccount}>Create free account</Link>
             </Button>
           </SheetClose>
           <SheetClose asChild>

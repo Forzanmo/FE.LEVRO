@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react'
 import {
   LayoutDashboardIcon,
-  BotIcon,
+  BotMessageSquareIcon,
   RouteIcon,
   FileTextIcon,
   MailIcon,
@@ -44,6 +44,9 @@ import {
   MoonIcon,
   MonitorIcon,
   UserIcon,
+  CircleUserRoundIcon,
+  VenusIcon,
+  MarsIcon,
   LogOutIcon,
   LogInIcon,
   TargetIcon,
@@ -73,7 +76,7 @@ import {
 export const iconRegistry = {
   // Navigation
   dashboard: LayoutDashboardIcon,
-  coach: BotIcon,
+  coach: BotMessageSquareIcon,
   /** STUB — the roadmap is planned, not built (PRODUCT.md, "Planned"). Kept so
    *  the icon choice survives the gap; no call site should use it until then. */
   roadmap: RouteIcon,
@@ -129,6 +132,9 @@ export const iconRegistry = {
 
   // Account
   user: UserIcon,
+  'user-neutral': CircleUserRoundIcon,
+  'user-woman': VenusIcon,
+  'user-man': MarsIcon,
   logout: LogOutIcon,
   login: LogInIcon,
 

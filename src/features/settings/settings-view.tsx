@@ -95,6 +95,7 @@ function makeProfileDraft(data: Record<string, unknown>, fallbackName: string): 
     ['full_name', editableValue(data.full_name) || fallbackName],
     ['phone', editableValue(data.phone)],
     ['location', editableValue(data.location)],
+    ['avatar_style', typeof data.avatar_style === 'string' ? data.avatar_style : 'neutral'],
     ...PROFILE_SECTIONS.map(([key]) => [key, editableValue(data[key])]),
   ])
 }
@@ -133,7 +134,8 @@ function ProfileForm({
       await updateProfile({
         full_name: fullName,
         phone: draft.phone.trim(),
-        location: draft.location.trim(),
+          location: draft.location.trim(),
+          avatar_style: draft.avatar_style,
         ...Object.fromEntries(
           PROFILE_SECTIONS.map(([key]) => [key, structuredValue(draft[key])]),
         ),
@@ -172,6 +174,25 @@ function ProfileForm({
         use this section to correct or replace them. Keep one item per line. Structured details
         extracted from a CV remain editable as JSON.
       </Text>
+      <ChoiceGroup
+        legend="Profile icon"
+        hideLegend={false}
+        options={[
+          { value: 'neutral', label: 'Neutral' },
+          { value: 'woman', label: 'Woman' },
+          { value: 'man', label: 'Man' },
+        ]}
+        value={draft.avatar_style}
+        onChange={(avatar_style) => setDraft((current) => ({ ...current, avatar_style }))}
+        className="grid grid-cols-3 gap-2 sm:max-w-md"
+      >
+        {(option, { selected }) => (
+          <span className={cn('flex min-h-12 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium transition', selected ? 'border-brand bg-brand-muted/40' : 'border-border hover:bg-muted')}>
+            <Icon name={`user-${option.value}` as IconName} size="sm" />
+            {option.label}
+          </span>
+        )}
+      </ChoiceGroup>
       <div className="grid gap-4 sm:grid-cols-2">
         {PROFILE_SECTIONS.map(([key, label]) => (
           <div key={key} className="space-y-2">
