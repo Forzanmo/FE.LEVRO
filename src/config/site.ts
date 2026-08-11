@@ -8,7 +8,7 @@ export const siteConfig = {
   description:
     'See what your CV actually proves — and fix what it doesn’t. AI coaching that maps your skills to the role you want, then writes the CV and cover letter that show it.',
   tagline: 'Never waste your time.',
-  url: process.env.NEXT_PUBLIC_APP_URL ?? 'https://levvro.app',
+  url: process.env.NEXT_PUBLIC_APP_URL ?? 'https://levrro.app',
   /*
    * No `ogImage` here. It used to point at `/og.png`, a file that was never
    * created — and nothing read the field anyway, so the only thing it did was
@@ -20,7 +20,7 @@ export const siteConfig = {
    */
   creator: 'Levvro',
   /** Single source for the public contact address (footer, legal pages). */
-  contactEmail: 'hello@levvro.app',
+  contactEmail: 'hello@levrro.app',
   keywords: [
     'AI career coach',
     'resume generator',
@@ -30,8 +30,8 @@ export const siteConfig = {
     'job search',
   ],
   links: {
-    twitter: 'https://twitter.com/levvro',
-    github: 'https://github.com/levvro',
+    twitter: 'https://twitter.com/levrro',
+    github: 'https://github.com/levrro',
   },
 } as const
 

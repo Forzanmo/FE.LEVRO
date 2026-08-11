@@ -231,7 +231,7 @@ export function DocumentEditorView({ documentId }: { documentId: string }) {
       const url = URL.createObjectURL(blob)
       const anchor = window.document.createElement('a')
       anchor.href = url
-      anchor.download = `${document.data?.content.title ?? 'levvro-document'}.pdf`
+      anchor.download = `${document.data?.content.title ?? 'levrro-document'}.pdf`
       anchor.click()
       URL.revokeObjectURL(url)
     },

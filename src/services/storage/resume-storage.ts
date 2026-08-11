@@ -5,7 +5,7 @@ import { clampResume, resumeSchema, type ResumeData } from '@/lib/validators/res
  * only place the resume draft is read from or written to the browser. Swappable
  * for a server-backed store without touching the editor.
  */
-const STORAGE_KEY = 'levvro:resume:draft'
+const STORAGE_KEY = 'levrro:resume:draft'
 
 export const resumeStorage = {
   load(): ResumeData | null {

@@ -7,7 +7,7 @@
  * The end of the first session is what the whole session is remembered by, so
  * it has to be true.
  */
-const STORAGE_KEY = 'levvro:journey'
+const STORAGE_KEY = 'levrro:journey'
 
 export interface JourneyState {
   /** ISO timestamp of the first completed assessment, or null. */

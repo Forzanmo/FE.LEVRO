@@ -31,8 +31,8 @@ export function seedFor(state) {
   switch (state) {
     case 'onboarded':
       return {
-        'levvro:auth': { authenticated: true, user: DEMO_USER, hasOnboarded: true },
-        'levvro:journey': { assessmentCompletedAt: SEEDED_AT, dashboardSeenAt: SEEDED_AT },
+        'levrro:auth': { authenticated: true, user: DEMO_USER, hasOnboarded: true },
+        'levrro:journey': { assessmentCompletedAt: SEEDED_AT, dashboardSeenAt: SEEDED_AT },
       }
     /*
      * Signed in and onboarded, but the assessment has never been taken — the
@@ -48,11 +48,11 @@ export function seedFor(state) {
      * describes, one layer down.
      */
     case 'no-assessment':
-      return { 'levvro:auth': { authenticated: true, user: DEMO_USER, hasOnboarded: true } }
+      return { 'levrro:auth': { authenticated: true, user: DEMO_USER, hasOnboarded: true } }
     case 'needs-onboarding':
-      return { 'levvro:auth': { authenticated: true, user: DEMO_USER, hasOnboarded: false } }
+      return { 'levrro:auth': { authenticated: true, user: DEMO_USER, hasOnboarded: false } }
     case 'signedout':
-      return { 'levvro:auth': { authenticated: false, user: null, hasOnboarded: false } }
+      return { 'levrro:auth': { authenticated: false, user: null, hasOnboarded: false } }
     case 'new':
     default:
       // No keys at all — a genuinely fresh visitor. Public surfaces only.

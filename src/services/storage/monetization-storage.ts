@@ -1,7 +1,7 @@
 import type { MonetizationConfig } from '@/features/monetization/types'
 
-const KEY = 'levvro:monetization:v1'
-const EVENT = 'levvro:monetization-change'
+const KEY = 'levrro:monetization:v1'
+const EVENT = 'levrro:monetization-change'
 
 export const DEFAULT_MONETIZATION: MonetizationConfig = {
   heading: 'Choose the support your next move needs',

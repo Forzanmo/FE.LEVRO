@@ -12,8 +12,8 @@ import type { Page } from '@playwright/test'
  * Written via `addInitScript` so the value is present before the app's first
  * render, not after a reload.
  */
-const JOURNEY_KEY = 'levvro:journey'
-const AUTH_KEY = 'levvro:auth'
+const JOURNEY_KEY = 'levrro:journey'
+const AUTH_KEY = 'levrro:auth'
 
 /**
  * Auth has to be seeded explicitly now. A first visit is signed out, so anything

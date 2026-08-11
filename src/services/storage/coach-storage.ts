@@ -12,7 +12,7 @@ import { z } from 'zod'
  * this around a job, studies, or life. A promise the interface makes must be a
  * promise the code keeps.
  */
-const STORAGE_KEY = 'levvro:coach:session'
+const STORAGE_KEY = 'levrro:coach:session'
 
 /** Bump when the persisted shape changes; older payloads are then discarded. */
 const SCHEMA_VERSION = 1
