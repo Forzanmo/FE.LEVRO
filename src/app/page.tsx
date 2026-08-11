@@ -615,7 +615,7 @@ export default function HomePage() {
             layer stack as the hero so the page closes where it opened. */}
         <PricingSection />
 
-        <section className={cn(SHELL, 'pb-16 sm:pb-20')}>
+        <section className={cn(SHELL, 'py-16 sm:py-20')}>
           {/*
            * No `shadow-brand-glow` here. A teal halo around a near-black band
            * on a near-black page is the design system's own crypto/neon
