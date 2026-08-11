@@ -3,8 +3,8 @@
  * Imported by metadata, marketing pages, and layout chrome.
  */
 export const siteConfig = {
-  name: 'Levvro',
-  title: 'Levvro — AI Career Intelligence',
+  name: 'Levrro',
+  title: 'Levrro — AI Career Intelligence',
   description:
     'See what your CV actually proves — and fix what it doesn’t. AI coaching that maps your skills to the role you want, then writes the CV and cover letter that show it.',
   tagline: 'Never waste your time.',
@@ -18,7 +18,7 @@ export const siteConfig = {
    * emits the URL and the dimensions and cannot silently point at nothing.
    * Regenerate it with `npm run brand-assets`.
    */
-  creator: 'Levvro',
+  creator: 'Levrro',
   /** Single source for the public contact address (footer, legal pages). */
   contactEmail: 'hello@levrro.app',
   keywords: [

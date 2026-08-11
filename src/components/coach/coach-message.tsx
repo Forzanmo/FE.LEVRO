@@ -34,7 +34,7 @@ export function CoachMessage({
     >
       <CoachAvatar />
       <div className="min-w-0 flex-1 space-y-1.5 pt-0.5">
-        <span className="text-muted-foreground text-xs font-medium">Levvro coach</span>
+        <span className="text-muted-foreground text-xs font-medium">Levrro coach</span>
         {/*
          * The CURRENT question renders as a real <h2>, not a styled <p>. It is
          * the single most important thing on the screen, and as a paragraph it

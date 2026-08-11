@@ -70,7 +70,7 @@ const HOW_IT_WORKS: { title: string; body: string }[] = [
   },
   {
     title: 'Send the version that proves it',
-    body: 'Levvro writes the CV and the matching cover letter, in the template that suits where you are applying. Every version stays saved and reusable.',
+    body: 'Levrro writes the CV and the matching cover letter, in the template that suits where you are applying. Every version stays saved and reusable.',
   },
 ]
 
@@ -343,7 +343,7 @@ export default function HomePage() {
                 tone="onBrand"
                 className="text-brand-surface-muted mt-5 text-pretty"
               >
-                Levvro reads it the way a recruiter does — then shows you every skill it proves,
+                Levrro reads it the way a recruiter does — then shows you every skill it proves,
                 every skill it doesn&rsquo;t, and the line that decided each one.
               </Text>
 

@@ -20,7 +20,7 @@ Method: dual-agent (A: a3b19ef8b91bd9575 · B: a97ac345f6360d3a0)
 | 6 | Recognition Rather Than Recall | 3 | Panel teaches the verdict vocabulary before step 2 uses it; the trust band's link is styled like its three inert neighbours |
 | 7 | Flexibility and Efficiency | 2 | One door for every visitor — no pricing, FAQ, demo, or way to see anything without an account |
 | 8 | Aesthetic and Minimalist Design | 3 | Real restraint (442 words, 14 teal elements), undone by ~600px of empty white under the sticky features heading |
-| 9 | Error Recovery | 2 | No objection handling. The panel says "Not shown" and the page never says what Levvro does about it |
+| 9 | Error Recovery | 2 | No objection handling. The panel says "Not shown" and the page never says what Levrro does about it |
 | 10 | Help and Documentation | 2 | Never says how long the conversation takes, what it asks, or what "free to start" stops covering |
 | **Total** | | **25/40** | **Acceptable — significant improvements needed** |
 
@@ -118,6 +118,6 @@ The page's craft floor is high and provably so — CLS 0, 61fps, no overflow at 
 ## Questions to Consider
 
 1. Four of the eight controls above the fold resolve to `/sign-in`. If you deleted "Sign in" from the header and made the hero primary read "Start your assessment", what would you actually lose — and who would notice?
-2. The page's argument is "we show our reasoning." The panel's fourth row resolves to `Not shown`, and then nothing. Where is the screen showing what Levvro *does* about a gap — and isn't that more persuasive than the verdict?
+2. The page's argument is "we show our reasoning." The panel's fourth row resolves to `Not shown`, and then nothing. Where is the screen showing what Levrro *does* about a gap — and isn't that more persuasive than the verdict?
 3. A competitor could ship the inverse-test sentence by Friday. Name the one element they could not — then ask whether it deserves more than 22rem of a hero column and one appearance in 5,900px of scroll.
 4. Nothing tells an anxious, time-pressed reader how long the conversation takes, what it asks, or what "free to start" stops covering. Which of those three, answered above the fold, would move more people than every visual fix in this report combined?

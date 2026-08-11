@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 
 /**
- * The Levvro mark — a rising arrowhead with an open book cut out of it, and a
+ * The Levrro mark — a rising arrowhead with an open book cut out of it, and a
  * single teal triangle at the apex.
  *
  * Vector, not the source raster. The mark has to render at 24px in a sidebar,

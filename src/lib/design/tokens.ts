@@ -1,5 +1,5 @@
 /**
- * Levvro Design Tokens — single source of truth.
+ * Levrro Design Tokens — single source of truth.
  *
  * Every color, radius, shadow, motion value, z-index and layout dimension in
  * the product originates here. Nothing downstream (Tailwind, Mantine, Theme UI,
@@ -413,7 +413,7 @@ export const semanticColors: { light: SemanticColorMap; dark: SemanticColorMap }
     // Navy cannot be read on a navy-ink surface, so `brand` climbs to the pale
     // end of its OWN ramp rather than switching to teal. The brand stays navy in
     // both themes; teal stays the accent in both. Swapping them by theme would
-    // mean the product has no fixed answer to "which colour is Levvro".
+    // mean the product has no fixed answer to "which colour is Levrro".
     brand: palette.brand[300],
     'brand-foreground': palette.neutral[950],
     'brand-muted': alpha(palette.brand[400], 0.18),

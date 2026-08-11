@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils'
  * So this section is not new decoration. It is that same idea made structural,
  * and it follows the SAME PERSON as the hero panel. Up there, the Marketing
  * Coordinator's "Budget ownership" reads Thin. Here is the mechanism that
- * changes it: what the coach asked, what she said, the line Levvro wrote from
+ * changes it: what the coach asked, what she said, the line Levrro wrote from
  * it, and the verdict that line earns. One continuous story across the page
  * rather than five interchangeable blocks.
  *
@@ -76,7 +76,7 @@ export function GapClosing() {
           <ol className="border-border relative space-y-8 border-l pl-6 sm:pl-8">
             <li>
               <span className={cn('block text-xs font-medium', 'text-muted-foreground')}>
-                Levvro asked
+                Levrro asked
               </span>
               <Text as="p" size="lg" measure="prose" className="mt-1 text-pretty">
                 {ASKED}
@@ -92,7 +92,7 @@ export function GapClosing() {
 
             <li>
               <span className="text-muted-foreground block text-xs font-medium">
-                Levvro wrote, and put it on the sheet
+                Levrro wrote, and put it on the sheet
               </span>
               {/*
                * On the actual document surface, not in a styled quote. The

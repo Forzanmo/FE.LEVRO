@@ -68,7 +68,7 @@ export function AdminMonetizationView() {
               </div>
               <div className="space-y-2"><Label htmlFor={`plan-${index}-cta`}>Button label</Label><Input id={`plan-${index}-cta`} value={plan.cta} onChange={(event) => updatePlan(index, { cta: event.target.value })} /></div>
               <div className="space-y-2"><Label htmlFor={`plan-${index}-features`}>Features, one per line</Label><Textarea id={`plan-${index}-features`} rows={6} value={plan.features.join('\n')} onChange={(event) => updatePlan(index, { features: event.target.value.split('\n').filter(Boolean) })} /></div>
-              <div className="flex items-center justify-between gap-3"><div><Label htmlFor={`plan-${index}-featured`}>Recommended plan</Label><Text tone="muted" size="sm">Highlight this as Levvro&rsquo;s suggested starting point.</Text></div><Switch id={`plan-${index}-featured`} checked={plan.featured} onCheckedChange={(checked) => updatePlan(index, { featured: checked })} /></div>
+              <div className="flex items-center justify-between gap-3"><div><Label htmlFor={`plan-${index}-featured`}>Recommended plan</Label><Text tone="muted" size="sm">Highlight this as Levrro&rsquo;s suggested starting point.</Text></div><Switch id={`plan-${index}-featured`} checked={plan.featured} onCheckedChange={(checked) => updatePlan(index, { featured: checked })} /></div>
             </div>
           </section>
         ))}

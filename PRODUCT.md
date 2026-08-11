@@ -14,7 +14,7 @@ web
 
 ## Users
 
-Levvro's users are juniors early in their careers and career shifters moving into a
+Levrro's users are juniors early in their careers and career shifters moving into a
 new field — consumer job-seekers, usually facing their first serious job hunt on
 their own. They arrive uncertain and often anxious: unsure what to fix, what
 recruiters want, or whether they're ready. Their context is high-stakes and
@@ -26,16 +26,16 @@ that actually made me confident to go through a real interview."
 
 ## Product Purpose
 
-Levvro turns career uncertainty into a clear, evidence-backed path toward getting
+Levrro turns career uncertainty into a clear, evidence-backed path toward getting
 hired. Rather than starting by generating a CV, it starts with an AI coaching
 conversation to understand the person and assess where they stand, then shows exactly
 which skills their CV proves and which it does not — each verdict with its reasoning
 attached. From that assessment it produces the recruiter-ready assets — CV and cover
 letter — at the right stage of the journey rather than up front.
 
-Levvro exists because the path to "hired" is invisible and overwhelming, and the
+Levrro exists because the path to "hired" is invisible and overwhelming, and the
 market is full of tools that make documents look better without making candidates more
-hireable; Levvro makes the path legible, evidence-based, and paced so the user never
+hireable; Levrro makes the path legible, evidence-based, and paced so the user never
 wastes time.
 
 ### Shipping today
@@ -85,7 +85,7 @@ excitement; earned trust over persuasion.
 
 ## Anti-references
 
-Levvro must not look or feel like any of these:
+Levrro must not look or feel like any of these:
 
 - Generic AI-SaaS — purple gradient blobs, glossy glass cards, gradient-filled text,
   endless identical icon-card grids, the default "an AI made this" look.
@@ -95,7 +95,7 @@ Levvro must not look or feel like any of these:
 - Crypto/neon-dark — glow-heavy neon-on-black hype that reads untrustworthy for
   something as consequential as a career.
 - Cheap resume-builder sites — busy, ad-heavy, template-picker interfaces (the
-  Zety / Canva-resume register). Levvro assesses and coaches toward getting hired;
+  Zety / Canva-resume register). Levrro assesses and coaches toward getting hired;
   it is not a template gallery.
 
 The needle to thread: premium and human, closer to editorial/Linear/Notion craft

@@ -6,7 +6,7 @@ p1_count: 2
 timestamp: 2026-07-22T08-45-06Z
 slug: src-app-app-dashboard-page-tsx
 ---
-# Critique — Levvro (re-run after fixes)
+# Critique — Levrro (re-run after fixes)
 
 Method: dual-agent (A: design review · B: detector + browser evidence). Target: the project quality and progress.
 

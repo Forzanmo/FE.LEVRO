@@ -2,7 +2,7 @@ import { expect, test } from './fixtures'
 
 import { seedAssessed, seedOnboardedNoAssessment } from './support/journey'
 
-test.describe('Levvro smoke', () => {
+test.describe('Levrro smoke', () => {
   test('landing renders the hero and primary CTA', async ({ page }) => {
     await page.goto('/')
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
@@ -62,7 +62,7 @@ test.describe('Levvro smoke', () => {
     await seedAssessed(page)
     await page.goto('/coach')
     await expect(page.getByRole('heading', { name: 'Career assessment' })).toBeVisible()
-    await expect(page.getByText('Levvro coach').first()).toBeVisible()
+    await expect(page.getByText('Levrro coach').first()).toBeVisible()
   })
 
   test('applications table renders rows and controls', async ({ page }) => {

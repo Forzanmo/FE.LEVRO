@@ -1,4 +1,4 @@
-# Levvro — AI Career Intelligence (Frontend)
+# Levrro — AI Career Intelligence (Frontend)
 
 Transform career uncertainty into a measurable roadmap toward getting hired.
 Built with a production-grade, scalable frontend architecture.

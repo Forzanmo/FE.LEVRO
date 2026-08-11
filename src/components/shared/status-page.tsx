@@ -29,7 +29,7 @@ export interface StatusPageProps {
  * It carries its own chrome rather than reusing the app shell, because both can
  * fire outside `(app)` — a bad link from an email, or a render error that took
  * the sidebar down with it. Same backdrop, logo, and theme toggle as the auth
- * surface, so an error still looks like Levvro instead of like the framework's
+ * surface, so an error still looks like Levrro instead of like the framework's
  * default black-on-white, which is what a dead route used to render.
  */
 export function StatusPage({

@@ -42,7 +42,7 @@ export default function GlobalError({
         className="flex min-h-full flex-col items-center justify-center gap-4 px-6 py-12 text-center antialiased"
       >
         <h1 className="font-heading text-2xl font-semibold tracking-tight">
-          Levvro couldn’t start
+          Levrro couldn’t start
         </h1>
         <p className="max-w-sm text-pretty" style={{ color: '#5b6b7e' }}>
           Something failed before the app could load. Your saved work is untouched — reloading
@@ -54,7 +54,7 @@ export default function GlobalError({
           style={{ background: '#0d4980' }}
           className="mt-1 inline-flex h-9 items-center rounded-lg px-3.5 text-sm font-medium text-white"
         >
-          Reload Levvro
+          Reload Levrro
         </button>
         {error.digest ? (
           <p className="text-sm" style={{ color: '#5b6b7e' }}>

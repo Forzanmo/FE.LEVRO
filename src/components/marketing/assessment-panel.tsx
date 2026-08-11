@@ -2,7 +2,7 @@ import { SHEET_INK, SHEET_SURFACE } from '@/components/documents/document-sheet'
 import { cn } from '@/lib/utils'
 
 /**
- * The hero's product visualization: Levvro's skills assessment, mid-run.
+ * The hero's product visualization: Levrro's skills assessment, mid-run.
  *
  * This is the one artefact that answers all three hero questions without being
  * read — what this is (a report on your CV), who it is for (someone chasing a
@@ -212,7 +212,7 @@ export function AssessmentPanel({ className }: { className?: string }) {
 
               {/*
                * The reasoning. This single line is the product's entire claim —
-               * every other tool asserts a score, Levvro quotes the sentence
+               * every other tool asserts a score, Levrro quotes the sentence
                * that earned the verdict — so it is shown by default rather than
                * hidden behind the disclosure the dashboard uses.
                */}

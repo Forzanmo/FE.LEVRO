@@ -49,7 +49,7 @@ export function Logo({
       {/*
        * The mark, unboxed. It used to be a generic sparkles glyph inside a
        * gradient rounded chip — a placeholder that said "AI startup" rather than
-       * "Levvro", and the chip existed only to give the glyph something to sit
+       * "Levrro", and the chip existed only to give the glyph something to sit
        * in. A real mark needs no container.
        */}
       <BrandMark tone={onBrand ? 'onBrand' : 'auto'} className="w-6" />

@@ -186,7 +186,7 @@ export function CoachView() {
         <Alert>
           <AlertTitle>What I will build from this conversation</AlertTitle>
           <AlertDescription>
-            Your answers become editable profile evidence. Levvro can reuse them in your CV,
+            Your answers become editable profile evidence. Levrro can reuse them in your CV,
             cover letter, and tailored applications. You can still edit or replace every field
             later, and you can skip anything that does not apply.
           </AlertDescription>

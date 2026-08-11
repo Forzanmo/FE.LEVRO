@@ -355,7 +355,7 @@ export function SettingsView() {
         />
       </SettingsSection>
 
-      <SettingsSection title="Appearance" description="Choose how Levvro looks on this device.">
+      <SettingsSection title="Appearance" description="Choose how Levrro looks on this device.">
         <AppearanceSection />
       </SettingsSection>
 

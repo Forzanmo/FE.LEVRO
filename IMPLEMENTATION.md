@@ -1,6 +1,6 @@
-# Levvro — Implementation Plan (enhanced build brief)
+# Levrro — Implementation Plan (enhanced build brief)
 
-The definitive blueprint for the enhanced Levvro frontend. It captures the
+The definitive blueprint for the enhanced Levrro frontend. It captures the
 review feedback that motivated this iteration, the design + tech decisions that
 answer each point, and the build order. Read alongside
 [`PRODUCT.md`](./PRODUCT.md) (strategy — who/what/why) and
@@ -9,7 +9,7 @@ answer each point, and the build order. Read alongside
 > A complete, **working reference implementation** of everything below already
 > exists and was verified — WCAG-AA contrast gate + `tsc` typecheck + browser
 > screenshots (marketing & dashboard, light & dark, no console errors) — in the
-> sibling `FRONT_LEVVRO` project. This brief is the enhanced blueprint; the
+> sibling `FRONT_LEVRRO` project. This brief is the enhanced blueprint; the
 > reference code can be adopted directly rather than rebuilt from scratch.
 
 ---
@@ -103,7 +103,7 @@ Tremor** (four styling systems → one; 96 packages gone in the reference build)
 ## 3. Build / adoption order
 
 1. Scaffold Next 16 (App Router, RSC) · React 19 · TypeScript · Tailwind v4, or
-   adopt the `FRONT_LEVVRO` codebase directly.
+   adopt the `FRONT_LEVRRO` codebase directly.
 2. Install the stack in §2.7 (winners only — do not install the removed bloat).
 3. Land `src/lib/design/tokens.ts` (teal/gold) + `scripts/build-tokens.mts`
    (contrast gate). `npm run tokens`.

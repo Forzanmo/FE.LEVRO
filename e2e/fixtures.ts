@@ -111,18 +111,18 @@ export async function installApi(page: Page, initiallyAuthenticated = true) {
       { id: 'plan', type: 'single', prompt: 'What should we generate first?', reasoning: 'The choice prioritizes work.', optional: false, options: [{ value: 'resume', label: 'A stronger resume' }] },
     ]
     if (path === '/api/v1/product/coach' && method === 'GET') {
-      return respond(route, { intro: "Hi — I'm your Levvro coach.", questions: coachQuestions, answers: coachAnswers, revision: coachRevision, completed_at: null })
+      return respond(route, { intro: "Hi — I'm your Levrro coach.", questions: coachQuestions, answers: coachAnswers, revision: coachRevision, completed_at: null })
     }
     if (path === '/api/v1/product/coach/answer' && method === 'PUT') {
       const body = request.postDataJSON() as { question_id: string; value: string | string[]; skipped?: boolean }
       coachRevision += 1
       coachAnswers = { ...coachAnswers, [body.question_id]: { question_id: body.question_id, value: body.value, skipped: Boolean(body.skipped) } }
-      return respond(route, { intro: "Hi — I'm your Levvro coach.", questions: coachQuestions, answers: coachAnswers, revision: coachRevision, completed_at: null })
+      return respond(route, { intro: "Hi — I'm your Levrro coach.", questions: coachQuestions, answers: coachAnswers, revision: coachRevision, completed_at: null })
     }
     if (path === '/api/v1/product/coach' && method === 'DELETE') {
       coachRevision = 0
       coachAnswers = {}
-      return respond(route, { intro: "Hi — I'm your Levvro coach.", questions: coachQuestions, answers: coachAnswers, revision: 0, completed_at: null })
+      return respond(route, { intro: "Hi — I'm your Levrro coach.", questions: coachQuestions, answers: coachAnswers, revision: 0, completed_at: null })
     }
 
     const roadmapNodes = [

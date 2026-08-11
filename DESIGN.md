@@ -1,5 +1,5 @@
 ---
-name: Levvro
+name: Levrro
 description: AI Career Intelligence — see what your CV actually proves, and fix what it doesn’t.
 colors:
   navy-surface: "#0b2540"
@@ -107,13 +107,13 @@ components:
     padding: "{spacing.lg}"
 ---
 
-# Design System: Levvro
+# Design System: Levrro
 
 ## 1. Overview
 
 **Creative North Star: "The Standards Document"**
 
-Levvro should feel like being handed a well-made technical report on your own
+Levrro should feel like being handed a well-made technical report on your own
 career — precise, unhurried, and signed by someone who shows their working. Not a
 brochure and not a dashboard: a document of record, produced by an instrument you
 trust. The system runs on two colours doing two jobs: a **deep navy** for
@@ -166,7 +166,7 @@ everything else. Status colours are functional only.
 
   Navy does **not** hand over to teal in dark mode. `brand` climbs to the pale
   end of its own ramp (`brand-300`) instead, because a product whose brand colour
-  swaps hue by theme has no answer to "which colour is Levvro".
+  swaps hue by theme has no answer to "which colour is Levrro".
 
 ### Secondary
 - **Teal** (`oklch(0.702 0.120 182)` / `#21b7a5`): the accent, and the terminus

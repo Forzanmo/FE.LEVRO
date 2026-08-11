@@ -14,8 +14,8 @@ import net from 'node:net'
  *
  * Resolution order:
  *   1. `--base` on the command line (explicit always wins)
- *   2. `LEVVRO_BASE_URL` in the environment (for CI)
- *   3. an already-running Levvro dev server on a common port (the local case)
+ *   2. `LEVRRO_BASE_URL` in the environment (for CI)
+ *   3. an already-running Levrro dev server on a common port (the local case)
  *   4. one this function starts and stops itself (the CI / cold case)
  */
 
@@ -64,7 +64,7 @@ async function probe(base) {
     // Confirm it is this app: another project on 3000 would otherwise be
     // measured and reported as a pass.
     const html = await res.text()
-    return html.includes('Levvro')
+    return html.includes('Levrro')
   } catch {
     return false
   } finally {
@@ -105,8 +105,8 @@ export async function resolveBase(explicitBase) {
 
   if (explicitBase) return { base: explicitBase, started: false, stop: noop }
 
-  if (process.env.LEVVRO_BASE_URL) {
-    return { base: process.env.LEVVRO_BASE_URL, started: false, stop: noop }
+  if (process.env.LEVRRO_BASE_URL) {
+    return { base: process.env.LEVRRO_BASE_URL, started: false, stop: noop }
   }
 
   for (const port of PROBE_PORTS) {

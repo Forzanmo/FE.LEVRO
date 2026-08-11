@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generatedAt": "2026-07-22T08:30:00Z",
-  "title": "Design System: Levvro",
+  "title": "Design System: Levrro",
   "extensions": {
     "colorMeta": {
       "teal-primary": {
@@ -117,7 +117,7 @@
   ],
   "narrative": {
     "northStar": "The Golden-Hour Mentor",
-    "overview": "Levvro should feel like sitting across from a sharp, warm mentor in a calm, well-lit room — one who tells an anxious job-seeker exactly where they stand and lights the path forward. Two colours do two jobs: deep peacock teal for calm competence and trust, and warm achievement gold for momentum and 'your moment'. The register is premium, calm, and confident — editorial craft over decoration, in the Linear/Notion lineage. Identity lives in colour, type, and motion, never in gimmicks. Every palette value passes a WCAG-AA contrast gate at build time.",
+    "overview": "Levrro should feel like sitting across from a sharp, warm mentor in a calm, well-lit room — one who tells an anxious job-seeker exactly where they stand and lights the path forward. Two colours do two jobs: deep peacock teal for calm competence and trust, and warm achievement gold for momentum and 'your moment'. The register is premium, calm, and confident — editorial craft over decoration, in the Linear/Notion lineage. Identity lives in colour, type, and motion, never in gimmicks. Every palette value passes a WCAG-AA contrast gate at build time.",
     "keyCharacteristics": [
       "Two-colour identity: teal (trust/competence) + gold (achievement/momentum).",
       "Dark = teal-ink near-black, not pure black; light = near-white with a teal whisper, never a warm cream.",

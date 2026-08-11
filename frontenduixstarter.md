@@ -1,7 +1,7 @@
-# Levvro2 Frontend UI/UX Starter Specification
+# Levrro2 Frontend UI/UX Starter Specification
 
 ## 1. Product Identity
-- **Product:** Levvro2
+- **Product:** Levrro2
 - **Category:** AI Career Intelligence Platform
 - **Vision:** Transform career uncertainty into a measurable roadmap toward getting hired.
 - **Mission:** Help juniors and career shifters become recruiter-ready through assessment, coaching, and AI-generated career assets.

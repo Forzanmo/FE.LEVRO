@@ -115,7 +115,7 @@ export function DocumentsView() {
         <EmptyState
           icon="resume"
           title="No documents yet"
-          description="Start an application, add the opportunity and your evidence, then Levvro will save the tailored CV and cover letter here."
+          description="Start an application, add the opportunity and your evidence, then Levrro will save the tailored CV and cover letter here."
           action={
             <Button asChild>
               <Link href={ROUTES.applications}>Start your first application</Link>

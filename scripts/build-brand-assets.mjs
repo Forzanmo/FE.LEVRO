@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Renders every raster form of the Levvro mark from one source: `app/icon.svg`.
+ * Renders every raster form of the Levrro mark from one source: `app/icon.svg`.
  *
  * Outputs:
  *   src/app/favicon.ico          16/32/48/256, PNG payloads in an ICO container

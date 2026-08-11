@@ -81,7 +81,7 @@ export function ResumeView() {
         <EmptyState
           icon="coach"
           title="Your CV gets written from your answers"
-          description="Take the short assessment first — Levvro drafts the CV from what you say, so you edit real sentences instead of staring at an empty page."
+          description="Take the short assessment first — Levrro drafts the CV from what you say, so you edit real sentences instead of staring at an empty page."
           action={
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Button asChild size="lg">

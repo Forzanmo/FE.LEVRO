@@ -48,7 +48,7 @@ export const signedOutSession: StoredSession = {
 function displayName(email: string, profile: ProfileResponse): string {
   const configured = profile.data.full_name
   if (typeof configured === 'string' && configured.trim()) return configured.trim()
-  return email.split('@')[0]?.replace(/[._-]+/g, ' ') || 'Levvro user'
+  return email.split('@')[0]?.replace(/[._-]+/g, ' ') || 'Levrro user'
 }
 
 function toSession(user: UserResponse, profile: ProfileResponse): StoredSession {

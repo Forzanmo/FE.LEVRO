@@ -102,7 +102,7 @@ export function ResetPasswordView({ token }: { token: string | null }) {
     <AuthCard>
       <div className="space-y-2 text-center">
         <Heading level={1} size="2xl">Choose a new password</Heading>
-        <Text tone="muted">Use at least 10 characters and keep it unique to Levvro.</Text>
+        <Text tone="muted">Use at least 10 characters and keep it unique to Levrro.</Text>
       </div>
       <form className="mt-6 space-y-4" onSubmit={submit}>
         <div className="space-y-2">

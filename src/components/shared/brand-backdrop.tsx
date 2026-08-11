@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
  *   2. one soft atmospheric pool per corner — navy pulling down from the top,
  *      teal answering from the bottom
  *   3. the chevron field: the mark's own hatch, the texture that makes this
- *      backdrop Levvro's rather than anyone's
+ *      backdrop Levrro's rather than anyone's
  *   4. motion — the field rises, slowly, on pointer-fine screens only
  *   5. page content
  *

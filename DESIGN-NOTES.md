@@ -4,7 +4,7 @@
 > carries the machine-readable token frontmatter + the six fixed sections). Same
 > system, prose form — read this for the "why", read `DESIGN.md` for tooling.
 
-Visual system for Levvro. The single source of truth in code is
+Visual system for Levrro. The single source of truth in code is
 `src/lib/design/tokens.ts`, projected to CSS/Tailwind by
 `scripts/build-tokens.mts`, which enforces a **WCAG-AA contrast gate at build
 time** — the palette is provably accessible in both themes or the build fails.
@@ -16,7 +16,7 @@ register). The identity is carried by **colour, type, and motion**, never by
 decorative gimmicks. Actively steering away from the "generic AI-SaaS" tell:
 
 - **No indigo/violet/fuchsia.** That purple gradient is the saturated AI default
-  and is banned here. Levvro's identity is teal + gold.
+  and is banned here. Levrro's identity is teal + gold.
 - Gradient is a brand asset for **solid surfaces** (a CTA band, the logo mark, a
   progress-ring stroke, the aurora backdrop), never a text fill.
 - No glassmorphism as a default surface; frosting is rare and purposeful.

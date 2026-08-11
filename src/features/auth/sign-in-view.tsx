@@ -185,7 +185,7 @@ export function SignInView({ initialMode = 'sign-in' }: { initialMode?: 'sign-in
               setError(null)
             }}
           >
-            {registering ? 'Already have an account? Sign in' : 'New to Levvro? Create account'}
+            {registering ? 'Already have an account? Sign in' : 'New to Levrro? Create account'}
           </Button>
         </form>
 
