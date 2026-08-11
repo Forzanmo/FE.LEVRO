@@ -68,7 +68,7 @@ export function Logo({
            * scarcity the palette depends on works better when the one place it
            * always shows is the brand's own name.
            */}
-          Levvr
+          Levrr
           <span className={onBrand ? 'text-brand-surface-accent' : 'text-achievement'}>o</span>
         </span>
       ) : null}
